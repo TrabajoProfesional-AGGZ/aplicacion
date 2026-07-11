@@ -1,9 +1,9 @@
-import PruebaPago from './pages/PruebaPago.jsx';
+import FlujoPagoCompleto from './pages/FlujoPagoCompleto.jsx';
 
 function App() {
   return (
     <div>
-      <PruebaPago />
+      <FlujoPagoCompleto />
     </div>
   );
 }

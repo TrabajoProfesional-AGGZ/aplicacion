@@ -20,18 +20,34 @@ export default function PruebaPago() {
 
   // 3. Esta función se ejecuta cuando el usuario le da al botón "Pagar"
   const onSubmit = async ({ selectedPaymentMethod, formData }) => {
-    // Acá es donde el Brick hace la magia de tokenizar la tarjeta de forma segura.
-    // El 'formData' ya viene con el token listo para que se lo mandes a tu backend.
     console.log("💳 Tipo de pago seleccionado:", selectedPaymentMethod);
-    console.log("📦 Datos para enviar a tu backend:", formData);
-    
-    // Simulamos una carga para que el botón muestre el spinner
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        alert("¡Token generado con éxito! Revisá la consola del navegador.");
-        resolve();
-      }, 2000);
-    });
+    console.log("Enviando token al backend para procesar cobro...");
+
+    try {
+      // Hacemos el POST a tu API de FastAPI/KrakenD
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/pagos/procesar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': `Bearer ${token}` <-- Si tu endpoint requiere login, va acá
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      // Evaluamos la respuesta de tu backend
+      if (response.ok && data.estado === 'approved') {
+        alert(`¡Pago exitoso! ID de operación: ${data.id_pago}`);
+        // TODO: Redirigir al usuario a una pantalla verde de "Éxito"
+      } else {
+        alert(`El pago no se pudo aprobar. Estado: ${data.estado || 'Error'}`);
+      }
+      
+    } catch (error) {
+      console.error("Error de conexión con el backend:", error);
+      alert("Hubo un problema al intentar contactar al servidor del club.");
+    }
   };
 
   const onError = async (error) => {
