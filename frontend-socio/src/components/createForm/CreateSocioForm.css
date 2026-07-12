@@ -1,0 +1,503 @@
+.csf-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  padding: var(--space-6) var(--space-4);
+}
+
+button.csf-overlay {
+  border: none;
+  cursor: default;
+  width: 100%;
+}
+
+.csf-wrapper {
+  width: 100%;
+  max-width: 520px;
+}
+
+.csf-outer-card {
+  background-color: #f0f0f0;
+  border-radius: var(--radius-xl);
+  padding: 28px 28px 24px;
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+/* Header */
+.csf-header {
+  margin-bottom: var(--space-6);
+}
+
+.csf-header h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+.csf-header p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* Step indicators */
+.csf-steps {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.csf-step-item {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.csf-step-item:last-child {
+  flex: none;
+}
+
+.csf-step-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.csf-step-bubble {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.csf-step-label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+.csf-step-label--active {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.csf-connector {
+  flex: 1;
+  height: 1px;
+  margin: 0 var(--space-2) 20px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background-color: var(--color-border);
+}
+
+.csf-connector-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-primary);
+}
+
+/* Progress bar */
+.csf-progress {
+  height: 4px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background-color: var(--color-border);
+  margin-bottom: 28px;
+}
+
+.csf-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-primary);
+}
+
+/* Card */
+.csf-card {
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  overflow: hidden;
+}
+
+/* Fields */
+.csf-fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.csf-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.csf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.csf-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.csf-input,
+.csf-select {
+  width: 100%;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  border: 2px solid transparent;
+  background-color: var(--color-bg);
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
+  box-sizing: border-box;
+}
+
+.csf-input:focus,
+.csf-select:focus {
+  background-color: var(--color-surface);
+  border-color: var(--color-border-strong);
+}
+
+.csf-input--error,
+.csf-select--error {
+  border-color: var(--color-danger);
+  background-color: var(--color-surface);
+}
+
+.csf-input::placeholder {
+  color: #c0c0c0;
+}
+
+.csf-select {
+  cursor: pointer;
+  appearance: none;
+}
+
+.csf-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-danger);
+  overflow: hidden;
+}
+
+.csf-hint {
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+/* Error global en el formulario */
+.csf-form-error {
+  background-color: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--color-danger);
+  text-align: center;
+}
+
+/* Navigation */
+.csf-nav {
+  display: flex;
+  margin-top: var(--space-8);
+  gap: var(--space-3);
+}
+
+.csf-nav--end {
+  justify-content: flex-end;
+}
+
+.csf-nav--between {
+  justify-content: space-between;
+}
+
+.csf-btn-back,
+.csf-btn-next,
+.csf-btn-submit,
+.csf-btn-danger {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.csf-btn-back {
+  border: 2px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.csf-btn-back:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+.csf-btn-next,
+.csf-btn-submit,
+.csf-btn-danger {
+  border: none;
+  color: var(--color-surface);
+  transition: background-color var(--transition-fast);
+}
+
+.csf-btn-submit:disabled,
+.csf-btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.csf-btn-next,
+.csf-btn-submit {
+  background-color: var(--color-text-primary);
+}
+
+.csf-btn-next:hover,
+.csf-btn-submit:hover:not(:disabled) {
+  background-color: var(--color-text-secondary);
+}
+
+.csf-btn-danger {
+  background-color: var(--color-danger);
+}
+
+.csf-btn-danger:hover:not(:disabled) {
+  background-color: var(--color-danger-hover);
+}
+
+/* Spinner */
+.csf-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-surface);
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Success */
+.csf-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-6);
+  text-align: center;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.csf-success-logo-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.csf-success-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.csf-success h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.csf-success p {
+  margin: var(--space-2) 0 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+/* Checkbox inline */
+.csf-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  transition: border-color var(--transition-normal), background-color var(--transition-normal);
+  user-select: none;
+}
+
+.csf-checkbox-label:hover {
+  background-color: #ebebeb;
+}
+
+.csf-checkbox-input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-text-primary);
+  flex-shrink: 0;
+}
+
+/* ── Búsqueda de socio por número ── */
+.csf-socio-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.csf-socio-input-row > :first-child {
+  flex: 1;
+}
+
+.csf-socio-nombre-inline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #0D6E0D;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.csf-socio-encontrado {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #0D6E0D;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.csf-socio-buscando {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+}
+
+.csf-socio-logo-spin {
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Agregar socio button (CreateReservaForm) ──────────────────── */
+.csf-btn-agregar-socio {
+  padding: var(--space-2) 14px;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast);
+}
+
+.csf-btn-agregar-socio:hover:not(:disabled) {
+  background-color: #333333;
+}
+
+.csf-btn-agregar-socio:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Lista de socios agregados (CreateReservaForm) ─────────────── */
+.csf-socios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: var(--space-2);
+}
+
+.csf-socio-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-bg);
+  border: 1px solid #d0d0d0;
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.csf-socio-chip-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin-left: var(--space-2);
+  transition: color var(--transition-fast);
+}
+
+.csf-socio-chip-remove:hover {
+  color: var(--color-danger);
+}
+
+/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
+@media (max-width: 480px) {
+  .csf-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .csf-outer-card {
+    padding: var(--space-4) var(--space-3) var(--space-3);
+  }
+
+  .csf-card {
+    padding: var(--space-5);
+  }
+
+  .csf-header h1 {
+    font-size: 22px;
+  }
+}
