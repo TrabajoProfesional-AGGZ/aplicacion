@@ -4,45 +4,44 @@ import { Menu, QrCode, CreditCard, Calendar, User } from 'lucide-react';
 import { LoginSocio } from './pages/LoginPage/LoginSocio';
 import { RegistroSocioForm } from './pages/Registropage/RegistroSocioForm';
 import './socio-theme.css';
+import { useAuth } from './context/AuthContext';
 
 export default function App() {
-  const [vistaActual, setVistaActual] = useState('login');
-  const [socioActivo, setSocioActivo] = useState(null);
+  const [mostrarRegistro, setMostrarRegistro] = useState(false);
 
-  const manejarLoginExitoso = (datosSocio) => {
-    setSocioActivo(datosSocio);
-    setVistaActual('dashboard');
-  };
+  const { socio, cargandoAuth, cerrarSesion } = useAuth();
 
-  const cerrarSesion = () => {
-    localStorage.removeItem('socioToken');
-    setSocioActivo(null);
-    setVistaActual('login');
-  };
-
-  if (vistaActual === 'login') return <LoginSocio irARegistro={() => setVistaActual('registro')} onLoginExitoso={manejarLoginExitoso} />;
-  
-  if (vistaActual === 'registro') return <RegistroSocioForm onSuccess={() => setVistaActual('login')} onCancel={() => setVistaActual('login')} />;
-
-  if (vistaActual === 'dashboard') {
+  if (cargandoAuth) {
     return (
-      <div>
-        <header className="topbar">
-          <button className="menu-btn">
-            <Menu size={24} color="#111827" />
-          </button>
-          <div className="user-info">
-            <span style={{ color: '#6b7280' }}>Socio {socioActivo?.nro_socio}</span>
-            <button onClick={cerrarSesion} className="btn-cerrar-sesion">Cerrar sesión</button>
-          </div>
-        </header>
+      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <p>Cargando tu carnet...</p>
+      </div>
+    );
+  }
 
-        {/* CONTENIDO DEL DASHBOARD */}
-        <main className="dashboard-layout">
-          <h1 className="dashboard-title">Panel principal</h1>
-          <p className="dashboard-subtitle">
-            Bienvenido, <b>{socioActivo?.nombre}</b>. Accedé rápidamente a las secciones del club.
-          </p>
+  if (!socio) {
+    if (mostrarRegistro) {
+      return <RegistroSocioForm onSuccess={() => setMostrarRegistro(false)} onCancel={() => setMostrarRegistro(false)} />;
+    }
+    return <LoginSocio irARegistro={() => setMostrarRegistro(true)} />;
+  }
+
+  return (
+    <div>
+      <header className="topbar">
+        <button className="menu-btn"><Menu size={24} color="#111827" /></button>
+        <div className="user-info">
+          {/* Ahora sacamos el nombre del contexto global! */}
+          <span style={{ color: '#6b7280' }}>Socio {socio.nro_socio}</span>
+          <button onClick={cerrarSesion} className="btn-cerrar-sesion">Cerrar sesión</button>
+        </div>
+      </header>
+
+      <main className="dashboard-layout">
+        <h1 className="dashboard-title">Panel principal</h1>
+        <p className="dashboard-subtitle">
+          Bienvenido, <b>{socio.nombre} {socio.apellido}</b>. Accedé rápidamente a las secciones del club.
+        </p>
 
           <div className="cards-grid">
             {/* TARJETA 1: CARNET / QR */}
@@ -76,7 +75,4 @@ export default function App() {
         </main>
       </div>
     );
-  }
-
-  return null;
 }

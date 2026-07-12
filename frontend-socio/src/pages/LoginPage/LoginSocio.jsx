@@ -33,7 +33,6 @@ export function LoginSocio({ irARegistro, onLoginExitoso }) {
 
   useEffect(() => {
     if (shouldReduceMotion) return;
-    // Inicia la animación de "Splash Screen" instantes después de cargar
     const timer = setTimeout(() => setAnimStarted(true), 400);
     return () => clearTimeout(timer);
   }, [shouldReduceMotion]);
@@ -44,23 +43,19 @@ export function LoginSocio({ irARegistro, onLoginExitoso }) {
     setError('');
 
     try {
-      let datosSocio = await login(email, password);
+      await login(email, password);
 
-      if (shouldReduceMotion) {
-         onLoginExitoso(datosSocio);
-      } else {
-         // Dispara la animación de salida del formulario
+      if (!shouldReduceMotion) {
          setExiting(true);
-         // Espera 800ms a que termine la animación para hacer el cambio de pantalla real
-         setTimeout(() => onLoginExitoso(datosSocio), 800);
       }
+
     } catch (err) {
       if (err.code === 'auth/invalid-credential') {
         setError('Email o contraseña incorrectos.');
       } else {
         setError(err.message || 'Ocurrió un error al iniciar sesión.');
       }
-      setCargando(false);
+      setCargando(false); // Solo cortamos la carga si hay error
     }
   };
 

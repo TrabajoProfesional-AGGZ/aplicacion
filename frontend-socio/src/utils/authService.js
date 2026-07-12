@@ -7,25 +7,9 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase';
 
-const API_BASE_URL = import.meta.env.VITE_APP_API_BASE_URL;
-
 export async function login(email, password) {
-  const { user } = await signInWithEmailAndPassword(auth, email, password);
-  const idToken = await user.getIdToken();
-  const response = await fetch(`${API_BASE_URL}/api/v1/socios/por-email/${email}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${idToken}`,
-    }
-  });
-
-  if (!response.ok) {
-    await signOut(auth);
-    throw new Error('unauthorized');
-  }
-
-  return response.json();
+  const userCredential = await signInWithEmailAndPassword(auth, email, password);
+  return userCredential;
 }
 
 export async function logout() {
