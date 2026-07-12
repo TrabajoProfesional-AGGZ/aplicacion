@@ -1,26 +1,17 @@
+// src/App.jsx
 import { useState } from 'react';
-import { LoginSocio } from './components/LoginSocio';
-import { RegistroSocioForm } from './components/RegistroSocioForm';
+import { Menu, QrCode, CreditCard, Calendar, User } from 'lucide-react';
+import { LoginSocio } from './pages/LoginPage/LoginSocio';
+import { RegistroSocioForm } from './pages/Registropage/RegistroSocioForm';
+import './socio-theme.css';
 
 export default function App() {
-  // Estados de navegación: 'login', 'registro', 'dashboard'
   const [vistaActual, setVistaActual] = useState('login');
-  
-  // Guardamos los datos del socio una vez que se loguea
   const [socioActivo, setSocioActivo] = useState(null);
-
-  // Efecto opcional: Si ya hay un token en localStorage, podríamos intentar 
-  // auto-loguearlo, pero por ahora lo dejamos simple.
 
   const manejarLoginExitoso = (datosSocio) => {
     setSocioActivo(datosSocio);
-    setVistaActual('dashboard'); // Cambiamos la vista a la app principal
-  };
-
-  const manejarRegistroExitoso = () => {
-    // Si se registró con éxito, lo mandamos al login para que entre (o lo logueamos directo)
-    alert("¡Registro exitoso! Por favor, iniciá sesión.");
-    setVistaActual('login');
+    setVistaActual('dashboard');
   };
 
   const cerrarSesion = () => {
@@ -29,49 +20,60 @@ export default function App() {
     setVistaActual('login');
   };
 
-  // ----------------------------------------------------
-  // RENDERIZADO CONDICIONAL DE PANTALLAS
-  // ----------------------------------------------------
-
-  if (vistaActual === 'login') {
-    return (
-      <LoginSocio 
-        irARegistro={() => setVistaActual('registro')} 
-        onLoginExitoso={manejarLoginExitoso} 
-      />
-    );
-  }
-
-  if (vistaActual === 'registro') {
-    return (
-      <div style={{ padding: '2rem' }}>
-        <RegistroSocioForm 
-          onSuccess={manejarRegistroExitoso}
-          onCancel={() => setVistaActual('login')} 
-        />
-      </div>
-    );
-  }
+  if (vistaActual === 'login') return <LoginSocio irARegistro={() => setVistaActual('registro')} onLoginExitoso={manejarLoginExitoso} />;
+  
+  if (vistaActual === 'registro') return <RegistroSocioForm onSuccess={() => setVistaActual('login')} onCancel={() => setVistaActual('login')} />;
 
   if (vistaActual === 'dashboard') {
     return (
       <div>
-        {/* Navbar de ejemplo */}
-        <nav style={{ padding: '1rem', backgroundColor: '#009ee3', color: 'white', display: 'flex', justifyContent: 'space-between' }}>
-          <h2 style={{ margin: 0 }}>SocioUnido</h2>
-          <div>
-            <span style={{ marginRight: '1rem' }}>Hola, {socioActivo?.nombre}</span>
-            <button onClick={cerrarSesion} style={{ padding: '0.5rem', cursor: 'pointer' }}>Salir</button>
+        <header className="topbar">
+          <button className="menu-btn">
+            <Menu size={24} color="#111827" />
+          </button>
+          <div className="user-info">
+            <span style={{ color: '#6b7280' }}>Socio {socioActivo?.nro_socio}</span>
+            <button onClick={cerrarSesion} className="btn-cerrar-sesion">Cerrar sesión</button>
           </div>
-        </nav>
+        </header>
 
-        {/* ACÁ VA TU APP REAL: El componente de pagos, el TOTP, etc. */}
-        <div style={{ padding: '2rem' }}>
-          <h3>Bienvenido a tu panel</h3>
-          <p>Tu estado actual: <strong>{socioActivo?.estado || 'Activo'}</strong></p>
-          
-          {/* <FlujoPagoCompleto /> */}
-        </div>
+        {/* CONTENIDO DEL DASHBOARD */}
+        <main className="dashboard-layout">
+          <h1 className="dashboard-title">Panel principal</h1>
+          <p className="dashboard-subtitle">
+            Bienvenido, <b>{socioActivo?.nombre}</b>. Accedé rápidamente a las secciones del club.
+          </p>
+
+          <div className="cards-grid">
+            {/* TARJETA 1: CARNET / QR */}
+            <div className="su-card" onClick={() => alert('Próximamente: Tu QR')}>
+              <div className="card-icon"><QrCode size={24} color="#111827" /></div>
+              <h3 className="card-title">Mi Carnet Digital</h3>
+              <p className="card-desc">Generá tu código QR de acceso a las instalaciones.</p>
+            </div>
+
+            {/* TARJETA 2: PAGOS */}
+            <div className="su-card" onClick={() => alert('Próximamente: Pagos')}>
+              <div className="card-icon"><CreditCard size={24} color="#111827" /></div>
+              <h3 className="card-title">Cuotas y Pagos</h3>
+              <p className="card-desc">Aboná tu cuota social o servicios adicionales.</p>
+            </div>
+
+            {/* TARJETA 3: RESERVAS */}
+            <div className="su-card" onClick={() => alert('Próximamente: Reservas')}>
+              <div className="card-icon"><Calendar size={24} color="#111827" /></div>
+              <h3 className="card-title">Reservas e Instalaciones</h3>
+              <p className="card-desc">Administrar reservas de espacios físicos.</p>
+            </div>
+
+            {/* TARJETA 4: PERFIL */}
+            <div className="su-card" onClick={() => alert('Próximamente: Perfil')}>
+              <div className="card-icon"><User size={24} color="#111827" /></div>
+              <h3 className="card-title">Mis Datos</h3>
+              <p className="card-desc">Consultar o modificar tu información personal.</p>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }

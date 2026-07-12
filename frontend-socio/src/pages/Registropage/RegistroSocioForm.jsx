@@ -2,14 +2,14 @@ import {
   User, Mail, Phone,
   Calendar, Lock, ShieldCheck, MapPin
 } from 'lucide-react';
-import { validarFechaNacimiento, getDocNumberRules } from '../utils/formValidators';
-import { Field, StyledInput, StyledSelect, FormStep, DocNumberField, EmailField } from './createForm/FormFields';
-import { MultiStepFormShell } from './createForm/MultiStepFormShell';
-import { useMultiStepForm } from '../hooks/useMultiStepForm';
+import { validarFechaNacimiento, getDocNumberRules } from '../../utils/formValidators';
+import { Field, StyledInput, StyledSelect, FormStep, DocNumberField, EmailField } from '../../components/createForm/FormFields';
+import { MultiStepFormShell } from '../../components/createForm/MultiStepFormShell';
+import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 import { useState } from 'react';
-import { fetchTo } from '../utils/utils';
+import { fetchTo } from '../../utils/utils';
 
-import { auth } from '../firebase';
+import { auth } from '../../firebase';
 import { createUserWithEmailAndPassword, getIdToken, deleteUser } from 'firebase/auth';
 
 const STEPS = [
