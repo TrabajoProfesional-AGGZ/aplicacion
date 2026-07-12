@@ -20,7 +20,7 @@ const formItemVariants = {
   exiting: { y: -20, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } },
 };
 
-export function LoginSocio({ irARegistro, onLoginExitoso }) {
+export function LoginSocio({ irARegistro }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
