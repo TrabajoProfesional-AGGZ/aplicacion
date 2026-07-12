@@ -1,122 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// src/App.jsx
+import { useState } from 'react';
+import { Menu, QrCode, CreditCard, Calendar, User } from 'lucide-react';
+import { LoginSocio } from './pages/LoginPage/LoginSocio';
+import { RegistroSocioForm } from './pages/Registropage/RegistroSocioForm';
+import './socio-theme.css';
+import { useAuth } from './context/AuthContext';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [mostrarRegistro, setMostrarRegistro] = useState(false);
+
+  const { socio, cargandoAuth, cerrarSesion } = useAuth();
+
+  if (cargandoAuth) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <p>Cargando tu carnet...</p>
+      </div>
+    );
+  }
+
+  if (!socio) {
+    if (mostrarRegistro) {
+      return <RegistroSocioForm onSuccess={() => setMostrarRegistro(false)} onCancel={() => setMostrarRegistro(false)} />;
+    }
+    return <LoginSocio irARegistro={() => setMostrarRegistro(true)} />;
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    <div>
+      <header className="topbar">
+        <button className="menu-btn"><Menu size={24} color="#111827" /></button>
+        <div className="user-info">
+          {/* Ahora sacamos el nombre del contexto global! */}
+          <span style={{ color: '#6b7280' }}>Socio {socio.nro_socio}</span>
+          <button onClick={cerrarSesion} className="btn-cerrar-sesion">Cerrar sesión</button>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      <main className="dashboard-layout">
+        <h1 className="dashboard-title">Panel principal</h1>
+        <p className="dashboard-subtitle">
+          Bienvenido, <b>{socio.nombre} {socio.apellido}</b>. Accedé rápidamente a las secciones del club.
+        </p>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <div className="cards-grid">
+            {/* TARJETA 1: CARNET / QR */}
+            <div className="su-card" onClick={() => alert('Próximamente: Tu QR')}>
+              <div className="card-icon"><QrCode size={24} color="#111827" /></div>
+              <h3 className="card-title">Mi Carnet Digital</h3>
+              <p className="card-desc">Generá tu código QR de acceso a las instalaciones.</p>
+            </div>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            {/* TARJETA 2: PAGOS */}
+            <div className="su-card" onClick={() => alert('Próximamente: Pagos')}>
+              <div className="card-icon"><CreditCard size={24} color="#111827" /></div>
+              <h3 className="card-title">Cuotas y Pagos</h3>
+              <p className="card-desc">Aboná tu cuota social o servicios adicionales.</p>
+            </div>
+
+            {/* TARJETA 3: RESERVAS */}
+            <div className="su-card" onClick={() => alert('Próximamente: Reservas')}>
+              <div className="card-icon"><Calendar size={24} color="#111827" /></div>
+              <h3 className="card-title">Reservas e Instalaciones</h3>
+              <p className="card-desc">Administrar reservas de espacios físicos.</p>
+            </div>
+
+            {/* TARJETA 4: PERFIL */}
+            <div className="su-card" onClick={() => alert('Próximamente: Perfil')}>
+              <div className="card-icon"><User size={24} color="#111827" /></div>
+              <h3 className="card-title">Mis Datos</h3>
+              <p className="card-desc">Consultar o modificar tu información personal.</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
 }
-
-export default App
