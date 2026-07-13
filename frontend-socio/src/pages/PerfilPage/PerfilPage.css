@@ -1,0 +1,249 @@
+.perfil-page-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.03), 0 6px 16px -12px rgba(17, 17, 17, 0.25);
+}
+
+.perfil-volver,
+.perfil-header-spacer {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.perfil-volver {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-primary);
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.perfil-volver:hover {
+  background-color: var(--color-bg-subtle);
+}
+
+.perfil-volver:active {
+  transform: scale(0.92);
+}
+
+.perfil-page-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.perfil-page {
+  padding: var(--space-6) var(--space-4) var(--space-8);
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ---- Card de perfil: propia (no reutiliza WelcomeCard, esa es solo del
+   inicio) pero con el mismo lenguaje visual de superficie clara + acento
+   negro institucional. Todos los datos del socio viven dentro de esta
+   tarjeta, no repartidos en secciones sueltas. ---- */
+.perfil-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.perfil-card-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4);
+}
+
+.perfil-avatar {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.perfil-card-top-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.perfil-card-nombre {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.perfil-card-estado {
+  align-self: flex-start;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-full);
+  padding: 0.3em 0.75em;
+  white-space: nowrap;
+}
+
+/* ---- Datos personales: misma lógica visual que quick-access-list, pero
+   de solo lectura (sin hover/cursor de acción), anidada dentro de la card. ---- */
+.perfil-datos-list {
+  border-top: 1px solid var(--color-border-light);
+}
+
+.perfil-dato-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.perfil-datos-list .perfil-dato-row:last-child {
+  border-bottom: none;
+}
+
+.perfil-dato-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+}
+
+.perfil-dato-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.perfil-dato-label {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.perfil-dato-valor {
+  font-size: 0.95rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Cambiar contraseña: acción secundaria normal, mismo tratamiento
+   sólido que el resto de los CTA principales de la app. ---- */
+.perfil-cambiar-button {
+  width: 100%;
+  background-color: var(--color-text-primary);
+  color: var(--color-on-accent);
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color var(--transition-normal);
+}
+
+.perfil-cambiar-button:hover {
+  background-color: var(--color-text-secondary);
+}
+
+.perfil-cambiar-button:active {
+  transform: scale(0.99);
+}
+
+/* ---- Password toggle dentro del modal de cambiar contraseña, mismo patrón
+   que .login-password-wrapper/.login-toggle-password (socio-theme.css) pero
+   sobre el input csf-* del modal. ---- */
+.perfil-password-wrapper {
+  position: relative;
+}
+
+.perfil-password-wrapper .csf-input {
+  padding-right: 44px;
+}
+
+.perfil-toggle-password {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ---- Cerrar sesión: acción destructiva, tono rojo pero sin gritar
+   (borde + texto, no relleno sólido). ---- */
+.perfil-cerrar-sesion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  color: var(--color-danger);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
+}
+
+.perfil-cerrar-sesion:hover {
+  background-color: var(--status-error-surface-bg);
+  border-color: var(--status-danger-border);
+}
+
+.perfil-cerrar-sesion:active {
+  transform: scale(0.99);
+}
