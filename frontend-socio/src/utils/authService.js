@@ -4,12 +4,17 @@ import {
   reauthenticateWithCredential,
   updatePassword,
   EmailAuthProvider,
+  sendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth } from '../firebase';
 
 export async function login(email, password) {
   const userCredential = await signInWithEmailAndPassword(auth, email, password);
   return userCredential;
+}
+
+export async function resetPassword(email) {
+  await sendPasswordResetEmail(auth, email);
 }
 
 export async function logout() {

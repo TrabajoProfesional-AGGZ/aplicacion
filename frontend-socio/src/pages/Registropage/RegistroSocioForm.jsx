@@ -6,7 +6,7 @@ import { validarFechaNacimiento, getDocNumberRules } from '../../utils/formValid
 import { Field, StyledInput, StyledSelect, FormStep, DocNumberField, EmailField } from '../../components/createForm/FormFields';
 import { MultiStepFormShell } from '../../components/createForm/MultiStepFormShell';
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { fetchTo } from '../../utils/utils';
 import { validarSocio, reclamarCuentaSocio } from '../../services/sociosService';
 
@@ -36,6 +36,20 @@ const {
   } = useMultiStepForm(stepFields);
 
   const [validandoPaso, setValidandoPaso] = useState(false);
+  const montadoRef = useRef(true);
+
+  // Sin este flag, un unmount antes de los 1800ms (navegación desde el padre,
+  // o simplemente el próximo test montando otra instancia) termina llamando a
+  // un `onSuccess` de un componente ya desmontado.
+  useEffect(() => {
+    return () => {
+      montadoRef.current = false;
+    };
+  }, []);
+
+  const notificarExito = () => {
+    if (montadoRef.current) onSuccess();
+  };
 
   const manejarSiguiente = async () => {
     setFormError('');
@@ -102,7 +116,7 @@ const {
 
       localStorage.setItem('socioToken', tokenJWT);
       setSubmitted(true);
-      setTimeout(() => onSuccess(), 1800);
+      setTimeout(notificarExito, 1800);
 
     } catch (err) {
       if (usuarioCreado) {
@@ -129,6 +143,14 @@ const {
 
   const nroDocumentoRegister = register('nroDocumento', getDocNumberRules());
 
+  // react-hook-form invoca a `onSubmit` recién cuando el usuario manda el
+  // formulario (nunca durante este render) — el ref que toca (`montadoRef`,
+  // vía `notificarExito`) siempre se lee/escribe en un handler o efecto. La
+  // regla `react-hooks/refs` no puede verificar eso y marca cualquier ref
+  // alcanzable desde el argumento de `handleSubmit()` como si se leyera acá.
+  // eslint-disable-next-line react-hooks/refs
+  const enviarFormulario = handleSubmit(onSubmit);
+
   return (
     <MultiStepFormShell
       steps={STEPS}
@@ -145,7 +167,7 @@ const {
       goBack={goBack}
       goNext={manejarSiguiente}
       direction={direction}
-      onFormSubmit={handleSubmit(onSubmit)}
+      onFormSubmit={enviarFormulario}
     >
         {/* PASO 1: VALIDACIÓN DE IDENTIDAD */}
         {step === 1 && (

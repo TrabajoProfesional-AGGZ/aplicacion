@@ -36,7 +36,12 @@ body {
 }
 
 .login-band-logo {
-  width: 500px;
+  /* Fijo en 500px desbordaba la banda en pantallas de celular (min-height
+     140px), recortando el logo por el overflow:hidden del contenedor y
+     dejando la animación de entrada casi invisible. Escala con el viewport
+     en vez de un ancho fijo, con un piso legible y el mismo techo original. */
+  width: clamp(160px, 60vw, 500px);
+  max-width: 100%;
 }
 
 .login-form-wrapper {
@@ -63,6 +68,44 @@ body {
   font-size: 0.85rem;
   margin: 0 0 var(--space-6) 0;
   text-align: center;
+}
+
+.login-password-wrapper {
+  position: relative;
+}
+
+.login-password-wrapper .su-input {
+  padding-right: 44px;
+}
+
+.login-toggle-password {
+  position: absolute;
+  right: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.login-forgot-wrapper {
+  text-align: right;
+  margin-top: calc(-1 * var(--space-4));
+  margin-bottom: var(--space-6);
+}
+
+.login-forgot-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0;
 }
 
 .login-submit-btn {
@@ -208,6 +251,10 @@ body {
 }
 
 .su-card {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  color: inherit;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
