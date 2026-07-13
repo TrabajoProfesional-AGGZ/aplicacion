@@ -4,7 +4,7 @@ import { Menu, QrCode, CreditCard, Calendar, User } from 'lucide-react';
 import { LoginSocio } from './pages/LoginPage/LoginSocio';
 import { RegistroSocioForm } from './pages/Registropage/RegistroSocioForm';
 import './socio-theme.css';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './hooks/useAuth';
 
 const SECCIONES_PROXIMAMENTE = [
   { id: 'qr', icon: QrCode, titulo: 'Mi Carnet Digital', desc: 'Generá tu código QR de acceso a las instalaciones.' },
