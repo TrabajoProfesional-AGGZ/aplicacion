@@ -44,7 +44,10 @@ async function fillStep3() {
 
 async function fillStep4() {
   await userEvent.type(screen.getByPlaceholderText('maria@ejemplo.com'), 'juan@club.com');
-  await userEvent.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'clave123');
+  await userEvent.type(
+    screen.getByPlaceholderText('Mínimo 10 caracteres, con mayúscula, minúscula y número'),
+    'Clave12345',
+  );
 }
 
 // Los campos del paso siguiente no montan de forma síncrona: FormStep ahora
@@ -147,7 +150,7 @@ describe('RegistroSocioForm', () => {
     userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
 
     await waitFor(() => expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
-      expect.anything(), 'juan@club.com', 'clave123'
+      expect.anything(), 'juan@club.com', 'Clave12345'
     ));
     await waitFor(() => expect(fetchTo).toHaveBeenCalledWith(
       '/api/v1/socios/por-dni/12345678', 'PATCH', expect.objectContaining({ nombre: 'Juan', apellido: 'Lopez' })
@@ -194,5 +197,15 @@ describe('RegistroSocioForm', () => {
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await userEvent.click(screen.getByRole('button', { name: /cancelar/i }));
     expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  test('muestra el error de contraseña débil al salir del campo, sin esperar al submit', async () => {
+    render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
+    await navigateToStep4();
+    const passwordInput = screen.getByPlaceholderText('Mínimo 10 caracteres, con mayúscula, minúscula y número');
+    await userEvent.type(passwordInput, 'clave123456');
+    fireEvent.blur(passwordInput);
+    expect(await screen.findByText('Debe incluir al menos una mayúscula')).toBeInTheDocument();
+    expect(createUserWithEmailAndPassword).not.toHaveBeenCalled();
   });
 });

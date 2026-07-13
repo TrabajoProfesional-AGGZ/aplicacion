@@ -1,0 +1,68 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-4);
+  background-color: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 0 rgba(17, 17, 17, 0.03), 0 6px 16px -12px rgba(17, 17, 17, 0.25);
+}
+
+.app-header-logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 80px;
+  width: auto;
+}
+
+.app-header-perfil {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.app-header-perfil:hover {
+  background-color: var(--color-bg-subtle);
+}
+
+.app-header-perfil:active {
+  transform: scale(0.92);
+}
+
+.app-header-bell {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.app-header-bell:hover {
+  background-color: var(--color-bg-subtle);
+}
+
+.app-header-bell:active {
+  transform: scale(0.92);
+}
+
+@media (max-width: 480px) {
+  .app-header-logo {
+    height: 22px;
+  }
+}

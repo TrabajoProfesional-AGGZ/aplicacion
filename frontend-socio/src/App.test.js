@@ -30,6 +30,10 @@ jest.mock('./pages/Registropage/RegistroSocioForm', () => ({
   ),
 }));
 
+jest.mock('./pages/HomePage/HomePage', () => ({
+  HomePage: () => <p>home-mock</p>,
+}));
+
 describe('App', () => {
   beforeEach(() => {
     mockAuthState = { socio: null, cargandoAuth: false, cerrarSesion: jest.fn() };
@@ -51,10 +55,10 @@ describe('App', () => {
     mockAuthState = { ...mockAuthState, socio: { nro_socio: '1000', nombre: 'Ana', apellido: 'Pérez' } };
     render(<App />);
     expect(screen.getByText('login-mock')).toBeInTheDocument();
-    expect(screen.queryByText('Panel principal')).not.toBeInTheDocument();
+    expect(screen.queryByText('home-mock')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText('simular ingreso completo'));
-    expect(screen.getByText('Panel principal')).toBeInTheDocument();
+    expect(screen.getByText('home-mock')).toBeInTheDocument();
   });
 
   test('un registro exitoso lleva directo al dashboard, sin pasar por LoginSocio', () => {
@@ -64,7 +68,7 @@ describe('App', () => {
     expect(screen.getByText('registro-mock')).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('simular registro exitoso'));
-    expect(screen.getByText('Panel principal')).toBeInTheDocument();
+    expect(screen.getByText('home-mock')).toBeInTheDocument();
     expect(screen.queryByText('login-mock')).not.toBeInTheDocument();
   });
 });

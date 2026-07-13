@@ -1,0 +1,143 @@
+.quick-access {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ---- Acceso destacado (primera fila, jerarquía visual propia) ---- */
+.qa-featured {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-normal), transform var(--transition-fast), border-color var(--transition-normal);
+}
+
+.qa-featured:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-medium);
+}
+
+.qa-featured:active {
+  transform: scale(0.99);
+}
+
+.qa-featured-icon {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+}
+
+.qa-featured-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.qa-featured-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.qa-featured-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+/* ---- Resto de accesos: lista agrupada, no cajas repetidas ---- */
+.quick-access-list {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.qa-row {
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-border-light);
+  padding: var(--space-4) var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.quick-access-list .qa-row:last-child {
+  border-bottom: none;
+}
+
+.qa-row:hover {
+  background-color: var(--color-row-hover);
+}
+
+.qa-row:active {
+  background-color: var(--color-bg-subtle);
+}
+
+.qa-row-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+}
+
+.qa-row-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.qa-row-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.qa-row-desc {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qa-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 640px) {
+  .qa-featured {
+    padding: var(--space-6);
+  }
+}
