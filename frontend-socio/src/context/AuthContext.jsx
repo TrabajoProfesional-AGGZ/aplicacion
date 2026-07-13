@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { auth } from '../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
@@ -35,24 +35,28 @@ export function AuthProvider({ children }) {
           setAuthError('No pudimos cargar tu perfil de socio. Probá de nuevo en unos segundos.');
         }
       } else {
-        // Si no hay usuario en Firebase, limpiamos todo
         localStorage.removeItem('socioToken');
         setSocio(null);
         setAuthError(null);
       }
-      setCargandoAuth(false); // Terminamos de cargar
+      setCargandoAuth(false); 
     });
 
-    return () => unsubscribe(); // Limpieza del observador
+    return () => unsubscribe(); 
   }, []);
 
-  const cerrarSesion = async () => {
+  const cerrarSesion = useCallback(async () => {
     await signOut(auth);
     setSocio(null);
-  };
+  }, []);
+
+  const value = useMemo(
+    () => ({ socio, setSocio, cargandoAuth, authError, cerrarSesion }),
+    [socio, cargandoAuth, authError, cerrarSesion]
+  );
 
   return (
-    <AuthContext.Provider value={{ socio, setSocio, cargandoAuth, authError, cerrarSesion }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

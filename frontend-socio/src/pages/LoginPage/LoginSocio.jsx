@@ -1,22 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
-import { login } from '../../utils/authService'; // Asegurate de que esta ruta sea correcta
+import { login } from '../../utils/authService';
 import { useAuth } from '../../hooks/useAuth';
 import { MAX_LEN, validarCredencialSegura } from '../../utils/formValidators';
 import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import logoSocioAlt from '../../assets/logo_socio_login.png';
 import '../../socio-theme.css';
 
-// 1. Orquestador de animaciones del contenedor
 const formContainerVariants = {
   hidden: {},
-  // "staggerChildren" hace que los elementos aparezcan uno tras otro (efecto cascada)
   visible: { transition: { staggerChildren: 0.1, delayChildren: 0.8 } },
   exiting: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
 };
 
-// 2. Animación individual de cada elemento (slogan, inputs, botón)
 const formItemVariants = {
   hidden: { y: 30, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
@@ -31,16 +28,12 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
 
-  // Estados para controlar el flujo visual
   const [animStarted, setAnimStarted] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const ingresoCompletoLlamado = useRef(false);
 
   const { socio, authError, cerrarSesion } = useAuth();
 
-  // Dispara la coreografía de salida (banda cubriendo la pantalla + fade
-  // negro→gris→blanco); en reduced motion no hay banda que animar, así que
-  // avisamos a App.jsx de inmediato en el efecto de abajo.
   const exiting = Boolean(socio) && !shouldReduceMotion;
 
   useEffect(() => {
@@ -49,8 +42,6 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
     return () => clearTimeout(timer);
   }, [shouldReduceMotion]);
 
-  // Con reduced motion no hay animación de banda cuyo onAnimationComplete avise
-  // que terminamos: avisamos apenas sabemos que el login fue exitoso.
   useEffect(() => {
     if (socio && shouldReduceMotion && !ingresoCompletoLlamado.current) {
       ingresoCompletoLlamado.current = true;
@@ -58,9 +49,6 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
     }
   }, [socio, shouldReduceMotion, onIngresoCompleto]);
 
-  // Si Firebase aceptó las credenciales pero no se pudo cargar el perfil, dejamos el
-  // formulario visible y usable en vez de trabado invisible, y cerramos la sesión a medias
-  // para que un reintento arranque de cero.
   useEffect(() => {
     if (authError && cargando) {
       cerrarSesion().finally(() => {
@@ -70,9 +58,6 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
     }
   }, [authError, cargando, cerrarSesion]);
 
-  // La banda animada (no reduced-motion) llama a esto cuando termina de crecer
-  // y fundir el color; solo nos interesa si fue la animación de "éxito", no la
-  // de entrada (que reusa el mismo elemento con otro target).
   const manejarBandaCompleta = () => {
     if (exiting && !ingresoCompletoLlamado.current) {
       ingresoCompletoLlamado.current = true;
@@ -112,20 +97,32 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
       } else {
         setError(err.message || 'Ocurrió un error al iniciar sesión.');
       }
-      setCargando(false); // Solo cortamos la carga si hay error
+      setCargando(false);
     }
   };
+
+  let exitAnimation;
+  if (shouldReduceMotion) {
+    exitAnimation = { opacity: 0 };
+  } else if (exiting) {
+    exitAnimation = { opacity: 1 };
+  } else {
+    exitAnimation = { x: '-40%', opacity: 0, filter: 'blur(10px)' };
+  }
+
+  let formAnimateState;
+  if (exiting) {
+    formAnimateState = 'exiting';
+  } else if (animStarted || shouldReduceMotion) {
+    formAnimateState = 'visible';
+  } else {
+    formAnimateState = 'hidden';
+  }
 
   return (
     <motion.div
       className="login-container"
-      exit={
-        shouldReduceMotion
-          ? { opacity: 0 }
-          : exiting
-            ? { opacity: 1 } // la banda ya cubrió la pantalla; no volvemos a animar la salida
-            : { x: '-40%', opacity: 0, filter: 'blur(10px)' }
-      }
+      exit={exitAnimation}
       transition={{ duration: 0.45, ease: 'easeIn' }}
     >
       {!shouldReduceMotion && (
@@ -161,7 +158,7 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
       <motion.div
         variants={formContainerVariants}
         initial="hidden"
-        animate={exiting ? 'exiting' : (animStarted || shouldReduceMotion ? 'visible' : 'hidden')}
+        animate={formAnimateState}
         className="login-form-wrapper"
       >
         <motion.h2 variants={formItemVariants} className="login-slogan">

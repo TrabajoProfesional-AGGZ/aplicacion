@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Menu, QrCode, CreditCard, Calendar, User } from 'lucide-react';
 import { LoginSocio } from './pages/LoginPage/LoginSocio';
@@ -23,6 +23,17 @@ export default function App() {
   const [vista, setVista] = useState('auth');
 
   const { socio, cargandoAuth, cerrarSesion } = useAuth();
+
+  // Mismo patrón que ModalOverlay.jsx: un <div> sin tabIndex nunca recibe foco,
+  // así que Escape se escucha a nivel document en vez de con un onKeyDown en el overlay.
+  useEffect(() => {
+    if (!proximamente) return undefined;
+    const manejarTecla = (e) => {
+      if (e.key === 'Escape') setProximamente(null);
+    };
+    document.addEventListener('keydown', manejarTecla);
+    return () => document.removeEventListener('keydown', manejarTecla);
+  }, [proximamente]);
 
   // Derivado (no estado propio): si `socio` se vuelve falsy (ej. logout) esto
   // vuelve a `false` solo, sin necesitar un efecto que llame a setState.
@@ -74,17 +85,17 @@ export default function App() {
 
         <div className="cards-grid">
           {SECCIONES_PROXIMAMENTE.map(({ id, icon: Icon, titulo, desc }) => (
-            <div key={id} className="su-card" onClick={() => setProximamente(titulo)}>
+            <button key={id} type="button" className="su-card" onClick={() => setProximamente(titulo)}>
               <div className="card-icon"><Icon size={24} color="#111111" /></div>
               <h3 className="card-title">{titulo}</h3>
               <p className="card-desc">{desc}</p>
-            </div>
+            </button>
           ))}
         </div>
 
         {proximamente && (
-          <div className="proximamente-overlay" onClick={() => setProximamente(null)}>
-            <div className="proximamente-card" onClick={(e) => e.stopPropagation()}>
+          <div className="proximamente-overlay" role="presentation" onClick={() => setProximamente(null)}>
+            <div className="proximamente-card" role="presentation" onClick={(e) => e.stopPropagation()}>
               <p className="proximamente-titulo">{proximamente}</p>
               <p className="proximamente-texto">Próximamente...</p>
               <button className="proximamente-cerrar" onClick={() => setProximamente(null)}>Cerrar</button>

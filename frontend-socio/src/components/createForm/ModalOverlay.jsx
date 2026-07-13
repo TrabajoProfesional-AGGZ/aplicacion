@@ -23,7 +23,7 @@ export function ModalOverlay({ onClose, wrapperClass, children }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className={`csf-wrapper${wrapperClass ? ` ${wrapperClass}` : ''}`}>
+      <div className={['csf-wrapper', wrapperClass].filter(Boolean).join(' ')}>
         {children}
       </div>
     </div>

@@ -66,7 +66,7 @@ export const EmailField = ({ register, errors, required, placeholder = 'maria@ej
     <StyledInput
       {...register('email', {
         required: required ? 'Requerido' : false,
-        pattern: { value: /^\S+@\S+$/i, message: 'Formato de email inválido' }
+        pattern: { value: /^[^\s@]+@[^\s@]+$/i, message: 'Formato de email inválido' }
       })}
       type="email"
       placeholder={placeholder}
