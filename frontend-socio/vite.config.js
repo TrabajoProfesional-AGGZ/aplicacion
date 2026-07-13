@@ -3,11 +3,15 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  server: {
+    port: 5137,
+    strictPort: true,
+  },
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate', 
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'], 
+      registerType: 'autoUpdate',
+      includeAssets: ['pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
         name: 'SocioUnido Club',
         short_name: 'SocioUnido',

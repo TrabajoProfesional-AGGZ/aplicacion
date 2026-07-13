@@ -1,72 +1,203 @@
 // src/components/createForm/MultiStepFormShell.jsx
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import logoVerde from '../../assets/logo-verde.png';
+import { ModalOverlay } from './ModalOverlay';
+
+// framer-motion interpola colores en JS, no puede resolver var(--token) en
+// tiempo de animación — por eso están duplicados acá. Deben mantenerse en
+// sync con --color-text-primary/--color-border/--color-surface/
+// --color-text-secondary/--status-success-border (tokens.css). Sin dark mode
+// en esta app (a diferencia de WebApp), no hace falta un objeto {light, dark}.
+const STEP_COLORS = {
+  bubbleActive: '#111111',
+  bubbleIdle: '#e8e8e8',
+  onBubble: '#ffffff',
+  idleIcon: '#4a4a4a',
+  success: '#0D6E0D',
+};
 
 export function MultiStepFormShell({
   steps, step, submitted, isSubmitting, title,
   successTitle, successMessage, submitLabel, submitLoadingLabel,
-  onCancel, goBack, goNext, onFormSubmit, children
+  onCancel, goBack, goNext, direction, onFormSubmit, children
 }) {
-  
-  // Si el formulario ya se envió con éxito, mostramos la pantalla verde
-  if (submitted) {
-    return (
-      <div style={{ textAlign: 'center', padding: '3rem', maxWidth: '500px', margin: '2rem auto', border: '1px solid #ddd', borderRadius: '12px' }}>
-        <h2 style={{ color: '#4caf50', fontSize: '2rem', marginBottom: '1rem' }}>✅ {successTitle}</h2>
-        <p style={{ color: '#666' }}>{successMessage}</p>
-      </div>
-    );
-  }
-
-  const isLastStep = step === steps.length;
+  const progress = (step / steps.length) * 100;
 
   return (
-    <div style={{ maxWidth: '500px', margin: '2rem auto', padding: '2rem', border: '1px solid #ddd', borderRadius: '12px', backgroundColor: 'white' }}>
-      <h2 style={{ textAlign: 'center', color: '#009ee3', marginBottom: '0.5rem' }}>{title}</h2>
-      
-      {/* Indicador de progreso de Pasos */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '2rem', fontSize: '0.9rem', color: '#888', fontWeight: 'bold' }}>
-        Paso {step} de {steps.length}: <span style={{ color: '#333' }}>{steps[step - 1]?.label}</span>
-      </div>
+    <ModalOverlay onClose={onCancel}>
+      <AnimatePresence mode="wait">
+        {submitted ? (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ type: 'spring', stiffness: 180 }}
+            className="csf-outer-card csf-success"
+          >
+            <motion.div
+              className="csf-success-logo-circle"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 220, delay: 0.1 }}
+            >
+              <img src={logoVerde} alt="SocioUnido" className="csf-success-logo" />
+            </motion.div>
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 260, delay: 0.4 }}
+            >
+              <CheckCircle2 size={48} color={STEP_COLORS.success} strokeWidth={1.5} />
+            </motion.div>
+            <div>
+              <h2>{successTitle}</h2>
+              <p>{successMessage}</p>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="csf-outer-card"
+          >
+            <div className="csf-header">
+              <h1>{title}</h1>
+              <p>Paso {step} de {steps.length} — {steps[step - 1]?.label}</p>
+            </div>
 
-      <form onSubmit={onFormSubmit}>
-        
-        {/* Acá se inyectan los <FormStep> desde RegistroSocioForm */}
-        {children}
+            <div className="csf-steps">
+              {steps.map((s, i) => {
+                const done = step > s.id;
+                const active = step === s.id;
+                const Icon = s.icon;
+                return (
+                  <div key={s.id} className="csf-step-item">
+                    <div className="csf-step-meta">
+                      <motion.div
+                        className="csf-step-bubble"
+                        animate={{ background: done || active ? STEP_COLORS.bubbleActive : STEP_COLORS.bubbleIdle }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <AnimatePresence mode="wait">
+                          {done ? (
+                            <motion.span
+                              key="check"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: 'spring', stiffness: 300 }}
+                            >
+                              <CheckCircle2 size={16} color={STEP_COLORS.onBubble} strokeWidth={2.5} />
+                            </motion.span>
+                          ) : (
+                            <motion.span key="icon" initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
+                              <Icon size={16} color={active ? STEP_COLORS.onBubble : STEP_COLORS.idleIcon} strokeWidth={2} />
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                      <span className={`csf-step-label${active ? ' csf-step-label--active' : ''}`}>
+                        {s.label}
+                      </span>
+                    </div>
+                    {i < steps.length - 1 && (
+                      <div className="csf-connector">
+                        <motion.div
+                          className="csf-connector-fill"
+                          animate={{ width: step > s.id ? '100%' : '0%' }}
+                          transition={{ duration: 0.4, ease: 'easeInOut' }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
 
-        {/* Botonera de Navegación */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
-          {step > 1 ? (
-            <button type="button" onClick={goBack} style={estilos.botonSecundario}>
-              ← Atrás
-            </button>
-          ) : (
-            <button type="button" onClick={onCancel} style={estilos.botonCancelar}>
-              Cancelar
-            </button>
-          )}
+            <div className="csf-progress">
+              <motion.div
+                className="csf-progress-fill"
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.4, ease: 'easeInOut' }}
+              />
+            </div>
 
-          {!isLastStep ? (
-            <button type="button" onClick={goNext} style={estilos.botonPrimario}>
-              Siguiente →
-            </button>
-          ) : (
-            <button type="submit" disabled={isSubmitting} style={estilos.botonPrimario}>
-              {isSubmitting ? submitLoadingLabel : submitLabel}
-            </button>
-          )}
-        </div>
-      </form>
-    </div>
+            <div className="csf-card">
+              <form onSubmit={onFormSubmit} onKeyDown={(e) => { if (e.key === 'Enter' && step < steps.length) e.preventDefault(); }}>
+                {direction !== undefined ? (
+                  <AnimatePresence mode="wait" custom={direction}>
+                    {children}
+                  </AnimatePresence>
+                ) : children}
+
+                <div className={`csf-nav ${step > 1 ? 'csf-nav--between' : 'csf-nav--end'}`}>
+                  {step > 1 ? (
+                    <motion.button
+                      type="button"
+                      onClick={goBack}
+                      whileHover={{ scale: 1.015 }}
+                      whileTap={{ scale: 0.985 }}
+                      className="csf-btn-back"
+                    >
+                      <ChevronLeft size={17} />
+                      Atrás
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      type="button"
+                      onClick={onCancel}
+                      whileHover={{ scale: 1.015 }}
+                      whileTap={{ scale: 0.985 }}
+                      className="csf-btn-back"
+                    >
+                      Cancelar
+                    </motion.button>
+                  )}
+
+                  {step < steps.length ? (
+                    <motion.button
+                      type="button"
+                      onClick={goNext}
+                      whileHover={{ scale: 1.015 }}
+                      whileTap={{ scale: 0.985 }}
+                      className="csf-btn-next"
+                    >
+                      Siguiente
+                      <ChevronRight size={17} />
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      type="submit"
+                      disabled={isSubmitting}
+                      whileHover={{ scale: 1.015 }}
+                      whileTap={{ scale: 0.985 }}
+                      className="csf-btn-submit"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <motion.span
+                            className="csf-spinner"
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
+                          />
+                          {submitLoadingLabel}
+                        </>
+                      ) : (
+                        <>
+                          {submitLabel}
+                          <CheckCircle2 size={17} />
+                        </>
+                      )}
+                    </motion.button>
+                  )}
+                </div>
+              </form>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </ModalOverlay>
   );
 }
-
-const estilos = {
-  botonPrimario: { 
-    padding: '0.8rem 1.5rem', backgroundColor: '#009ee3', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' 
-  },
-  botonSecundario: { 
-    padding: '0.8rem 1.5rem', backgroundColor: '#f0f0f0', color: '#333', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' 
-  },
-  botonCancelar: { 
-    padding: '0.8rem 1.5rem', backgroundColor: 'transparent', color: '#ff4d4f', border: '1px solid #ff4d4f', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' 
-  }
-};

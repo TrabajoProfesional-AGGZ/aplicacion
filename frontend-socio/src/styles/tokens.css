@@ -1,0 +1,82 @@
+/* Breakpoints de referencia (no usables dentro de @media — las custom
+   properties de CSS no funcionan en condiciones de media query, así que
+   quedan documentadas acá y se repiten como literales en cada archivo):
+   768px = tablet
+   480px = celular angosto
+   Mismos breakpoints que WebApp/src/styles/tokens.css, para mantener
+   consistencia visual entre ambas apps. */
+:root {
+  color-scheme: light;
+
+  /* Colors */
+  --color-text-primary: #111111;
+  --color-text-secondary: #4a4a4a;
+  --color-bg: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-border: #e8e8e8;
+  --color-border-medium: #d0d0d0;
+  --color-border-strong: #111111;
+  --color-border-light: #efefef;
+  --color-danger: #c0392b;
+  --color-danger-hover: #96281b;
+  --color-row-hover: #f8f8f8;
+  --color-bg-subtle: #f0f0f0;
+  --color-overlay: rgba(0, 0, 0, 0.4);
+
+  /* Texto fijo sobre botones de color sólido (ej. danger) */
+  --color-on-accent: #ffffff;
+
+  /* Status colors (bg/border pairs) */
+  --status-success-bg: #a7daa7;
+  --status-success-border: #0d6e0d;
+  --status-danger-bg: #f4bebe;
+  --status-danger-border: #a01414;
+  --status-warning-bg: #f5e9b2;
+  --status-warning-border: #9a6200;
+  --status-suspended-bg: #ffbd98;
+  --status-suspended-border: #f14701;
+  --status-error-surface-bg: #fdecea;
+  --status-error-surface-border: #f5c6cb;
+
+  /* Variante suave para banners de éxito */
+  --surface-success-bg: #f0faf5;
+  --surface-success-border: #b7dfc8;
+
+  /* Spacing (base-8) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
+
+  /* Z-index scale */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* Typography */
+  --font-sans: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-numeric: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}

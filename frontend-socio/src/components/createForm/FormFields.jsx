@@ -1,64 +1,76 @@
 // src/components/createForm/FormFields.jsx
 import React from 'react';
+import { motion } from 'framer-motion';
+import { AlertCircle } from 'lucide-react';
+
+const slideVariants = {
+  enter: (dir) => ({ x: dir > 0 ? 52 : -52, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir) => ({ x: dir > 0 ? -52 : 52, opacity: 0 }),
+};
 
 export const StyledInput = React.forwardRef(({ error, ...props }, ref) => (
-  <input 
-    ref={ref} 
-    {...props} 
-    style={{ 
-      width: '100%', padding: '0.8rem', marginTop: '0.3rem', boxSizing: 'border-box',
-      border: error ? '1px solid #ff4d4f' : '1px solid #ccc', borderRadius: '6px' 
-    }} 
+  <input
+    ref={ref}
+    {...props}
+    className={`csf-input${error ? ' csf-input--error' : ''}`}
   />
 ));
 
 export const StyledSelect = React.forwardRef(({ error, children, ...props }, ref) => (
-  <select 
-    ref={ref} 
-    {...props} 
-    style={{ 
-      width: '100%', padding: '0.8rem', marginTop: '0.3rem', boxSizing: 'border-box',
-      border: error ? '1px solid #ff4d4f' : '1px solid #ccc', borderRadius: '6px',
-      backgroundColor: 'white'
-    }}
+  <select
+    ref={ref}
+    {...props}
+    className={`csf-select${error ? ' csf-select--error' : ''}`}
   >
     {children}
   </select>
 ));
 
 export const Field = ({ label, icon: Icon, error, children }) => (
-  <div style={{ marginBottom: '1rem', width: '100%' }}>
-    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem', color: '#555', fontWeight: '500' }}>
-      {Icon && <Icon size={16} color="#009ee3" />} {label}
+  <div className="csf-field">
+    <label className="csf-label">
+      {Icon && <Icon size={16} color="#4A4A4A" />} {label}
     </label>
     {children}
-    {error && <span style={{ color: '#ff4d4f', fontSize: '0.8rem', display: 'block', marginTop: '0.2rem' }}>{error}</span>}
+    {error && (
+      <span className="csf-error">
+        <AlertCircle size={14} /> {error}
+      </span>
+    )}
   </div>
 );
 
-export const FormStep = ({ children }) => (
-  // Acá podrías agregar clases CSS para animar la transición si quisieras
-  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+export const FormStep = ({ direction, children }) => (
+  <motion.div
+    custom={direction}
+    variants={slideVariants}
+    initial="enter"
+    animate="center"
+    exit="exit"
+    transition={{ duration: 0.26, ease: 'easeInOut' }}
+    className="csf-fields"
+  >
     {children}
-  </div>
+  </motion.div>
 );
 
-export const DocNumberField = ({ docNumberRegister, errors, fieldKey = 'nroDocumento' }) => (
+export const DocNumberField = ({ docNumberRegister, errors, fieldKey = 'nroDocumento', placeholder = 'Ej. 12345678' }) => (
   <Field label="Número de Documento" error={errors[fieldKey]?.message}>
-    <StyledInput {...docNumberRegister} placeholder="Sin puntos ni espacios" error={!!errors[fieldKey]} />
+    <StyledInput {...docNumberRegister} placeholder={placeholder} error={!!errors[fieldKey]} />
   </Field>
 );
 
-export const EmailField = ({ register, errors, required }) => (
+export const EmailField = ({ register, errors, required, placeholder = 'maria@ejemplo.com' }) => (
   <Field label="Email" error={errors.email?.message}>
-    <StyledInput 
-      {...register('email', { 
+    <StyledInput
+      {...register('email', {
         required: required ? 'Requerido' : false,
         pattern: { value: /^\S+@\S+$/i, message: 'Formato de email inválido' }
-      })} 
-      type="email" 
-      placeholder="tu@email.com" 
-      error={!!errors.email} 
+      })}
+      type="email"
+      placeholder={placeholder}
+      error={!!errors.email}
     />
   </Field>
 );

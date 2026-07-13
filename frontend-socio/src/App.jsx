@@ -1,15 +1,32 @@
 // src/App.jsx
 import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Menu, QrCode, CreditCard, Calendar, User } from 'lucide-react';
 import { LoginSocio } from './pages/LoginPage/LoginSocio';
 import { RegistroSocioForm } from './pages/Registropage/RegistroSocioForm';
 import './socio-theme.css';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from './hooks/useAuth';
+
+const SECCIONES_PROXIMAMENTE = [
+  { id: 'qr', icon: QrCode, titulo: 'Mi Carnet Digital', desc: 'Generá tu código QR de acceso a las instalaciones.' },
+  { id: 'pagos', icon: CreditCard, titulo: 'Cuotas y Pagos', desc: 'Aboná tu cuota social o servicios adicionales.' },
+  { id: 'reservas', icon: Calendar, titulo: 'Reservas e Instalaciones', desc: 'Administrar reservas de espacios físicos.' },
+  { id: 'perfil', icon: User, titulo: 'Mis Datos', desc: 'Consultar o modificar tu información personal.' },
+];
 
 export default function App() {
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
+  const [proximamente, setProximamente] = useState(null);
+  // Gatea cuándo se muestra el dashboard: no basta con que `socio` sea verdadero,
+  // hay que esperar a que LoginSocio termine su coreografía de salida (banda
+  // cubriendo la pantalla + fade a blanco) para no cortarla a mitad de camino.
+  const [vista, setVista] = useState('auth');
 
   const { socio, cargandoAuth, cerrarSesion } = useAuth();
+
+  // Derivado (no estado propio): si `socio` se vuelve falsy (ej. logout) esto
+  // vuelve a `false` solo, sin necesitar un efecto que llame a setState.
+  const mostrarDashboard = vista === 'app' && Boolean(socio);
 
   if (cargandoAuth) {
     return (
@@ -19,20 +36,32 @@ export default function App() {
     );
   }
 
-  if (!socio) {
-    if (mostrarRegistro) {
-      return <RegistroSocioForm onSuccess={() => setMostrarRegistro(false)} onCancel={() => setMostrarRegistro(false)} />;
-    }
-    return <LoginSocio irARegistro={() => setMostrarRegistro(true)} />;
+  if (!mostrarDashboard) {
+    return (
+      <AnimatePresence mode="wait">
+        {mostrarRegistro ? (
+          <RegistroSocioForm
+            key="registro"
+            onSuccess={() => { setMostrarRegistro(false); setVista('app'); }}
+            onCancel={() => setMostrarRegistro(false)}
+          />
+        ) : (
+          <LoginSocio
+            key="login"
+            irARegistro={() => setMostrarRegistro(true)}
+            onIngresoCompleto={() => setVista('app')}
+          />
+        )}
+      </AnimatePresence>
+    );
   }
 
   return (
     <div>
       <header className="topbar">
-        <button className="menu-btn"><Menu size={24} color="#111827" /></button>
+        <button className="menu-btn"><Menu size={24} color="#111111" /></button>
         <div className="user-info">
-          {/* Ahora sacamos el nombre del contexto global! */}
-          <span style={{ color: '#6b7280' }}>Socio {socio.nro_socio}</span>
+          <span style={{ color: '#4A4A4A' }}>Socio {socio.nro_socio}</span>
           <button onClick={cerrarSesion} className="btn-cerrar-sesion">Cerrar sesión</button>
         </div>
       </header>
@@ -43,36 +72,26 @@ export default function App() {
           Bienvenido, <b>{socio.nombre} {socio.apellido}</b>. Accedé rápidamente a las secciones del club.
         </p>
 
-          <div className="cards-grid">
-            {/* TARJETA 1: CARNET / QR */}
-            <div className="su-card" onClick={() => alert('Próximamente: Tu QR')}>
-              <div className="card-icon"><QrCode size={24} color="#111827" /></div>
-              <h3 className="card-title">Mi Carnet Digital</h3>
-              <p className="card-desc">Generá tu código QR de acceso a las instalaciones.</p>
+        <div className="cards-grid">
+          {SECCIONES_PROXIMAMENTE.map(({ id, icon: Icon, titulo, desc }) => (
+            <div key={id} className="su-card" onClick={() => setProximamente(titulo)}>
+              <div className="card-icon"><Icon size={24} color="#111111" /></div>
+              <h3 className="card-title">{titulo}</h3>
+              <p className="card-desc">{desc}</p>
             </div>
+          ))}
+        </div>
 
-            {/* TARJETA 2: PAGOS */}
-            <div className="su-card" onClick={() => alert('Próximamente: Pagos')}>
-              <div className="card-icon"><CreditCard size={24} color="#111827" /></div>
-              <h3 className="card-title">Cuotas y Pagos</h3>
-              <p className="card-desc">Aboná tu cuota social o servicios adicionales.</p>
-            </div>
-
-            {/* TARJETA 3: RESERVAS */}
-            <div className="su-card" onClick={() => alert('Próximamente: Reservas')}>
-              <div className="card-icon"><Calendar size={24} color="#111827" /></div>
-              <h3 className="card-title">Reservas e Instalaciones</h3>
-              <p className="card-desc">Administrar reservas de espacios físicos.</p>
-            </div>
-
-            {/* TARJETA 4: PERFIL */}
-            <div className="su-card" onClick={() => alert('Próximamente: Perfil')}>
-              <div className="card-icon"><User size={24} color="#111827" /></div>
-              <h3 className="card-title">Mis Datos</h3>
-              <p className="card-desc">Consultar o modificar tu información personal.</p>
+        {proximamente && (
+          <div className="proximamente-overlay" onClick={() => setProximamente(null)}>
+            <div className="proximamente-card" onClick={(e) => e.stopPropagation()}>
+              <p className="proximamente-titulo">{proximamente}</p>
+              <p className="proximamente-texto">Próximamente...</p>
+              <button className="proximamente-cerrar" onClick={() => setProximamente(null)}>Cerrar</button>
             </div>
           </div>
-        </main>
-      </div>
-    );
+        )}
+      </main>
+    </div>
+  );
 }
