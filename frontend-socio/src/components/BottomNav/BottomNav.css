@@ -1,0 +1,88 @@
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-sticky);
+  height: var(--bottom-nav-height);
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex;
+  overflow: visible;
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -6px 16px -12px rgba(17, 17, 17, 0.25);
+}
+
+.bottom-nav-item {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1);
+  color: var(--color-text-secondary);
+  font-family: inherit;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+}
+
+.bottom-nav-item span {
+  font-size: 15px;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.bottom-nav-item:hover {
+  color: var(--color-text-primary);
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.94);
+}
+
+.bottom-nav-item--active {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+/* "Mi Carnet" es la función real de esta app (token TOTP offline en portería,
+   ver README): se eleva como acción principal en vez de mezclarse con el
+   resto de íconos idénticos del nav. */
+.bottom-nav-item--carnet {
+  color: var(--color-text-secondary);
+}
+
+.bottom-nav-item--carnet span:last-child {
+  margin-top: 2px;
+}
+
+.bottom-nav-carnet-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  margin-top: -22px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  box-shadow: 0 8px 16px -6px rgba(17, 17, 17, 0.45), 0 0 0 4px var(--color-surface);
+  transition: transform var(--transition-fast), box-shadow var(--transition-normal);
+}
+
+.bottom-nav-item--carnet:hover .bottom-nav-carnet-icon {
+  box-shadow: 0 10px 20px -6px rgba(17, 17, 17, 0.5), 0 0 0 4px var(--color-surface);
+}
+
+.bottom-nav-item--carnet:active .bottom-nav-carnet-icon {
+  transform: scale(0.92);
+}
+
+@media (max-width: 480px) {
+  .bottom-nav-item span {
+    font-size: 9px;
+  }
+}
