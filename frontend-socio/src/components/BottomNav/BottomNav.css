@@ -48,9 +48,6 @@
   font-weight: 600;
 }
 
-/* "Mi Carnet" es la función real de esta app (token TOTP offline en portería,
-   ver README): se eleva como acción principal en vez de mezclarse con el
-   resto de íconos idénticos del nav. */
 .bottom-nav-item--carnet {
   color: var(--color-text-secondary);
 }

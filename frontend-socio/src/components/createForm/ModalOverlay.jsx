@@ -3,10 +3,6 @@ import PropTypes from 'prop-types';
 import './ModalOverlay.css';
 
 export function ModalOverlay({ onClose, wrapperClass, children }) {
-  // Un <div> sin tabIndex nunca es el elemento con foco, así que un onKeyDown
-  // en él jamás recibe una tecla Escape real del usuario (el evento nace en
-  // el elemento enfocado, no acá). Por eso Escape se escucha a nivel document,
-  // con cleanup al desmontar para no acumular listeners entre modales.
   useEffect(() => {
     const manejarTecla = (e) => {
       if (e.key === 'Escape') onClose();

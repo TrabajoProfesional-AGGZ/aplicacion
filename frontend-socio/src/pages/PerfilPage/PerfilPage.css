@@ -56,10 +56,6 @@
   gap: var(--space-6);
 }
 
-/* ---- Card de perfil: propia (no reutiliza WelcomeCard, esa es solo del
-   inicio) pero con el mismo lenguaje visual de superficie clara + acento
-   negro institucional. Todos los datos del socio viven dentro de esta
-   tarjeta, no repartidos en secciones sueltas. ---- */
 .perfil-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -121,8 +117,6 @@
   white-space: nowrap;
 }
 
-/* ---- Datos personales: misma lógica visual que quick-access-list, pero
-   de solo lectura (sin hover/cursor de acción), anidada dentro de la card. ---- */
 .perfil-datos-list {
   border-top: 1px solid var(--color-border-light);
 }
@@ -170,8 +164,6 @@
   white-space: nowrap;
 }
 
-/* ---- Cambiar contraseña: acción secundaria normal, mismo tratamiento
-   sólido que el resto de los CTA principales de la app. ---- */
 .perfil-cambiar-button {
   width: 100%;
   background-color: var(--color-text-primary);
@@ -194,9 +186,6 @@
   transform: scale(0.99);
 }
 
-/* ---- Password toggle dentro del modal de cambiar contraseña, mismo patrón
-   que .login-password-wrapper/.login-toggle-password (socio-theme.css) pero
-   sobre el input csf-* del modal. ---- */
 .perfil-password-wrapper {
   position: relative;
 }
@@ -219,8 +208,6 @@
   align-items: center;
 }
 
-/* ---- Cerrar sesión: acción destructiva, tono rojo pero sin gritar
-   (borde + texto, no relleno sólido). ---- */
 .perfil-cerrar-sesion {
   width: 100%;
   display: flex;

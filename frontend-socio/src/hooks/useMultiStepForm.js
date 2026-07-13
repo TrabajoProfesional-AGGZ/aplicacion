@@ -9,15 +9,13 @@ export function useMultiStepForm(stepFields) {
   const [formError, setFormError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Inicializamos react-hook-form
+
   const { register, handleSubmit, getValues, trigger, formState: { errors } } = useForm({
     mode: 'onTouched'
   });
 
-  // Avanzar de paso con validación previa
   const goNext = async () => {
     const fieldsToValidate = stepFields[step];
-    // Dispara la validación solo para los campos del paso actual
     const isStepValid = await trigger(fieldsToValidate);
     
     if (isStepValid) {

@@ -14,9 +14,6 @@ export function RecuperarContraseniaModal({ onClose }) {
     e.preventDefault();
     setError('');
 
-    // El "required"/type="email" del input ya bloquea el submit si está vacío
-    // o mal formado (misma convención que LoginSocio); acá solo cubrimos lo que
-    // la validación nativa no chequea (longitud, caracteres de control).
     const emailLimpio = email.trim();
     const errorEmail = validarCredencialSegura(emailLimpio, MAX_LEN.EMAIL);
     if (errorEmail) {
@@ -28,8 +25,7 @@ export function RecuperarContraseniaModal({ onClose }) {
     try {
       await resetPassword(emailLimpio);
     } catch {
-      // No distinguimos el error acá: mostrar "no existe esa cuenta" permitiría
-      // a un atacante enumerar emails registrados probando este formulario.
+
     } finally {
       setEnviando(false);
       setEnviado(true);

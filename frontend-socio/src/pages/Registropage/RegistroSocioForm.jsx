@@ -38,9 +38,6 @@ const {
   const [validandoPaso, setValidandoPaso] = useState(false);
   const montadoRef = useRef(true);
 
-  // Sin este flag, un unmount antes de los 1800ms (navegación desde el padre,
-  // o simplemente el próximo test montando otra instancia) termina llamando a
-  // un `onSuccess` de un componente ya desmontado.
   useEffect(() => {
     return () => {
       montadoRef.current = false;
@@ -143,12 +140,6 @@ const {
 
   const nroDocumentoRegister = register('nroDocumento', getDocNumberRules());
 
-  // react-hook-form invoca a `onSubmit` recién cuando el usuario manda el
-  // formulario (nunca durante este render) — el ref que toca (`montadoRef`,
-  // vía `notificarExito`) siempre se lee/escribe en un handler o efecto. La
-  // regla `react-hooks/refs` no puede verificar eso y marca cualquier ref
-  // alcanzable desde el argumento de `handleSubmit()` como si se leyera acá.
-  // eslint-disable-next-line react-hooks/refs
   const enviarFormulario = handleSubmit(onSubmit);
 
   return (

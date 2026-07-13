@@ -19,9 +19,6 @@ function iniciales(nombre, apellido) {
   return `${nombre?.[0] ?? ''}${apellido?.[0] ?? ''}`.toUpperCase();
 }
 
-// Igual que WebApp's PerfilPage.PasswordInput: input controlado + botón de
-// mostrar/ocultar, pero con las clases csf-*/perfil-* de este repo en vez de
-// estilos inline.
 function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, error }) {
   const [mostrar, setMostrar] = useState(false);
   return (
@@ -49,19 +46,11 @@ function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, er
   );
 }
 
-// Análogo a WebApp's CambiarContrasenaModal: mismo formulario de 3 campos
-// (actual / nueva / confirmar) y misma validación de fortaleza
-// (getPasswordRules / validarFortalezaPassword). A diferencia de WebApp,
-// `useCambiarContrasenia` cierra la sesión en vez de navegar — ver el hook.
 function CambiarContraseniaModal({ cerrarSesion, onClose }) {
   const {
     actual, setActual, nueva, setNueva, confirmar, setConfirmar, error, loading, handleSubmit,
   } = useCambiarContrasenia(cerrarSesion);
 
-  // Feedback de fortaleza en el campo "nueva contraseña" apenas se sale de él,
-  // sin esperar al submit (mismo criterio que RegistroSocioForm, que ya lo
-  // hace gratis vía mode: 'onTouched' de react-hook-form — acá el form es
-  // manual, así que se replica a mano).
   const [nuevaTocada, setNuevaTocada] = useState(false);
   const nuevaError = nuevaTocada ? validarFortalezaPassword(nueva) : undefined;
 

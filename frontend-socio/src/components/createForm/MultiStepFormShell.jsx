@@ -4,11 +4,6 @@ import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import logoVerde from '../../assets/logo-verde.png';
 import { ModalOverlay } from './ModalOverlay';
 
-// framer-motion interpola colores en JS, no puede resolver var(--token) en
-// tiempo de animación — por eso están duplicados acá. Deben mantenerse en
-// sync con --color-text-primary/--color-border/--color-surface/
-// --color-text-secondary/--status-success-border (tokens.css). Sin dark mode
-// en esta app (a diferencia de WebApp), no hace falta un objeto {light, dark}.
 const STEP_COLORS = {
   bubbleActive: '#111111',
   bubbleIdle: '#e8e8e8',

@@ -18,10 +18,6 @@ body {
   background-color: var(--color-surface);
 }
 
-/* Banda de intro: cubre toda la pantalla al montar, se "acopla" arriba con el
-   logo, y vuelve a cubrir todo (con fade negro→gris→blanco) al loguearse con
-   éxito. El color base lo pone esta clase; el color animado de la salida
-   exitosa lo pisa framer-motion vía estilo inline (animate.backgroundColor). */
 .login-band {
   position: absolute;
   top: 0;
@@ -37,10 +33,6 @@ body {
 }
 
 .login-band-logo {
-  /* Fijo en 500px desbordaba la banda en pantallas de celular (min-height
-     140px), recortando el logo por el overflow:hidden del contenedor y
-     dejando la animación de entrada casi invisible. Escala con el viewport
-     en vez de un ancho fijo, con un piso legible y el mismo techo original. */
   width: clamp(160px, 60vw, 500px);
   max-width: 100%;
 }

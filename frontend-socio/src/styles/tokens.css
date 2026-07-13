@@ -1,10 +1,4 @@
-/* Breakpoints de referencia (no usables dentro de @media — las custom
-   properties de CSS no funcionan en condiciones de media query, así que
-   quedan documentadas acá y se repiten como literales en cada archivo):
-   768px = tablet
-   480px = celular angosto
-   Mismos breakpoints que WebApp/src/styles/tokens.css, para mantener
-   consistencia visual entre ambas apps. */
+
 :root {
   color-scheme: light;
 
