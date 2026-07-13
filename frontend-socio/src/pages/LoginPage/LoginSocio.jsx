@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { login } from '../../utils/authService'; // Asegurate de que esta ruta sea correcta
-import logoSocioAlt from '../../assets/logo_socio_alt.png';
-import logoConTexto from '../../assets/logo_con_texto.png';
+import { useAuth } from '../../hooks/useAuth';
+import { MAX_LEN, validarCredencialSegura } from '../../utils/formValidators';
+import logoSocioAlt from '../../assets/logo_socio_login.png';
 import '../../socio-theme.css';
 
 // 1. Orquestador de animaciones del contenedor
@@ -13,14 +14,14 @@ const formContainerVariants = {
   exiting: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
 };
 
-// 2. Animación individual de cada elemento (Logo, inputs, botón)
+// 2. Animación individual de cada elemento (slogan, inputs, botón)
 const formItemVariants = {
   hidden: { y: 30, opacity: 0 },
   visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
   exiting: { y: -20, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } },
 };
 
-export function LoginSocio({ irARegistro }) {
+export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -28,8 +29,15 @@ export function LoginSocio({ irARegistro }) {
 
   // Estados para controlar el flujo visual
   const [animStarted, setAnimStarted] = useState(false);
-  const [exiting, setExiting] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const ingresoCompletoLlamado = useRef(false);
+
+  const { socio, authError, cerrarSesion } = useAuth();
+
+  // Dispara la coreografía de salida (banda cubriendo la pantalla + fade
+  // negro→gris→blanco); en reduced motion no hay banda que animar, así que
+  // avisamos a App.jsx de inmediato en el efecto de abajo.
+  const exiting = Boolean(socio) && !shouldReduceMotion;
 
   useEffect(() => {
     if (shouldReduceMotion) return;
@@ -37,18 +45,58 @@ export function LoginSocio({ irARegistro }) {
     return () => clearTimeout(timer);
   }, [shouldReduceMotion]);
 
+  // Con reduced motion no hay animación de banda cuyo onAnimationComplete avise
+  // que terminamos: avisamos apenas sabemos que el login fue exitoso.
+  useEffect(() => {
+    if (socio && shouldReduceMotion && !ingresoCompletoLlamado.current) {
+      ingresoCompletoLlamado.current = true;
+      onIngresoCompleto();
+    }
+  }, [socio, shouldReduceMotion, onIngresoCompleto]);
+
+  // Si Firebase aceptó las credenciales pero no se pudo cargar el perfil, dejamos el
+  // formulario visible y usable en vez de trabado invisible, y cerramos la sesión a medias
+  // para que un reintento arranque de cero.
+  useEffect(() => {
+    if (authError && cargando) {
+      cerrarSesion().finally(() => {
+        setError(authError);
+        setCargando(false);
+      });
+    }
+  }, [authError, cargando, cerrarSesion]);
+
+  // La banda animada (no reduced-motion) llama a esto cuando termina de crecer
+  // y fundir el color; solo nos interesa si fue la animación de "éxito", no la
+  // de entrada (que reusa el mismo elemento con otro target).
+  const manejarBandaCompleta = () => {
+    if (exiting && !ingresoCompletoLlamado.current) {
+      ingresoCompletoLlamado.current = true;
+      onIngresoCompleto();
+    }
+  };
+
   const manejarLogin = async (e) => {
     e.preventDefault();
-    setCargando(true);
     setError('');
 
+    const emailLimpio = email.trim();
+    const passwordLimpia = password.trim();
+
+    const errorEmail = validarCredencialSegura(emailLimpio, MAX_LEN.EMAIL);
+    if (errorEmail) {
+      setError(errorEmail);
+      return;
+    }
+    const errorPassword = validarCredencialSegura(passwordLimpia, MAX_LEN.PASSWORD);
+    if (errorPassword) {
+      setError(errorPassword);
+      return;
+    }
+
+    setCargando(true);
     try {
-      await login(email, password);
-
-      if (!shouldReduceMotion) {
-         setExiting(true);
-      }
-
+      await login(emailLimpio, passwordLimpia);
     } catch (err) {
       const codigosCredencialesInvalidas = [
         'auth/invalid-credential',
@@ -65,50 +113,53 @@ export function LoginSocio({ irARegistro }) {
   };
 
   return (
-    <div className="login-container" style={{ position: 'relative', overflow: 'hidden' }}>
-
-      {/* =========================================
-          CAPA 1: SPLASH SCREEN MÓVIL
-          ========================================= */}
+    <motion.div
+      className="login-container"
+      exit={
+        shouldReduceMotion
+          ? { opacity: 0 }
+          : exiting
+            ? { opacity: 1 } // la banda ya cubrió la pantalla; no volvemos a animar la salida
+            : { x: '-40%', opacity: 0, filter: 'blur(10px)' }
+      }
+      transition={{ duration: 0.45, ease: 'easeIn' }}
+    >
       {!shouldReduceMotion && (
         <motion.div
-          initial={{ y: '0%' }}
-          animate={{ y: animStarted ? '-100%' : '0%' }} // Se desliza hacia arriba
-          transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.4 }}
-          style={{
-            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: '#111111',
-            display: 'flex', justifyContent: 'center', alignItems: 'center',
-            zIndex: 50
-          }}
-          aria-hidden="true"
+          className="login-band"
+          initial={{ height: '100%' }}
+          animate={
+            exiting
+              ? { height: '100%', backgroundColor: ['#111111', '#4A4A4A', '#F5F5F5'] }
+              : { height: animStarted ? '30%' : '100%' }
+          }
+          transition={
+            exiting
+              ? {
+                  height: { duration: 0.5, ease: [0.76, 0, 0.24, 1] },
+                  backgroundColor: { duration: 1, delay: 0.4, times: [0, 0.5, 1] },
+                }
+              : { duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.4 }
+          }
+          onAnimationComplete={manejarBandaCompleta}
         >
-          {/* Logo invertido latiendo levemente al entrar */}
           <motion.img
             src={logoSocioAlt}
-            alt="Logo"
+            alt="SocioUnido"
+            className="login-band-logo"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            style={{ width: '120px' }}
           />
         </motion.div>
       )}
 
-      {/* =========================================
-          CAPA 2: FORMULARIO MINIMALISTA
-          ========================================= */}
       <motion.div
         variants={formContainerVariants}
         initial="hidden"
         animate={exiting ? 'exiting' : (animStarted || shouldReduceMotion ? 'visible' : 'hidden')}
-        style={{ width: '100%', maxWidth: '400px', margin: '0 auto', display: 'flex', flexDirection: 'column', zIndex: 10 }}
+        className="login-form-wrapper"
       >
-        {/* Logo superior */}
-        <motion.div variants={formItemVariants} style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          <img src={logoConTexto} alt="SocioUnido" style={{ height: '50px', objectFit: 'contain' }} />
-        </motion.div>
-
         <motion.h2 variants={formItemVariants} className="login-slogan">
           Porque el club es de los socios, y la gestión es de <b>SocioUnido</b>
         </motion.h2>
@@ -118,7 +169,11 @@ export function LoginSocio({ irARegistro }) {
             <label className="input-label" htmlFor="email">Email</label>
             <input
               id="email"
-              type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              required
+              maxLength={MAX_LEN.EMAIL}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="su-input"
             />
           </div>
@@ -127,25 +182,29 @@ export function LoginSocio({ irARegistro }) {
             <label className="input-label" htmlFor="password">Contraseña</label>
             <input
               id="password"
-              type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              required
+              maxLength={MAX_LEN.PASSWORD}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="su-input"
             />
           </div>
 
-          {error && <p style={{ color: '#C0392B', fontSize: '0.85rem', margin: '0 0 1rem 0', textAlign: 'center' }}>{error}</p>}
+          {error && <p className="login-error">{error}</p>}
 
-          <button type="submit" disabled={cargando} className="su-button" style={{ marginTop: '0.5rem' }}>
+          <button type="submit" disabled={cargando} className="su-button login-submit-btn">
             {cargando ? 'Ingresando...' : 'Ingresar'}
           </button>
         </motion.form>
 
-        <motion.div variants={formItemVariants} style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.9rem' }}>
-          <button type="button" onClick={irARegistro} style={{ background: 'none', border: 'none', color: '#4A4A4A', textDecoration: 'underline', cursor: 'pointer' }}>
+        <motion.div variants={formItemVariants} className="login-registro-link">
+          <button type="button" onClick={irARegistro} className="login-link-btn">
             ¿Es tu primera vez? Configurar mi cuenta
           </button>
         </motion.div>
 
       </motion.div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,5 +1,6 @@
 // src/App.jsx
 import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Menu, QrCode, CreditCard, Calendar, User } from 'lucide-react';
 import { LoginSocio } from './pages/LoginPage/LoginSocio';
 import { RegistroSocioForm } from './pages/Registropage/RegistroSocioForm';
@@ -16,8 +17,16 @@ const SECCIONES_PROXIMAMENTE = [
 export default function App() {
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
   const [proximamente, setProximamente] = useState(null);
+  // Gatea cuándo se muestra el dashboard: no basta con que `socio` sea verdadero,
+  // hay que esperar a que LoginSocio termine su coreografía de salida (banda
+  // cubriendo la pantalla + fade a blanco) para no cortarla a mitad de camino.
+  const [vista, setVista] = useState('auth');
 
   const { socio, cargandoAuth, cerrarSesion } = useAuth();
+
+  // Derivado (no estado propio): si `socio` se vuelve falsy (ej. logout) esto
+  // vuelve a `false` solo, sin necesitar un efecto que llame a setState.
+  const mostrarDashboard = vista === 'app' && Boolean(socio);
 
   if (cargandoAuth) {
     return (
@@ -27,11 +36,24 @@ export default function App() {
     );
   }
 
-  if (!socio) {
-    if (mostrarRegistro) {
-      return <RegistroSocioForm onSuccess={() => setMostrarRegistro(false)} onCancel={() => setMostrarRegistro(false)} />;
-    }
-    return <LoginSocio irARegistro={() => setMostrarRegistro(true)} />;
+  if (!mostrarDashboard) {
+    return (
+      <AnimatePresence mode="wait">
+        {mostrarRegistro ? (
+          <RegistroSocioForm
+            key="registro"
+            onSuccess={() => { setMostrarRegistro(false); setVista('app'); }}
+            onCancel={() => setMostrarRegistro(false)}
+          />
+        ) : (
+          <LoginSocio
+            key="login"
+            irARegistro={() => setMostrarRegistro(true)}
+            onIngresoCompleto={() => setVista('app')}
+          />
+        )}
+      </AnimatePresence>
+    );
   }
 
   return (

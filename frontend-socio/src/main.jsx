@@ -5,6 +5,7 @@ import '@fontsource-variable/archivo'
 import './index.css'
 import { registerSW } from 'virtual:pwa-register'
 import { AuthProvider } from './context/AuthContext.jsx'
+import { ErrorBoundary } from './components/ErrorBoundary.jsx'
 
 registerSW({
   onNeedRefresh() {
@@ -17,8 +18,10 @@ registerSW({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 <React.StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 )

@@ -1,6 +1,13 @@
 // src/components/createForm/FormFields.jsx
 import React from 'react';
+import { motion } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
+
+const slideVariants = {
+  enter: (dir) => ({ x: dir > 0 ? 52 : -52, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir) => ({ x: dir > 0 ? -52 : 52, opacity: 0 }),
+};
 
 export const StyledInput = React.forwardRef(({ error, ...props }, ref) => (
   <input
@@ -34,10 +41,18 @@ export const Field = ({ label, icon: Icon, error, children }) => (
   </div>
 );
 
-export const FormStep = ({ children }) => (
-  <div className="csf-fields">
+export const FormStep = ({ direction, children }) => (
+  <motion.div
+    custom={direction}
+    variants={slideVariants}
+    initial="enter"
+    animate="center"
+    exit="exit"
+    transition={{ duration: 0.26, ease: 'easeInOut' }}
+    className="csf-fields"
+  >
     {children}
-  </div>
+  </motion.div>
 );
 
 export const DocNumberField = ({ docNumberRegister, errors, fieldKey = 'nroDocumento', placeholder = 'Ej. 12345678' }) => (

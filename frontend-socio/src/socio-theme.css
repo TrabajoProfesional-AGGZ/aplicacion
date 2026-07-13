@@ -8,6 +8,8 @@ body {
 
 /* ================= LOGIN ================= */
 .login-container {
+  position: relative;
+  overflow: hidden;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -16,13 +18,69 @@ body {
   background-color: var(--color-surface);
 }
 
+/* Banda de intro: cubre toda la pantalla al montar, se "acopla" arriba con el
+   logo, y vuelve a cubrir todo (con fade negro→gris→blanco) al loguearse con
+   éxito. El color base lo pone esta clase; el color animado de la salida
+   exitosa lo pisa framer-motion vía estilo inline (animate.backgroundColor). */
+.login-band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: 140px;
+  background-color: var(--color-text-primary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+}
+
+.login-band-logo {
+  width: 500px;
+}
+
+.login-form-wrapper {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
 .login-slogan {
   font-style: italic;
   text-align: center;
   color: var(--color-text-secondary);
   font-size: 1.1rem;
+  margin-top: 7rem;
   margin-bottom: 3rem;
   font-weight: 400;
+}
+
+.login-error {
+  color: var(--color-danger);
+  font-size: 0.85rem;
+  margin: 0 0 var(--space-6) 0;
+  text-align: center;
+}
+
+.login-submit-btn {
+  margin-top: var(--space-2);
+}
+
+.login-registro-link {
+  text-align: center;
+  margin-top: var(--space-8);
+  font-size: 0.9rem;
+}
+
+.login-link-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .input-group {
@@ -63,11 +121,15 @@ body {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color var(--transition-normal);
+  transition: background-color var(--transition-normal), transform var(--transition-fast);
 }
 
 .su-button:hover {
   background-color: var(--color-text-secondary);
+}
+
+.su-button:active:not(:disabled) {
+  transform: scale(0.98);
 }
 
 .su-button:disabled {

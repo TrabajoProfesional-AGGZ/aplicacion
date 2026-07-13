@@ -47,10 +47,16 @@ async function fillStep4() {
   await userEvent.type(screen.getByPlaceholderText('Mínimo 6 caracteres'), 'clave123');
 }
 
+// Los campos del paso siguiente no montan de forma síncrona: FormStep ahora
+// anima la transición entre pasos con AnimatePresence en modo "wait" (el paso
+// viejo termina de salir antes de que el nuevo entre), así que hay que esperar
+// a que el campo distintivo del paso destino aparezca, no solo el texto del
+// header (que sí se actualiza de inmediato).
 async function navigateToStep2() {
   await fillStep1();
   userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
   await waitFor(() => expect(screen.getByText(/Paso 2 de 4/)).toBeInTheDocument());
+  await waitFor(() => expect(screen.getByPlaceholderText('María')).toBeInTheDocument());
 }
 
 async function navigateToStep3() {
@@ -58,6 +64,7 @@ async function navigateToStep3() {
   await fillStep2();
   userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
   await waitFor(() => expect(screen.getByText(/Paso 3 de 4/)).toBeInTheDocument());
+  await waitFor(() => expect(screen.getByPlaceholderText('Ej: 1123456789')).toBeInTheDocument());
 }
 
 async function navigateToStep4() {
@@ -65,6 +72,7 @@ async function navigateToStep4() {
   await fillStep3();
   userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
   await waitFor(() => expect(screen.getByText(/Paso 4 de 4/)).toBeInTheDocument());
+  await waitFor(() => expect(screen.getByPlaceholderText('maria@ejemplo.com')).toBeInTheDocument());
 }
 
 describe('RegistroSocioForm', () => {

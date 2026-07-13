@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 
 export function useMultiStepForm(stepFields) {
   const [step, setStep] = useState(1);
-  const [direction, setDirection] = useState('forward');
+  const [direction, setDirection] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,13 +21,13 @@ export function useMultiStepForm(stepFields) {
     const isStepValid = await trigger(fieldsToValidate);
     
     if (isStepValid) {
-      setDirection('forward');
+      setDirection(1);
       setStep((s) => s + 1);
     }
   };
 
   const goBack = () => {
-    setDirection('backward');
+    setDirection(-1);
     setStep((s) => s - 1);
   };
 
