@@ -16,8 +16,8 @@ export default defineConfig({
         name: 'SocioUnido Club',
         short_name: 'SocioUnido',
         description: 'App oficial para socios del club',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        theme_color: '#111111',
+        background_color: '#111111',
         display: 'standalone', 
         icons: [
           {

@@ -21,11 +21,7 @@ export default function App() {
   const mostrarDashboard = vista === 'app' && Boolean(socio);
 
   if (cargandoAuth) {
-    return (
-      <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <p>Cargando tu carnet...</p>
-      </div>
-    );
+    return <div style={{ height: '100dvh' }} />;
   }
 
   if (!mostrarDashboard) {
