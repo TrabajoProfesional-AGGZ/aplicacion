@@ -1,61 +1,66 @@
 // src/components/createForm/MultiStepFormShell.jsx
+import { ModalOverlay } from './ModalOverlay';
 
 export function MultiStepFormShell({
   steps, step, submitted, isSubmitting, title,
   successTitle, successMessage, submitLabel, submitLoadingLabel,
   onCancel, goBack, goNext, onFormSubmit, children
 }) {
-  
+
   // Si el formulario ya se envió con éxito, mostramos la pantalla verde
   if (submitted) {
     return (
-      <div style={{ textAlign: 'center', padding: '3rem', maxWidth: '500px', margin: '2rem auto', border: '1px solid #ddd', borderRadius: '12px' }}>
-        <h2 style={{ color: '#4caf50', fontSize: '2rem', marginBottom: '1rem' }}>✅ {successTitle}</h2>
-        <p style={{ color: '#666' }}>{successMessage}</p>
-      </div>
+      <ModalOverlay onClose={onCancel}>
+        <div style={{ textAlign: 'center', padding: '3rem', maxWidth: '500px', margin: '2rem auto', border: '1px solid #ddd', borderRadius: '12px', backgroundColor: 'white' }}>
+          <h2 style={{ color: '#4caf50', fontSize: '2rem', marginBottom: '1rem' }}>{successTitle}</h2>
+          <p style={{ color: '#666' }}>{successMessage}</p>
+        </div>
+      </ModalOverlay>
     );
   }
 
   const isLastStep = step === steps.length;
 
   return (
-    <div style={{ maxWidth: '500px', margin: '2rem auto', padding: '2rem', border: '1px solid #ddd', borderRadius: '12px', backgroundColor: 'white' }}>
-      <h2 style={{ textAlign: 'center', color: '#009ee3', marginBottom: '0.5rem' }}>{title}</h2>
-      
-      {/* Indicador de progreso de Pasos */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '2rem', fontSize: '0.9rem', color: '#888', fontWeight: 'bold' }}>
-        Paso {step} de {steps.length}: <span style={{ color: '#333' }}>{steps[step - 1]?.label}</span>
-      </div>
+    <ModalOverlay onClose={onCancel}>
+      <div style={{ maxWidth: '500px', margin: '2rem auto', padding: '2rem', border: '1px solid #ddd', borderRadius: '12px', backgroundColor: 'white' }}>
+        <h2 style={{ textAlign: 'center', color: '#009ee3', marginBottom: '0.5rem' }}>{title}</h2>
 
-      <form onSubmit={onFormSubmit}>
-        
-        {/* Acá se inyectan los <FormStep> desde RegistroSocioForm */}
-        {children}
-
-        {/* Botonera de Navegación */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
-          {step > 1 ? (
-            <button type="button" onClick={goBack} style={estilos.botonSecundario}>
-              ← Atrás
-            </button>
-          ) : (
-            <button type="button" onClick={onCancel} style={estilos.botonCancelar}>
-              Cancelar
-            </button>
-          )}
-
-          {!isLastStep ? (
-            <button type="button" onClick={goNext} style={estilos.botonPrimario}>
-              Siguiente →
-            </button>
-          ) : (
-            <button type="submit" disabled={isSubmitting} style={estilos.botonPrimario}>
-              {isSubmitting ? submitLoadingLabel : submitLabel}
-            </button>
-          )}
+        {/* Indicador de progreso de Pasos */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '2rem', fontSize: '0.9rem', color: '#888', fontWeight: 'bold' }}>
+          Paso {step} de {steps.length}: <span style={{ color: '#333' }}>{steps[step - 1]?.label}</span>
         </div>
-      </form>
-    </div>
+
+        <form onSubmit={onFormSubmit}>
+
+          {/* Acá se inyectan los <FormStep> desde RegistroSocioForm */}
+          {children}
+
+          {/* Botonera de Navegación */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
+            {step > 1 ? (
+              <button type="button" onClick={goBack} style={estilos.botonSecundario}>
+                ← Atrás
+              </button>
+            ) : (
+              <button type="button" onClick={onCancel} style={estilos.botonCancelar}>
+                Cancelar
+              </button>
+            )}
+
+            {!isLastStep ? (
+              <button type="button" onClick={goNext} style={estilos.botonPrimario}>
+                Siguiente →
+              </button>
+            ) : (
+              <button type="submit" disabled={isSubmitting} style={estilos.botonPrimario}>
+                {isSubmitting ? submitLoadingLabel : submitLabel}
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+    </ModalOverlay>
   );
 }
 

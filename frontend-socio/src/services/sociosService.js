@@ -1,9 +1,17 @@
-import { fetchWithOutAuth } from '../utils/utils';
+import { fetchTo, fetchWithOutAuth } from '../utils/utils';
 
-export async function fetchValidarSocio(data) {
-  const res = await fetchWithOutAuth('/api/v1/socio/validar', 'POST', data);
+export async function validarSocio(nroSocio, dni) {
+  const res = await fetchWithOutAuth('/api/v1/socios/validar', 'POST', { nro_socio: nroSocio, dni });
   if (res.status === 404) throw new Error('socio-no-encontrado');
-  if (!res.ok) throw new Error('Error al obtener validación de socio');
+  if (res.status === 409) throw new Error('cuenta-ya-registrada');
+  if (!res.ok) throw new Error('Error al validar el socio');
   return res.json();
 }
 
+export async function reclamarCuentaSocio(dni) {
+  const res = await fetchTo(`/api/v1/socios/por-dni/${dni}/reclamar`, 'POST');
+  if (res.status === 409) throw new Error('cuenta-ya-registrada');
+  if (res.status === 404) throw new Error('socio-no-encontrado');
+  if (!res.ok) throw new Error('Error al reclamar la cuenta del socio');
+  return res.json();
+}

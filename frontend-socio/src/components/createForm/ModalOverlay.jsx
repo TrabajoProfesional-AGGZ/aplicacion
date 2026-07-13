@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import './CreateSocioForm.css';
+import './ModalOverlay.css';
 
 export function ModalOverlay({ onClose, wrapperClass, children }) {
   return (

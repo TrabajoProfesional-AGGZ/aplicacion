@@ -8,6 +8,7 @@ import { MultiStepFormShell } from '../../components/createForm/MultiStepFormShe
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 import { useState } from 'react';
 import { fetchTo } from '../../utils/utils';
+import { validarSocio, reclamarCuentaSocio } from '../../services/sociosService';
 
 import { auth } from '../../firebase';
 import { createUserWithEmailAndPassword, getIdToken, deleteUser } from 'firebase/auth';
@@ -46,22 +47,19 @@ const {
       setValidandoPaso(true);
       try {
         const { nroSocio, nroDocumento } = getValues();
-        
-        const response = await fetch(`${import.meta.env.VITE_APP_API_BASE_URL}/api/v1/socios/validar`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nro_socio: nroSocio, dni: nroDocumento })
-        });
 
-        if (!response.ok) {
-          setFormError('No pudimos validar tu identidad. Por favor, revisá los datos completados.');
-          return;
-        }
+        await validarSocio(nroSocio, nroDocumento);
 
         goNext();
       } catch (error) {
-        console.error('Error al validar el socio:', error);
-        setFormError('Error de conexión al validar el socio.');
+        if (error.message === 'cuenta-ya-registrada') {
+          setFormError('Este socio ya tiene una cuenta registrada. Iniciá sesión en su lugar.');
+        } else if (error.message === 'socio-no-encontrado') {
+          setFormError('No pudimos validar tu identidad. Por favor, revisá los datos completados.');
+        } else {
+          console.error('Error al validar el socio:', error);
+          setFormError('Error de conexión al validar el socio.');
+        }
       } finally {
         setValidandoPaso(false);
       }
@@ -94,6 +92,12 @@ const {
 
       if (!updateResponse.ok) {
         throw new Error('error-actualizacion');
+      }
+
+      try {
+        await reclamarCuentaSocio(data.nroDocumento);
+      } catch (reclamarErr) {
+        console.error('No se pudo marcar la cuenta como reclamada:', reclamarErr);
       }
 
       localStorage.setItem('socioToken', tokenJWT);

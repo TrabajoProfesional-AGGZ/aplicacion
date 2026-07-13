@@ -43,22 +43,22 @@ export const FormStep = ({ children }) => (
   </div>
 );
 
-export const DocNumberField = ({ docNumberRegister, errors, fieldKey = 'nroDocumento' }) => (
+export const DocNumberField = ({ docNumberRegister, errors, fieldKey = 'nroDocumento', placeholder = 'Ej. 12345678' }) => (
   <Field label="Número de Documento" error={errors[fieldKey]?.message}>
-    <StyledInput {...docNumberRegister} placeholder="Sin puntos ni espacios" error={!!errors[fieldKey]} />
+    <StyledInput {...docNumberRegister} placeholder={placeholder} error={!!errors[fieldKey]} />
   </Field>
 );
 
-export const EmailField = ({ register, errors, required }) => (
+export const EmailField = ({ register, errors, required, placeholder = 'maria@ejemplo.com' }) => (
   <Field label="Email" error={errors.email?.message}>
-    <StyledInput 
-      {...register('email', { 
+    <StyledInput
+      {...register('email', {
         required: required ? 'Requerido' : false,
         pattern: { value: /^\S+@\S+$/i, message: 'Formato de email inválido' }
-      })} 
-      type="email" 
-      placeholder="tu@email.com" 
-      error={!!errors.email} 
+      })}
+      type="email"
+      placeholder={placeholder}
+      error={!!errors.email}
     />
   </Field>
 );

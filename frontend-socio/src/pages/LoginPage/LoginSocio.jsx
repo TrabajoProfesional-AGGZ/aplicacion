@@ -50,8 +50,13 @@ export function LoginSocio({ irARegistro }) {
       }
 
     } catch (err) {
-      if (err.code === 'auth/invalid-credential') {
-        setError('Email o contraseña incorrectos.');
+      const codigosCredencialesInvalidas = [
+        'auth/invalid-credential',
+        'auth/user-not-found',
+        'auth/wrong-password',
+      ];
+      if (codigosCredencialesInvalidas.includes(err.code)) {
+        setError('Credenciales incorrectas');
       } else {
         setError(err.message || 'Ocurrió un error al iniciar sesión.');
       }
@@ -110,16 +115,18 @@ export function LoginSocio({ irARegistro }) {
 
         <motion.form onSubmit={manejarLogin} variants={formItemVariants}>
           <div className="input-group">
-            <label className="input-label">Email</label>
+            <label className="input-label" htmlFor="email">Email</label>
             <input
+              id="email"
               type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
               className="su-input"
             />
           </div>
 
           <div className="input-group">
-            <label className="input-label">Contraseña</label>
+            <label className="input-label" htmlFor="password">Contraseña</label>
             <input
+              id="password"
               type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
               className="su-input"
             />
