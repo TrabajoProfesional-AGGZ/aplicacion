@@ -77,7 +77,7 @@ export function LoginSocio({ irARegistro }) {
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.4 }}
           style={{
             position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'var(--primary-color)',
+            backgroundColor: '#111111',
             display: 'flex', justifyContent: 'center', alignItems: 'center',
             zIndex: 50
           }}
@@ -132,7 +132,7 @@ export function LoginSocio({ irARegistro }) {
             />
           </div>
 
-          {error && <p style={{ color: '#ef4444', fontSize: '0.85rem', margin: '0 0 1rem 0', textAlign: 'center' }}>{error}</p>}
+          {error && <p style={{ color: '#C0392B', fontSize: '0.85rem', margin: '0 0 1rem 0', textAlign: 'center' }}>{error}</p>}
 
           <button type="submit" disabled={cargando} className="su-button" style={{ marginTop: '0.5rem' }}>
             {cargando ? 'Ingresando...' : 'Ingresar'}
@@ -140,7 +140,7 @@ export function LoginSocio({ irARegistro }) {
         </motion.form>
 
         <motion.div variants={formItemVariants} style={{ textAlign: 'center', marginTop: '2rem', fontSize: '0.9rem' }}>
-          <button type="button" onClick={irARegistro} style={{ background: 'none', border: 'none', color: '#6b7280', textDecoration: 'underline', cursor: 'pointer' }}>
+          <button type="button" onClick={irARegistro} style={{ background: 'none', border: 'none', color: '#4A4A4A', textDecoration: 'underline', cursor: 'pointer' }}>
             ¿Es tu primera vez? Configurar mi cuenta
           </button>
         </motion.div>

@@ -10,8 +10,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate', 
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'], 
+      registerType: 'autoUpdate',
+      includeAssets: ['pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
         name: 'SocioUnido Club',
         short_name: 'SocioUnido',

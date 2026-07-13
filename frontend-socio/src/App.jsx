@@ -37,9 +37,9 @@ export default function App() {
   return (
     <div>
       <header className="topbar">
-        <button className="menu-btn"><Menu size={24} color="#111827" /></button>
+        <button className="menu-btn"><Menu size={24} color="#111111" /></button>
         <div className="user-info">
-          <span style={{ color: '#6b7280' }}>Socio {socio.nro_socio}</span>
+          <span style={{ color: '#4A4A4A' }}>Socio {socio.nro_socio}</span>
           <button onClick={cerrarSesion} className="btn-cerrar-sesion">Cerrar sesión</button>
         </div>
       </header>
@@ -53,7 +53,7 @@ export default function App() {
         <div className="cards-grid">
           {SECCIONES_PROXIMAMENTE.map(({ id, icon: Icon, titulo, desc }) => (
             <div key={id} className="su-card" onClick={() => setProximamente(titulo)}>
-              <div className="card-icon"><Icon size={24} color="#111827" /></div>
+              <div className="card-icon"><Icon size={24} color="#111111" /></div>
               <h3 className="card-title">{titulo}</h3>
               <p className="card-desc">{desc}</p>
             </div>

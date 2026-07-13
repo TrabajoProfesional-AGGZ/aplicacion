@@ -159,21 +159,7 @@ const {
             </Field>
             <DocNumberField docNumberRegister={nroDocumentoRegister} errors={errors} fieldKey="nroDocumento" />
             
-            {formError && (
-              <div style={{ 
-                padding: '0.8rem', 
-                backgroundColor: '#fee2e2', 
-                color: '#ef4444', 
-                border: '1px solid #f87171',
-                borderRadius: '6px', 
-                fontSize: '0.9rem', 
-                textAlign: 'center', 
-                marginTop: '1rem' 
-              }}>
-                {formError}
-              </div>
-            )}
-            
+            {formError && <p className="csf-form-error">{formError}</p>}
           </FormStep>
         )}
 

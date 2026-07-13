@@ -1,4 +1,6 @@
 // src/components/createForm/MultiStepFormShell.jsx
+import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import logoVerde from '../../assets/logo-verde.png';
 import { ModalOverlay } from './ModalOverlay';
 
 export function MultiStepFormShell({
@@ -6,72 +8,79 @@ export function MultiStepFormShell({
   successTitle, successMessage, submitLabel, submitLoadingLabel,
   onCancel, goBack, goNext, onFormSubmit, children
 }) {
-
-  // Si el formulario ya se envió con éxito, mostramos la pantalla verde
+  // Si el formulario ya se envió con éxito, mostramos la pantalla de éxito
   if (submitted) {
     return (
       <ModalOverlay onClose={onCancel}>
-        <div style={{ textAlign: 'center', padding: '3rem', maxWidth: '500px', margin: '2rem auto', border: '1px solid #ddd', borderRadius: '12px', backgroundColor: 'white' }}>
-          <h2 style={{ color: '#4caf50', fontSize: '2rem', marginBottom: '1rem' }}>{successTitle}</h2>
-          <p style={{ color: '#666' }}>{successMessage}</p>
+        <div className="csf-outer-card csf-success">
+          <div className="csf-success-logo-circle">
+            <img src={logoVerde} alt="SocioUnido" className="csf-success-logo" />
+          </div>
+          <CheckCircle2 size={48} color="#0D6E0D" strokeWidth={1.5} />
+          <div>
+            <h2>{successTitle}</h2>
+            <p>{successMessage}</p>
+          </div>
         </div>
       </ModalOverlay>
     );
   }
 
   const isLastStep = step === steps.length;
+  const progress = (step / steps.length) * 100;
 
   return (
     <ModalOverlay onClose={onCancel}>
-      <div style={{ maxWidth: '500px', margin: '2rem auto', padding: '2rem', border: '1px solid #ddd', borderRadius: '12px', backgroundColor: 'white' }}>
-        <h2 style={{ textAlign: 'center', color: '#009ee3', marginBottom: '0.5rem' }}>{title}</h2>
-
-        {/* Indicador de progreso de Pasos */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '2rem', fontSize: '0.9rem', color: '#888', fontWeight: 'bold' }}>
-          Paso {step} de {steps.length}: <span style={{ color: '#333' }}>{steps[step - 1]?.label}</span>
+      <div className="csf-outer-card">
+        <div className="csf-header">
+          <h1>{title}</h1>
+          <p>Paso {step} de {steps.length} — {steps[step - 1]?.label}</p>
         </div>
 
-        <form onSubmit={onFormSubmit}>
+        <div className="csf-progress">
+          <div className="csf-progress-fill" style={{ width: `${progress}%` }} />
+        </div>
 
-          {/* Acá se inyectan los <FormStep> desde RegistroSocioForm */}
-          {children}
+        <div className="csf-card">
+          <form onSubmit={onFormSubmit} onKeyDown={(e) => { if (e.key === 'Enter' && step < steps.length) e.preventDefault(); }}>
+            {children}
 
-          {/* Botonera de Navegación */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
-            {step > 1 ? (
-              <button type="button" onClick={goBack} style={estilos.botonSecundario}>
-                ← Atrás
-              </button>
-            ) : (
-              <button type="button" onClick={onCancel} style={estilos.botonCancelar}>
-                Cancelar
-              </button>
-            )}
+            <div className={`csf-nav ${step > 1 ? 'csf-nav--between' : 'csf-nav--end'}`}>
+              {step > 1 ? (
+                <button type="button" onClick={goBack} className="csf-btn-back">
+                  <ChevronLeft size={17} />
+                  Atrás
+                </button>
+              ) : (
+                <button type="button" onClick={onCancel} className="csf-btn-back">
+                  Cancelar
+                </button>
+              )}
 
-            {!isLastStep ? (
-              <button type="button" onClick={goNext} style={estilos.botonPrimario}>
-                Siguiente →
-              </button>
-            ) : (
-              <button type="submit" disabled={isSubmitting} style={estilos.botonPrimario}>
-                {isSubmitting ? submitLoadingLabel : submitLabel}
-              </button>
-            )}
-          </div>
-        </form>
+              {!isLastStep ? (
+                <button type="button" onClick={goNext} className="csf-btn-next">
+                  Siguiente
+                  <ChevronRight size={17} />
+                </button>
+              ) : (
+                <button type="submit" disabled={isSubmitting} className="csf-btn-submit">
+                  {isSubmitting ? (
+                    <>
+                      <span className="csf-spinner" />
+                      {submitLoadingLabel}
+                    </>
+                  ) : (
+                    <>
+                      {submitLabel}
+                      <CheckCircle2 size={17} />
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
       </div>
     </ModalOverlay>
   );
 }
-
-const estilos = {
-  botonPrimario: { 
-    padding: '0.8rem 1.5rem', backgroundColor: '#009ee3', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' 
-  },
-  botonSecundario: { 
-    padding: '0.8rem 1.5rem', backgroundColor: '#f0f0f0', color: '#333', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' 
-  },
-  botonCancelar: { 
-    padding: '0.8rem 1.5rem', backgroundColor: 'transparent', color: '#ff4d4f', border: '1px solid #ff4d4f', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' 
-  }
-};

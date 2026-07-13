@@ -12,6 +12,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@fontsource-variable/archivo": "^5.2.8",
     "firebase": "^12.16.0",
     "framer-motion": "^12.42.2",
     "lucide-react": "^1.24.0",
