@@ -76,6 +76,9 @@
   --z-modal: 400;
   --z-toast: 500;
 
+  /* Layout */
+  --bottom-nav-height: 64px;
+
   /* Typography */
   --font-sans: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-numeric: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;

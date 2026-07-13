@@ -1,39 +1,20 @@
 // src/App.jsx
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Menu, QrCode, CreditCard, Calendar, User } from 'lucide-react';
 import { LoginSocio } from './pages/LoginPage/LoginSocio';
 import { RegistroSocioForm } from './pages/Registropage/RegistroSocioForm';
+import { HomePage } from './pages/HomePage/HomePage';
 import './socio-theme.css';
 import { useAuth } from './hooks/useAuth';
 
-const SECCIONES_PROXIMAMENTE = [
-  { id: 'qr', icon: QrCode, titulo: 'Mi Carnet Digital', desc: 'Generá tu código QR de acceso a las instalaciones.' },
-  { id: 'pagos', icon: CreditCard, titulo: 'Cuotas y Pagos', desc: 'Aboná tu cuota social o servicios adicionales.' },
-  { id: 'reservas', icon: Calendar, titulo: 'Reservas e Instalaciones', desc: 'Administrar reservas de espacios físicos.' },
-  { id: 'perfil', icon: User, titulo: 'Mis Datos', desc: 'Consultar o modificar tu información personal.' },
-];
-
 export default function App() {
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
-  const [proximamente, setProximamente] = useState(null);
   // Gatea cuándo se muestra el dashboard: no basta con que `socio` sea verdadero,
   // hay que esperar a que LoginSocio termine su coreografía de salida (banda
   // cubriendo la pantalla + fade a blanco) para no cortarla a mitad de camino.
   const [vista, setVista] = useState('auth');
 
   const { socio, cargandoAuth, cerrarSesion } = useAuth();
-
-  // Mismo patrón que ModalOverlay.jsx: un <div> sin tabIndex nunca recibe foco,
-  // así que Escape se escucha a nivel document en vez de con un onKeyDown en el overlay.
-  useEffect(() => {
-    if (!proximamente) return undefined;
-    const manejarTecla = (e) => {
-      if (e.key === 'Escape') setProximamente(null);
-    };
-    document.addEventListener('keydown', manejarTecla);
-    return () => document.removeEventListener('keydown', manejarTecla);
-  }, [proximamente]);
 
   // Derivado (no estado propio): si `socio` se vuelve falsy (ej. logout) esto
   // vuelve a `false` solo, sin necesitar un efecto que llame a setState.
@@ -67,42 +48,5 @@ export default function App() {
     );
   }
 
-  return (
-    <div>
-      <header className="topbar">
-        <button className="menu-btn"><Menu size={24} color="#111111" /></button>
-        <div className="user-info">
-          <span style={{ color: '#4A4A4A' }}>Socio {socio.nro_socio}</span>
-          <button onClick={cerrarSesion} className="btn-cerrar-sesion">Cerrar sesión</button>
-        </div>
-      </header>
-
-      <main className="dashboard-layout">
-        <h1 className="dashboard-title">Panel principal</h1>
-        <p className="dashboard-subtitle">
-          Bienvenido, <b>{socio.nombre} {socio.apellido}</b>. Accedé rápidamente a las secciones del club.
-        </p>
-
-        <div className="cards-grid">
-          {SECCIONES_PROXIMAMENTE.map(({ id, icon: Icon, titulo, desc }) => (
-            <button key={id} type="button" className="su-card" onClick={() => setProximamente(titulo)}>
-              <div className="card-icon"><Icon size={24} color="#111111" /></div>
-              <h3 className="card-title">{titulo}</h3>
-              <p className="card-desc">{desc}</p>
-            </button>
-          ))}
-        </div>
-
-        {proximamente && (
-          <div className="proximamente-overlay" role="presentation" onClick={() => setProximamente(null)}>
-            <div className="proximamente-card" role="presentation" onClick={(e) => e.stopPropagation()}>
-              <p className="proximamente-titulo">{proximamente}</p>
-              <p className="proximamente-texto">Próximamente...</p>
-              <button className="proximamente-cerrar" onClick={() => setProximamente(null)}>Cerrar</button>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
+  return <HomePage socio={socio} cerrarSesion={cerrarSesion} />;
 }
