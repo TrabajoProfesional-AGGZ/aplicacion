@@ -8,6 +8,7 @@ jest.mock('../../utils/authService', () => ({
   login: jest.fn(),
   logout: jest.fn(),
   changePassword: jest.fn(),
+  resetPassword: jest.fn(),
 }));
 
 let mockAuthState;
@@ -31,6 +32,7 @@ describe('LoginSocio', () => {
   beforeEach(() => {
     mockAuthState = { socio: null, authError: null, cerrarSesion: jest.fn().mockResolvedValue() };
     authService.login.mockClear();
+    authService.resetPassword.mockClear();
   });
 
   test('renderiza los campos de email, contraseña y el botón de ingresar', () => {
@@ -176,5 +178,31 @@ describe('LoginSocio', () => {
     // Un segundo re-render con socio todavía activo no debería volver a disparar el callback
     rerender(<LoginSocio irARegistro={() => {}} onIngresoCompleto={onIngresoCompleto} />);
     expect(onIngresoCompleto).toHaveBeenCalledTimes(1);
+  });
+
+  test('el botón de mostrar/ocultar contraseña alterna el tipo del input', () => {
+    render(<LoginSocio irARegistro={() => {}} />);
+    expect(screen.getByLabelText('Contraseña')).toHaveAttribute('type', 'password');
+
+    // React reemplaza el nodo <input> del DOM cuando cambia su `type`, así que
+    // hay que volver a buscarlo después de cada click en vez de reusar la referencia.
+    fireEvent.click(screen.getByRole('button', { name: 'Mostrar contraseña' }));
+    expect(screen.getByLabelText('Contraseña')).toHaveAttribute('type', 'text');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ocultar contraseña' }));
+    expect(screen.getByLabelText('Contraseña')).toHaveAttribute('type', 'password');
+  });
+
+  test('el botón "¿Olvidaste tu contraseña?" abre el formulario de recuperación, y se puede cerrar', async () => {
+    render(<LoginSocio irARegistro={() => {}} />);
+    expect(screen.queryByRole('heading', { name: 'Recuperar contraseña' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /olvidaste tu contraseña/i }));
+    expect(screen.getByRole('heading', { name: 'Recuperar contraseña' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
+    await waitFor(() => {
+      expect(screen.queryByRole('heading', { name: 'Recuperar contraseña' })).not.toBeInTheDocument();
+    });
   });
 });

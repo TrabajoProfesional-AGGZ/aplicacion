@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { Eye, EyeOff } from 'lucide-react';
 import { login } from '../../utils/authService'; // Asegurate de que esta ruta sea correcta
 import { useAuth } from '../../hooks/useAuth';
 import { MAX_LEN, validarCredencialSegura } from '../../utils/formValidators';
+import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import logoSocioAlt from '../../assets/logo_socio_login.png';
 import '../../socio-theme.css';
 
@@ -26,6 +28,8 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
   const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState('');
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+  const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
 
   // Estados para controlar el flujo visual
   const [animStarted, setAnimStarted] = useState(false);
@@ -180,15 +184,35 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
 
           <div className="input-group">
             <label className="input-label" htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              required
-              maxLength={MAX_LEN.PASSWORD}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="su-input"
-            />
+            <div className="login-password-wrapper">
+              <input
+                id="password"
+                type={mostrarPassword ? 'text' : 'password'}
+                required
+                maxLength={MAX_LEN.PASSWORD}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="su-input"
+              />
+              <button
+                type="button"
+                className="login-toggle-password"
+                onClick={() => setMostrarPassword((v) => !v)}
+                aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {mostrarPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="login-forgot-wrapper">
+            <button
+              type="button"
+              className="login-forgot-btn"
+              onClick={() => setMostrarRecuperar(true)}
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
           </div>
 
           {error && <p className="login-error">{error}</p>}
@@ -205,6 +229,10 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
         </motion.div>
 
       </motion.div>
+
+      {mostrarRecuperar && (
+        <RecuperarContraseniaModal onClose={() => setMostrarRecuperar(false)} />
+      )}
     </motion.div>
   );
 }
