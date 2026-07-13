@@ -39,3 +39,23 @@ export function validarCredencialSegura(value, maxLength) {
   }
   return '';
 }
+
+// Misma política de contraseñas que WebApp (CreateUserForm/useChangePassword):
+// mín. 10, máx. MAX_LEN.PASSWORD, minúscula + mayúscula + número. Se usa al
+// definir una contraseña nueva (registro, cambio de contraseña) — no al hacer
+// login, donde solo corre `validarCredencialSegura` contra la que ya existe.
+export function validarFortalezaPassword(v) {
+  if (!v || v.length < 10) return 'Mínimo 10 caracteres';
+  if (v.length > MAX_LEN.PASSWORD) return `Máximo ${MAX_LEN.PASSWORD} caracteres`;
+  if (!/[a-z]/.test(v)) return 'Debe incluir al menos una minúscula';
+  if (!/[A-Z]/.test(v)) return 'Debe incluir al menos una mayúscula';
+  if (!/\d/.test(v)) return 'Debe incluir al menos un número';
+  return undefined;
+}
+
+export function getPasswordRules() {
+  return {
+    required: 'La contraseña es requerida',
+    validate: validarFortalezaPassword,
+  };
+}

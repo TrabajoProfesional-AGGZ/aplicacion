@@ -2,7 +2,7 @@ import {
   User, Mail, Phone,
   Calendar, Lock, ShieldCheck, MapPin
 } from 'lucide-react';
-import { validarFechaNacimiento, getDocNumberRules } from '../../utils/formValidators';
+import { validarFechaNacimiento, getDocNumberRules, getPasswordRules } from '../../utils/formValidators';
 import { Field, StyledInput, StyledSelect, FormStep, DocNumberField, EmailField } from '../../components/createForm/FormFields';
 import { MultiStepFormShell } from '../../components/createForm/MultiStepFormShell';
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
@@ -256,12 +256,9 @@ const {
             <EmailField register={register} errors={errors} required />
             <Field label="Contraseña" icon={Lock} error={errors.password?.message}>
               <StyledInput
-                {...register('password', {
-                  required: 'La contraseña es requerida',
-                  minLength: { value: 6, message: 'Mínimo 6 caracteres' },
-                })}
+                {...register('password', getPasswordRules())}
                 type="password"
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Mínimo 10 caracteres, con mayúscula, minúscula y número"
                 autoComplete="new-password"
                 error={!!errors.password}
               />
