@@ -21,7 +21,7 @@ export default function App() {
   const mostrarDashboard = vista === 'app' && Boolean(socio);
 
   if (cargandoAuth) {
-    return <div style={{ height: '100dvh' }} />;
+    return <div style={{ height: '100dvh', backgroundColor: '#111111' }} />;
   }
 
   if (!mostrarDashboard) {
