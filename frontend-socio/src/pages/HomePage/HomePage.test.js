@@ -5,8 +5,17 @@ jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../utils/authService', () => ({
   changePassword: jest.fn(),
 }));
+jest.mock('../../services/finanzasService', () => ({
+  getEstadoFinanciero: jest.fn(() => Promise.resolve({
+    id_socio: 'socio-1',
+    estado_financiero: 'Al día',
+    deuda_total: 0,
+    cuotas: [],
+  })),
+}));
 
 const socioFixture = {
+  id: 'socio-1',
   nombre: 'Ana',
   apellido: 'Pérez',
   nro_socio: '1000',
@@ -38,10 +47,33 @@ describe('HomePage', () => {
 
   test('click en "Cerrar" del overlay lo cierra', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Cuotas y pagos'));
+    fireEvent.click(screen.getByText('Inscribirme a actividad'));
     expect(screen.getByText('Próximamente...')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Cerrar'));
     expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
+  });
+
+  test('click en "Cuotas y pagos" navega a la página de finanzas (no abre el overlay)', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Cuotas y pagos'));
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Cuotas' })).toBeInTheDocument();
+  });
+
+  test('la página de finanzas se mantiene dentro del layout con Header y BottomNav', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Cuotas y pagos'));
+    await screen.findByRole('heading', { name: 'Cuotas' });
+    expect(screen.getByLabelText('Mi perfil')).toBeInTheDocument();
+    expect(screen.getByText('Inicio').closest('button')).toBeInTheDocument();
+  });
+
+  test('"Inicio" del nav inferior vuelve a mostrar el inicio desde cuotas y pagos', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Cuotas y pagos'));
+    await screen.findByRole('heading', { name: 'Cuotas' });
+    fireEvent.click(screen.getByText('Inicio'));
+    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
   });
 
   test('muestra el nav inferior con los 5 botones y "Inicio" activo', () => {
@@ -56,17 +88,26 @@ describe('HomePage', () => {
     expect(screen.getByText('Próximamente...')).toBeInTheDocument();
   });
 
-  test('click en el botón de perfil del header navega a la página de perfil', () => {
+  test('click en el botón de perfil del header navega a la página de perfil, sin flecha de volver', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByLabelText('Mi perfil'));
-    expect(screen.getByText('Mi perfil')).toBeInTheDocument();
     expect(screen.getByText('Cerrar sesión')).toBeInTheDocument();
+    expect(screen.queryByText('Bienvenido Ana Pérez')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Volver')).not.toBeInTheDocument();
   });
 
-  test('"Volver" desde el perfil vuelve a mostrar el inicio', () => {
+  test('el perfil se muestra dentro del layout con Header y BottomNav, sin el ícono de perfil', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByLabelText('Mi perfil'));
-    fireEvent.click(screen.getByLabelText('Volver'));
+    expect(screen.getByAltText('SocioUnido')).toBeInTheDocument();
+    expect(screen.getByText('Inicio').closest('button')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Mi perfil')).not.toBeInTheDocument();
+  });
+
+  test('"Inicio" del nav inferior vuelve a mostrar el inicio desde el perfil', () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByLabelText('Mi perfil'));
+    fireEvent.click(screen.getByText('Inicio'));
     expect(screen.getByText('Cuotas y pagos')).toBeInTheDocument();
   });
 });

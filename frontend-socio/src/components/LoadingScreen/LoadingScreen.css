@@ -1,0 +1,23 @@
+.loading-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.loading-logo {
+  width: 64px;
+  animation:
+    loading-pulse 1.4s ease-in-out infinite,
+    loading-spin  3s   linear        infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% { opacity: 1;   scale: 0.8; }
+  50%      { opacity: 0.3; scale: 0.8; }
+}
+
+@keyframes loading-spin {
+  from { rotate: 0deg;   scale: 0.8; }
+  to   { rotate: 360deg; scale: 0.8; }
+}

@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import {
-  ArrowLeft, Hash, Layers, IdCard, Cake, Mail, Phone, Lock, Eye, EyeOff, AlertCircle, LogOut,
+  Hash, Layers, IdCard, Cake, Mail, Phone, Lock, Eye, EyeOff, AlertCircle, LogOut,
   Plus, Upload, Camera, Loader2, CheckCircle2, XCircle,
 } from 'lucide-react';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
@@ -23,6 +23,13 @@ function formatearFecha(fechaIso) {
 function iniciales(nombre, apellido) {
   return `${nombre?.[0] ?? ''}${apellido?.[0] ?? ''}`.toUpperCase();
 }
+
+const ESTADO_COLOR = {
+  Activo: 'var(--status-success-border)',
+  Moroso: 'var(--status-danger-border)',
+  Inactivo: 'var(--status-warning-border)',
+  Suspendido: 'var(--status-suspended-border)',
+};
 
 function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, error }) {
   const [mostrar, setMostrar] = useState(false);
@@ -240,7 +247,7 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
   );
 }
 
-export function PerfilPage({ socio, cerrarSesion, onVolver }) {
+export function PerfilPage({ socio, cerrarSesion }) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [fotoModalAbierto, setFotoModalAbierto] = useState(false);
   const { setSocio } = useAuth();
@@ -255,63 +262,55 @@ export function PerfilPage({ socio, cerrarSesion, onVolver }) {
   ].filter((dato) => dato.valor);
 
   return (
-    <div>
-      <header className="perfil-page-header">
-        <button type="button" className="perfil-volver" onClick={onVolver} aria-label="Volver">
-          <ArrowLeft size={20} />
-        </button>
-        <h1 className="perfil-page-title">Mi perfil</h1>
-        <span className="perfil-header-spacer" aria-hidden="true" />
-      </header>
-
-      <main className="perfil-page">
-        <section className="perfil-card">
-          <div className="perfil-card-top">
-            <div className="perfil-avatar-wrapper">
-              {socio.foto_url
-                ? <img src={socio.foto_url} alt="" className="perfil-avatar-img" referrerPolicy="no-referrer" />
-                : <span className="perfil-avatar" aria-hidden="true">{iniciales(socio.nombre, socio.apellido)}</span>}
-              <button
-                type="button"
-                className="perfil-avatar-edit-btn"
-                aria-label="Cambiar foto de perfil"
-                onClick={() => setFotoModalAbierto(true)}
-              >
-                <Plus size={14} />
-              </button>
-            </div>
-            <div className="perfil-card-top-text">
-              <h2 className="perfil-card-nombre">{socio.nombre} {socio.apellido}</h2>
-              {socio.estado?.nombre && (
-                <span className="perfil-card-estado">Estado: {socio.estado.nombre}</span>
-              )}
-            </div>
+    <>
+      <section className="perfil-card">
+        <div className="perfil-card-top">
+          <div className="perfil-avatar-wrapper">
+            {socio.foto_url
+              ? <img src={socio.foto_url} alt="" className="perfil-avatar-img" referrerPolicy="no-referrer" />
+              : <span className="perfil-avatar" aria-hidden="true">{iniciales(socio.nombre, socio.apellido)}</span>}
+            <button
+              type="button"
+              className="perfil-avatar-edit-btn"
+              aria-label="Cambiar foto de perfil"
+              onClick={() => setFotoModalAbierto(true)}
+            >
+              <Plus size={14} />
+            </button>
           </div>
+          <div className="perfil-card-top-text">
+            <h2 className="perfil-card-nombre">{socio.nombre} {socio.apellido}</h2>
+            {socio.estado?.nombre && (
+              <span className="perfil-card-estado" style={{ color: ESTADO_COLOR[socio.estado.nombre] }}>
+                Estado: {socio.estado.nombre}
+              </span>
+            )}
+          </div>
+        </div>
 
-          {datos.length > 0 && (
-            <div className="perfil-datos-list">
-              {datos.map(({ icon: Icon, label, valor }) => (
-                <div className="perfil-dato-row" key={label}>
-                  <span className="perfil-dato-icon"><Icon size={18} /></span>
-                  <span className="perfil-dato-text">
-                    <span className="perfil-dato-label">{label}</span>
-                    <span className="perfil-dato-valor">{valor}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+        {datos.length > 0 && (
+          <div className="perfil-datos-list">
+            {datos.map(({ icon: Icon, label, valor }) => (
+              <div className="perfil-dato-row" key={label}>
+                <span className="perfil-dato-icon"><Icon size={18} /></span>
+                <span className="perfil-dato-text">
+                  <span className="perfil-dato-label">{label}</span>
+                  <span className="perfil-dato-valor">{valor}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
-        <button type="button" className="perfil-cambiar-button" onClick={() => setModalAbierto(true)}>
-          Cambiar contraseña
-        </button>
+      <button type="button" className="perfil-cambiar-button" onClick={() => setModalAbierto(true)}>
+        Cambiar contraseña
+      </button>
 
-        <button type="button" className="perfil-cerrar-sesion" onClick={cerrarSesion}>
-          <LogOut size={18} />
-          Cerrar sesión
-        </button>
-      </main>
+      <button type="button" className="perfil-cerrar-sesion" onClick={cerrarSesion}>
+        <LogOut size={18} />
+        Cerrar sesión
+      </button>
 
       {modalAbierto && (
         <CambiarContraseniaModal cerrarSesion={cerrarSesion} onClose={() => setModalAbierto(false)} />
@@ -324,6 +323,6 @@ export function PerfilPage({ socio, cerrarSesion, onVolver }) {
           onFotoActualizada={(foto_url) => setSocio({ ...socio, foto_url })}
         />
       )}
-    </div>
+    </>
   );
 }

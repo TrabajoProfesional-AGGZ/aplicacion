@@ -83,20 +83,20 @@ describe('PerfilPage', () => {
   });
 
   test('muestra el nombre y el estado del socio', () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     expect(screen.getByText('Ana Pérez')).toBeInTheDocument();
     expect(screen.getByText('Estado: Activo')).toBeInTheDocument();
   });
 
   test('muestra el número de socio con su etiqueta', () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     expect(screen.getByText('Número de Socio')).toBeInTheDocument();
     expect(screen.getByText('1000')).toBeInTheDocument();
   });
 
   test('muestra el resto de los datos personales dentro de la misma tarjeta', () => {
     const { container } = render(
-      <PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />,
+      <PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />,
     );
     expect(screen.getByText('Titular')).toBeInTheDocument();
     expect(screen.getByText('30123456')).toBeInTheDocument();
@@ -108,39 +108,32 @@ describe('PerfilPage', () => {
 
   test('no muestra una fila para los campos opcionales ausentes', () => {
     const socioSinTelefono = { ...socioFixture, telefono: null };
-    render(<PerfilPage socio={socioSinTelefono} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioSinTelefono} cerrarSesion={jest.fn()} />);
     expect(screen.queryByText('Teléfono')).not.toBeInTheDocument();
-  });
-
-  test('click en "Volver" llama a onVolver', () => {
-    const onVolver = jest.fn();
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={onVolver} />);
-    fireEvent.click(screen.getByLabelText('Volver'));
-    expect(onVolver).toHaveBeenCalledTimes(1);
   });
 
   test('click en "Cerrar sesión" llama a cerrarSesion', () => {
     const cerrarSesion = jest.fn();
-    render(<PerfilPage socio={socioFixture} cerrarSesion={cerrarSesion} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={cerrarSesion} />);
     fireEvent.click(screen.getByText('Cerrar sesión'));
     expect(cerrarSesion).toHaveBeenCalledTimes(1);
   });
 
   test('click en "Cambiar contraseña" abre el formulario de cambio de contraseña', () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalCambiarContrasenia();
     expect(screen.getByLabelText('Contraseña actual')).toBeInTheDocument();
   });
 
   test('"Cancelar" cierra el formulario de cambio de contraseña', () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalCambiarContrasenia();
     fireEvent.click(screen.getByText('Cancelar'));
     expect(screen.queryByLabelText('Contraseña actual')).not.toBeInTheDocument();
   });
 
   test('muestra el error de la nueva contraseña al salir del campo, sin esperar al submit', () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalCambiarContrasenia();
     const nuevaInput = screen.getByLabelText('Nueva contraseña');
     fireEvent.change(nuevaInput, { target: { value: 'clave123456' } });
@@ -150,7 +143,7 @@ describe('PerfilPage', () => {
   });
 
   test('muestra error si la nueva contraseña no cumple la política de seguridad', async () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalCambiarContrasenia();
     completarFormulario({ nueva: 'clave123456', confirmar: 'clave123456' });
     enviarFormulario();
@@ -159,7 +152,7 @@ describe('PerfilPage', () => {
   });
 
   test('muestra error si la confirmación no coincide con la nueva contraseña', async () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalCambiarContrasenia();
     completarFormulario({ nueva: 'NuevaClave12', confirmar: 'OtraClave12' });
     enviarFormulario();
@@ -170,7 +163,7 @@ describe('PerfilPage', () => {
   test('al cambiar la contraseña con éxito, cierra la sesión automáticamente', async () => {
     changePassword.mockResolvedValueOnce();
     const cerrarSesion = jest.fn().mockResolvedValueOnce();
-    render(<PerfilPage socio={socioFixture} cerrarSesion={cerrarSesion} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={cerrarSesion} />);
     abrirModalCambiarContrasenia();
     completarFormulario();
     enviarFormulario();
@@ -182,7 +175,7 @@ describe('PerfilPage', () => {
   test('si falla el cambio de contraseña, muestra un error y no cierra la sesión', async () => {
     changePassword.mockRejectedValueOnce(new Error('auth/wrong-password'));
     const cerrarSesion = jest.fn();
-    render(<PerfilPage socio={socioFixture} cerrarSesion={cerrarSesion} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={cerrarSesion} />);
     abrirModalCambiarContrasenia();
     completarFormulario();
     enviarFormulario();
@@ -192,20 +185,20 @@ describe('PerfilPage', () => {
   });
 
   test('muestra las iniciales cuando el socio no tiene foto', () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     expect(screen.getByText('AP')).toBeInTheDocument();
   });
 
   test('muestra la imagen del socio cuando tiene foto_url', () => {
     const socioConFoto = { ...socioFixture, foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' };
-    render(<PerfilPage socio={socioConFoto} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioConFoto} cerrarSesion={jest.fn()} />);
     expect(screen.queryByText('AP')).not.toBeInTheDocument();
     const img = screen.getByAltText('');
     expect(img).toHaveAttribute('src', socioConFoto.foto_url);
   });
 
   test('click en "Cambiar foto de perfil" abre el modal con las dos opciones', () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalFoto();
     expect(screen.getByText('Subir desde el dispositivo')).toBeInTheDocument();
     expect(screen.getByText('Tomar una foto en el momento')).toBeInTheDocument();
@@ -213,7 +206,7 @@ describe('PerfilPage', () => {
 
   test('subir una foto válida la envía al backend y actualiza el avatar', async () => {
     subirFotoSocio.mockResolvedValueOnce({ foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' });
-    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} />);
     abrirModalFoto();
 
     await subirArchivoDesdeDispositivo(crearArchivo());
@@ -226,7 +219,7 @@ describe('PerfilPage', () => {
   });
 
   test('rechaza un archivo con tipo no permitido sin llamar al backend', async () => {
-    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalFoto();
 
     await subirArchivoDesdeDispositivo(crearArchivo({ name: 'foto.gif', type: 'image/gif' }));
@@ -237,7 +230,7 @@ describe('PerfilPage', () => {
 
   test('si falla la subida, muestra un mensaje de error', async () => {
     subirFotoSocio.mockRejectedValueOnce(new Error('servicio-no-disponible'));
-    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} />);
     abrirModalFoto();
 
     await subirArchivoDesdeDispositivo(crearArchivo());
