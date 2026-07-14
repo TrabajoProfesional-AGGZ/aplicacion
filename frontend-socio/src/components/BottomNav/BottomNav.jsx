@@ -9,23 +9,24 @@ const ITEMS = [
   { id: 'noticias', icon: Newspaper, label: 'Noticias del Club' },
 ];
 
-export function BottomNav({ onProximamente }) {
+export function BottomNav({ onProximamente, onInicio, vistaActual }) {
   return (
     <nav className="bottom-nav">
       {ITEMS.map(({ id, icon: Icon, label }) => {
         const esInicio = id === 'inicio';
         const esCarnet = id === 'carnet';
+        const activo = esInicio && vistaActual === 'inicio';
         return (
           <button
             key={id}
             type="button"
             className={[
               'bottom-nav-item',
-              esInicio && 'bottom-nav-item--active',
+              activo && 'bottom-nav-item--active',
               esCarnet && 'bottom-nav-item--carnet',
             ].filter(Boolean).join(' ')}
-            aria-current={esInicio ? 'page' : undefined}
-            onClick={esInicio ? undefined : () => onProximamente(label)}
+            aria-current={activo ? 'page' : undefined}
+            onClick={esInicio ? onInicio : () => onProximamente(label)}
           >
             {esCarnet ? (
               <span className="bottom-nav-carnet-icon"><Icon size={22} /></span>

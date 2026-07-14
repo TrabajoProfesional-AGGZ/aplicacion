@@ -18,4 +18,9 @@ describe('Header', () => {
     fireEvent.click(screen.getByLabelText('Mi perfil'));
     expect(onPerfil).toHaveBeenCalledTimes(1);
   });
+
+  test('no muestra el ícono de perfil cuando mostrarPerfil es false', () => {
+    render(<Header onPerfil={jest.fn()} mostrarPerfil={false} />);
+    expect(screen.queryByLabelText('Mi perfil')).not.toBeInTheDocument();
+  });
 });
