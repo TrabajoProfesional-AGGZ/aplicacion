@@ -1,0 +1,205 @@
+/* Tarjeta de estado — mismo lenguaje visual que WelcomeCard (radial gradient + grano),
+   tinta el gradiente con el color del estado en vez del negro plano */
+.finanzas-resumen {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--radius-xl);
+  padding: var(--space-8) var(--space-6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 32px -16px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.finanzas-resumen--success {
+  background:
+    radial-gradient(130% 150% at 15% -10%, rgba(13, 110, 13, 0.4) 0%, transparent 55%),
+    linear-gradient(155deg, #16341c 0%, #101c12 45%, #0a0a0a 100%);
+}
+
+.finanzas-resumen--danger {
+  background:
+    radial-gradient(130% 150% at 15% -10%, rgba(160, 20, 20, 0.45) 0%, transparent 55%),
+    linear-gradient(155deg, #3a1512 0%, #200e0d 45%, #0a0a0a 100%);
+}
+
+.finanzas-resumen--warning {
+  background:
+    radial-gradient(130% 150% at 15% -10%, rgba(154, 98, 0, 0.4) 0%, transparent 55%),
+    linear-gradient(155deg, #362a12 0%, #1c160b 45%, #0a0a0a 100%);
+}
+
+.finanzas-resumen-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.finanzas-resumen-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.finanzas-resumen-tag {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.35em 0.85em;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+}
+
+.finanzas-resumen-tag--success { background-color: var(--status-success-bg); }
+.finanzas-resumen-tag--danger { background-color: var(--status-danger-bg); }
+.finanzas-resumen-tag--warning { background-color: var(--status-warning-bg); }
+
+.finanzas-resumen-deuda {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-surface);
+}
+
+.finanzas-resumen-copy {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.finanzas-cuotas-title {
+  margin: 0 0 var(--space-4);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Tarjetas de cuota: franja de color a la izquierda + sombra tintada según urgencia,
+   en vez del borde+sombra genérico plano */
+.finanzas-cuota-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  border-left: 4px solid transparent;
+  margin-bottom: var(--space-3);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.finanzas-cuota-card--danger {
+  border-left-color: var(--status-danger-border);
+  box-shadow: 0 6px 20px -10px rgba(160, 20, 20, 0.35);
+}
+
+.finanzas-cuota-card--warning {
+  border-left-color: var(--status-warning-border);
+  box-shadow: 0 6px 20px -10px rgba(154, 98, 0, 0.28);
+}
+
+.finanzas-cuota-card--success {
+  border-left-color: var(--status-success-border);
+  box-shadow: 0 6px 16px -10px rgba(13, 110, 13, 0.22);
+}
+
+.finanzas-cuota-card--neutral {
+  border-left-color: var(--color-border-medium);
+  box-shadow: var(--shadow-sm);
+}
+
+.finanzas-cuota-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.finanzas-cuota-concepto {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.finanzas-cuota-vencimiento {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.finanzas-cuota-tag {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25em 0.65em;
+  border-radius: var(--radius-sm);
+  color: var(--color-on-accent);
+}
+
+.finanzas-cuota-tag--danger { background-color: var(--status-danger-border); }
+.finanzas-cuota-tag--warning { background-color: var(--status-warning-border); }
+.finanzas-cuota-tag--success { background-color: var(--status-success-border); }
+.finanzas-cuota-tag--neutral { background-color: var(--color-text-secondary); }
+
+.finanzas-cuota-detalle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-2);
+}
+
+.finanzas-cuota-monto {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.15rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.finanzas-pagar-btn {
+  border: none;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.finanzas-pagar-btn:hover {
+  background-color: var(--color-text-secondary);
+}
+
+.finanzas-pagar-btn:active {
+  transform: scale(0.96);
+}
+
+.finanzas-error {
+  color: var(--status-danger-border);
+}
+
+@media (max-width: 480px) {
+  .finanzas-cuota-card {
+    align-items: flex-start;
+  }
+
+  .finanzas-resumen-deuda {
+    font-size: 2.1rem;
+  }
+}

@@ -1,5 +1,12 @@
 import './WelcomeCard.css';
 
+const ESTADO_COLOR = {
+  Activo: 'var(--status-success-border)',
+  Moroso: 'var(--status-danger-border)',
+  Inactivo: 'var(--status-warning-border)',
+  Suspendido: 'var(--status-suspended-border)',
+};
+
 export function WelcomeCard({ socio }) {
   const fechaFormateada = new Intl.DateTimeFormat('es-AR', {
     weekday: 'long',
@@ -13,7 +20,9 @@ export function WelcomeCard({ socio }) {
       <div className="welcome-card-texture" aria-hidden="true" />
       <div className="welcome-card-top">
         <p className="welcome-card-fecha">{fechaFormateada}</p>
-        <p className="welcome-card-estado">Estado: {socio.estado?.nombre}</p>
+        <p className="welcome-card-estado" style={{ color: ESTADO_COLOR[socio.estado?.nombre] }}>
+          Estado: {socio.estado?.nombre}
+        </p>
       </div>
       <h1 className="welcome-card-saludo">Bienvenido {socio.nombre} {socio.apellido}</h1>
       <p className="welcome-card-membresia">{socio.nro_socio} - {socio.categoria?.nombre}</p>

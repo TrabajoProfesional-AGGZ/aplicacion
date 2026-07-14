@@ -9,7 +9,7 @@ const ACCESOS_RAPIDOS = [
   { id: 'noticias', icon: Newspaper, titulo: 'Última noticia', desc: 'Enterate de las últimas novedades del club.' },
 ];
 
-export function QuickAccessGrid({ onProximamente }) {
+export function QuickAccessGrid({ onProximamente, onPagos }) {
   const [destacado, ...resto] = ACCESOS_RAPIDOS;
 
   return (
@@ -20,7 +20,7 @@ export function QuickAccessGrid({ onProximamente }) {
         titulo={destacado.titulo}
         desc={destacado.desc}
         variant="featured"
-        onClick={() => onProximamente(destacado.titulo)}
+        onClick={destacado.id === 'pagos' ? onPagos : () => onProximamente(destacado.titulo)}
       />
 
       <div className="quick-access-list">
@@ -31,7 +31,7 @@ export function QuickAccessGrid({ onProximamente }) {
             titulo={titulo}
             desc={desc}
             variant="row"
-            onClick={() => onProximamente(titulo)}
+            onClick={id === 'pagos' ? onPagos : () => onProximamente(titulo)}
           />
         ))}
       </div>
