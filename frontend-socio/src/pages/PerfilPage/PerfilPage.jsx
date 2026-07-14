@@ -143,8 +143,9 @@ function CambiarContraseniaModal({ cerrarSesion, onClose }) {
 function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
   const inputDispositivoRef = useRef(null);
   const inputCamaraRef = useRef(null);
-  const [estado, setEstado] = useState('inicial'); // inicial | subiendo | exito | error
+  const [estado, setEstado] = useState('inicial'); // inicial | previsualizando | subiendo | exito | error
   const [error, setError] = useState('');
+  const [archivoDataUrl, setArchivoDataUrl] = useState(null);
 
   async function manejarArchivoSeleccionado(e) {
     const file = e.target.files?.[0];
@@ -153,13 +154,12 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
 
     const errorValidacion = validarArchivoImagen(file);
     if (errorValidacion) {
+      setArchivoDataUrl(null);
       setEstado('error');
       setError(errorValidacion);
       return;
     }
 
-    setEstado('subiendo');
-    setError('');
     try {
       const dataUrl = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -167,7 +167,23 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
         reader.onerror = () => reject(reader.error);
         reader.readAsDataURL(file);
       });
-      const { foto_url } = await subirFotoSocio(socio.id, dataUrl);
+      setArchivoDataUrl(dataUrl);
+      setEstado('previsualizando');
+      setError('');
+    } catch {
+      setArchivoDataUrl(null);
+      setEstado('error');
+      setError('No pudimos leer la foto. Probá de nuevo.');
+    }
+  }
+
+  async function confirmarSubida() {
+    if (!archivoDataUrl) return;
+    setEstado('subiendo');
+    setError('');
+    try {
+      const { foto_url } = await subirFotoSocio(socio.id, archivoDataUrl);
+      setArchivoDataUrl(null);
       setEstado('exito');
       onFotoActualizada(foto_url);
       setTimeout(onClose, 900);
@@ -177,6 +193,15 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
     }
   }
 
+  function elegirOtra() {
+    setArchivoDataUrl(null);
+    setEstado('inicial');
+    setError('');
+  }
+
+  const mostrarPreview = Boolean(archivoDataUrl) && estado !== 'exito';
+  const mostrarOpciones = !mostrarPreview && estado !== 'exito';
+
   return (
     <ModalOverlay onClose={onClose}>
       <div className="csf-outer-card">
@@ -184,43 +209,50 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
           <h1>Foto de perfil</h1>
         </div>
         <div className="csf-card">
-          <div className="foto-modal-opciones">
-            <button
-              type="button"
-              className="foto-modal-opcion-btn"
-              onClick={() => inputDispositivoRef.current?.click()}
-              disabled={estado === 'subiendo'}
-            >
-              <Upload size={18} />
-              Subir desde el dispositivo
-            </button>
-            <button
-              type="button"
-              className="foto-modal-opcion-btn"
-              onClick={() => inputCamaraRef.current?.click()}
-              disabled={estado === 'subiendo'}
-            >
-              <Camera size={18} />
-              Tomar una foto en el momento
-            </button>
-            <input
-              ref={inputDispositivoRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={manejarArchivoSeleccionado}
-              style={{ display: 'none' }}
-              aria-label="Subir archivo desde el dispositivo"
-            />
-            <input
-              ref={inputCamaraRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              capture="user"
-              onChange={manejarArchivoSeleccionado}
-              style={{ display: 'none' }}
-              aria-label="Tomar una foto con la cámara"
-            />
-          </div>
+          {mostrarOpciones && (
+            <div className="foto-modal-opciones">
+              <button
+                type="button"
+                className="foto-modal-opcion-btn"
+                onClick={() => inputDispositivoRef.current?.click()}
+              >
+                <Upload size={18} />
+                Subir desde el dispositivo
+              </button>
+              <button
+                type="button"
+                className="foto-modal-opcion-btn"
+                onClick={() => inputCamaraRef.current?.click()}
+              >
+                <Camera size={18} />
+                Tomar una foto en el momento
+              </button>
+              <input
+                ref={inputDispositivoRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={manejarArchivoSeleccionado}
+                style={{ display: 'none' }}
+                aria-label="Subir archivo desde el dispositivo"
+              />
+              <input
+                ref={inputCamaraRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                capture="user"
+                onChange={manejarArchivoSeleccionado}
+                style={{ display: 'none' }}
+                aria-label="Tomar una foto con la cámara"
+              />
+            </div>
+          )}
+
+          {mostrarPreview && (
+            <div className="foto-modal-preview-wrapper">
+              <img src={archivoDataUrl} alt="Previsualización de la nueva foto" className="foto-modal-preview-img" />
+            </div>
+          )}
+
           {estado === 'subiendo' && (
             <p className="foto-modal-estado foto-modal-estado--subiendo">
               <Loader2 size={16} className="foto-modal-spinner" /> Subiendo foto...
@@ -236,12 +268,42 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
               <XCircle size={16} /> {error}
             </p>
           )}
-          <div className="csf-nav csf-nav--end">
-            <button type="button" className="csf-btn-back" onClick={onClose}>
-              Cerrar
-            </button>
-          </div>
+
+          {mostrarPreview ? (
+            <div className="csf-nav csf-nav--between">
+              <button type="button" className="csf-btn-back" onClick={elegirOtra} disabled={estado === 'subiendo'}>
+                Elegir otra
+              </button>
+              <button type="button" className="csf-btn-submit" onClick={confirmarSubida} disabled={estado === 'subiendo'}>
+                {estado === 'subiendo' ? 'Subiendo...' : 'Confirmar'}
+              </button>
+            </div>
+          ) : (
+            <div className="csf-nav csf-nav--end">
+              <button type="button" className="csf-btn-back" onClick={onClose}>
+                Cerrar
+              </button>
+            </div>
+          )}
         </div>
+      </div>
+    </ModalOverlay>
+  );
+}
+
+function FotoAmpliadaModal({ socio, onClose, onCambiarFoto }) {
+  return (
+    <ModalOverlay onClose={onClose} wrapperClass="foto-ampliada-wrapper">
+      <div className="foto-ampliada-imagen-wrapper">
+        <img src={socio.foto_url} alt="" className="foto-ampliada-imagen" referrerPolicy="no-referrer" />
+        <button
+          type="button"
+          className="perfil-avatar-edit-btn perfil-avatar-edit-btn--ampliada"
+          aria-label="Cambiar foto de perfil"
+          onClick={onCambiarFoto}
+        >
+          <Plus size={20} />
+        </button>
       </div>
     </ModalOverlay>
   );
@@ -250,6 +312,7 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
 export function PerfilPage({ socio, cerrarSesion }) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [fotoModalAbierto, setFotoModalAbierto] = useState(false);
+  const [fotoAmpliadaAbierta, setFotoAmpliadaAbierta] = useState(false);
   const { setSocio } = useAuth();
 
   const datos = [
@@ -267,7 +330,24 @@ export function PerfilPage({ socio, cerrarSesion }) {
         <div className="perfil-card-top">
           <div className="perfil-avatar-wrapper">
             {socio.foto_url
-              ? <img src={socio.foto_url} alt="" className="perfil-avatar-img" referrerPolicy="no-referrer" />
+              ? (
+                <img
+                  src={socio.foto_url}
+                  alt=""
+                  className="perfil-avatar-img"
+                  referrerPolicy="no-referrer"
+                  role="button"
+                  tabIndex={0}
+                  aria-label="Ver foto de perfil ampliada"
+                  onClick={() => setFotoAmpliadaAbierta(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setFotoAmpliadaAbierta(true);
+                    }
+                  }}
+                />
+              )
               : <span className="perfil-avatar" aria-hidden="true">{iniciales(socio.nombre, socio.apellido)}</span>}
             <button
               type="button"
@@ -321,6 +401,17 @@ export function PerfilPage({ socio, cerrarSesion }) {
           socio={socio}
           onClose={() => setFotoModalAbierto(false)}
           onFotoActualizada={(foto_url) => setSocio({ ...socio, foto_url })}
+        />
+      )}
+
+      {fotoAmpliadaAbierta && socio.foto_url && (
+        <FotoAmpliadaModal
+          socio={socio}
+          onClose={() => setFotoAmpliadaAbierta(false)}
+          onCambiarFoto={() => {
+            setFotoAmpliadaAbierta(false);
+            setFotoModalAbierto(true);
+          }}
         />
       )}
     </>
