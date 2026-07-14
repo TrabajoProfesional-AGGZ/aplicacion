@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { initMercadoPago, Payment, StatusScreen } from '@mercadopago/sdk-react';
+import { login } from '../auth';
+import { auth } from '../firebase';
 
 // Inicializamos MP
 initMercadoPago(import.meta.env.VITE_MP_PUBLIC_KEY_TEST, { locale: 'es-AR' });
@@ -19,10 +21,15 @@ export default function FlujoPagoCompleto() {
   // Función que se ejecuta cuando el Brick genera el token
   const onSubmitPago = async ({ formData }) => {
     try {
-      // Enviamos los datos al backend tal cual lo configuramos antes
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/pagos/procesar`, {
+      await login(`${import.meta.env.VITE_FIREBASE_EMAIL}`, `${import.meta.env.VITE_FIREBASE_PASSWORD}`);
+      let token = await auth.currentUser.getIdToken();
+      formData.id_cuota = crypto.randomUUID();
+      const response = await fetch(`${import.meta.env.VITE_APP_API_BASE_URL}/api/v1/pagos/procesar`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+         },
         body: JSON.stringify(formData),
       });
 
