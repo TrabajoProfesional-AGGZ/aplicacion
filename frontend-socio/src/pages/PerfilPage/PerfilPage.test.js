@@ -204,12 +204,37 @@ describe('PerfilPage', () => {
     expect(screen.getByText('Tomar una foto en el momento')).toBeInTheDocument();
   });
 
-  test('subir una foto válida la envía al backend y actualiza el avatar', async () => {
-    subirFotoSocio.mockResolvedValueOnce({ foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' });
+  test('seleccionar una foto la previsualiza sin subirla todavía', async () => {
     render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} />);
     abrirModalFoto();
 
     await subirArchivoDesdeDispositivo(crearArchivo());
+
+    expect(screen.getByAltText('Previsualización de la nueva foto')).toBeInTheDocument();
+    expect(screen.getByText('Confirmar')).toBeInTheDocument();
+    expect(subirFotoSocio).not.toHaveBeenCalled();
+  });
+
+  test('"Elegir otra" descarta la previsualización sin llamar al backend', async () => {
+    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} />);
+    abrirModalFoto();
+    await subirArchivoDesdeDispositivo(crearArchivo());
+
+    fireEvent.click(screen.getByText('Elegir otra'));
+
+    expect(screen.getByText('Subir desde el dispositivo')).toBeInTheDocument();
+    expect(screen.queryByAltText('Previsualización de la nueva foto')).not.toBeInTheDocument();
+    expect(subirFotoSocio).not.toHaveBeenCalled();
+  });
+
+  test('confirmar la foto la envía al backend y actualiza el avatar', async () => {
+    subirFotoSocio.mockResolvedValueOnce({ foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' });
+    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} />);
+    abrirModalFoto();
+    await subirArchivoDesdeDispositivo(crearArchivo());
+
+    expect(subirFotoSocio).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByText('Confirmar'));
 
     await waitFor(() => expect(subirFotoSocio).toHaveBeenCalledWith('socio-1', 'data:image/jpeg;base64,ZmFrZQ=='));
     await waitFor(() => expect(mockSetSocio).toHaveBeenCalledWith(
@@ -228,14 +253,36 @@ describe('PerfilPage', () => {
     expect(subirFotoSocio).not.toHaveBeenCalled();
   });
 
-  test('si falla la subida, muestra un mensaje de error', async () => {
+  test('si falla la subida al confirmar, muestra un mensaje de error', async () => {
     subirFotoSocio.mockRejectedValueOnce(new Error('servicio-no-disponible'));
     render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} />);
     abrirModalFoto();
-
     await subirArchivoDesdeDispositivo(crearArchivo());
+    fireEvent.click(screen.getByText('Confirmar'));
 
     expect(await screen.findByText('No pudimos subir la foto. Probá de nuevo.')).toBeInTheDocument();
     expect(mockSetSocio).not.toHaveBeenCalled();
+  });
+
+  test('click en la foto de perfil abre la vista ampliada con el mismo botón para cambiarla', () => {
+    const socioConFoto = { ...socioFixture, foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' };
+    render(<PerfilPage socio={socioConFoto} cerrarSesion={jest.fn()} />);
+
+    fireEvent.click(screen.getByLabelText('Ver foto de perfil ampliada'));
+
+    expect(screen.getAllByAltText('').length).toBe(2);
+    expect(screen.getAllByLabelText('Cambiar foto de perfil').length).toBe(2);
+  });
+
+  test('el botón "+" de la vista ampliada abre el formulario de subida', () => {
+    const socioConFoto = { ...socioFixture, foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' };
+    render(<PerfilPage socio={socioConFoto} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByLabelText('Ver foto de perfil ampliada'));
+
+    const botonesCambiar = screen.getAllByLabelText('Cambiar foto de perfil');
+    fireEvent.click(botonesCambiar[botonesCambiar.length - 1]);
+
+    expect(screen.getByText('Subir desde el dispositivo')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Cambiar foto de perfil').length).toBe(1);
   });
 });
