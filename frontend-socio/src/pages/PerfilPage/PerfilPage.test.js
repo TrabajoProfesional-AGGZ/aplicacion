@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { PerfilPage } from './PerfilPage';
 
 jest.mock('../../firebase', () => ({ auth: {} }));
@@ -6,6 +6,16 @@ jest.mock('../../utils/authService', () => ({
   changePassword: jest.fn(),
 }));
 import { changePassword } from '../../utils/authService';
+
+const mockSetSocio = jest.fn();
+jest.mock('../../hooks/useAuth', () => ({
+  useAuth: () => ({ setSocio: mockSetSocio }),
+}));
+
+jest.mock('../../services/sociosService', () => ({
+  subirFotoSocio: jest.fn(),
+}));
+import { subirFotoSocio } from '../../services/sociosService';
 
 const socioFixture = {
   nombre: 'Ana',
@@ -36,9 +46,40 @@ function enviarFormulario() {
   fireEvent.submit(screen.getByLabelText('Contraseña actual').closest('form'));
 }
 
+class MockFileReader {
+  readAsDataURL(file) {
+    this.result = `data:${file.type};base64,ZmFrZQ==`;
+    if (this.onload) this.onload();
+  }
+}
+
+function crearArchivo({ name = 'foto.jpg', type = 'image/jpeg', size } = {}) {
+  const file = new File(['contenido-de-prueba'], name, { type });
+  if (size !== undefined) Object.defineProperty(file, 'size', { value: size });
+  return file;
+}
+
+function abrirModalFoto() {
+  fireEvent.click(screen.getByLabelText('Cambiar foto de perfil'));
+}
+
+async function subirArchivoDesdeDispositivo(file) {
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText('Subir archivo desde el dispositivo'), { target: { files: [file] } });
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+}
+
 describe('PerfilPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useFakeTimers();
+    global.FileReader = MockFileReader;
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   test('muestra el nombre y el estado del socio', () => {
@@ -148,5 +189,60 @@ describe('PerfilPage', () => {
 
     expect(await screen.findByText('Contraseña actual incorrecta o error al cambiar la contraseña')).toBeInTheDocument();
     expect(cerrarSesion).not.toHaveBeenCalled();
+  });
+
+  test('muestra las iniciales cuando el socio no tiene foto', () => {
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    expect(screen.getByText('AP')).toBeInTheDocument();
+  });
+
+  test('muestra la imagen del socio cuando tiene foto_url', () => {
+    const socioConFoto = { ...socioFixture, foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' };
+    render(<PerfilPage socio={socioConFoto} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    expect(screen.queryByText('AP')).not.toBeInTheDocument();
+    const img = screen.getByAltText('');
+    expect(img).toHaveAttribute('src', socioConFoto.foto_url);
+  });
+
+  test('click en "Cambiar foto de perfil" abre el modal con las dos opciones', () => {
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    abrirModalFoto();
+    expect(screen.getByText('Subir desde el dispositivo')).toBeInTheDocument();
+    expect(screen.getByText('Tomar una foto en el momento')).toBeInTheDocument();
+  });
+
+  test('subir una foto válida la envía al backend y actualiza el avatar', async () => {
+    subirFotoSocio.mockResolvedValueOnce({ foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' });
+    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    abrirModalFoto();
+
+    await subirArchivoDesdeDispositivo(crearArchivo());
+
+    await waitFor(() => expect(subirFotoSocio).toHaveBeenCalledWith('socio-1', 'data:image/jpeg;base64,ZmFrZQ=='));
+    await waitFor(() => expect(mockSetSocio).toHaveBeenCalledWith(
+      expect.objectContaining({ foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' }),
+    ));
+    expect(await screen.findByText('Foto actualizada')).toBeInTheDocument();
+  });
+
+  test('rechaza un archivo con tipo no permitido sin llamar al backend', async () => {
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    abrirModalFoto();
+
+    await subirArchivoDesdeDispositivo(crearArchivo({ name: 'foto.gif', type: 'image/gif' }));
+
+    expect(screen.getByText('Solo se permiten imágenes JPG, PNG o WEBP')).toBeInTheDocument();
+    expect(subirFotoSocio).not.toHaveBeenCalled();
+  });
+
+  test('si falla la subida, muestra un mensaje de error', async () => {
+    subirFotoSocio.mockRejectedValueOnce(new Error('servicio-no-disponible'));
+    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} onVolver={jest.fn()} />);
+    abrirModalFoto();
+
+    await subirArchivoDesdeDispositivo(crearArchivo());
+
+    expect(await screen.findByText('No pudimos subir la foto. Probá de nuevo.')).toBeInTheDocument();
+    expect(mockSetSocio).not.toHaveBeenCalled();
   });
 });

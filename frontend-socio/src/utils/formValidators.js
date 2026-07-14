@@ -50,3 +50,27 @@ export function getPasswordRules() {
     validate: validarFortalezaPassword,
   };
 }
+
+const TIPOS_IMAGEN_PERMITIDOS = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const EXTENSIONES_IMAGEN_PERMITIDAS = new Set(['jpg', 'jpeg', 'png', 'webp']);
+const EXTENSIONES_PELIGROSAS = new Set([
+  'exe', 'sh', 'bat', 'cmd', 'msi', 'php', 'js', 'jar', 'py',
+  'dll', 'com', 'scr', 'vbs', 'ps1', 'apk', 'html', 'htm',
+]);
+const TAMANIO_MAXIMO_IMAGEN = 5 * 1024 * 1024;
+
+export function validarArchivoImagen(file) {
+  if (!file) return undefined;
+  if (!TIPOS_IMAGEN_PERMITIDOS.has(file.type)) return 'Solo se permiten imágenes JPG, PNG o WEBP';
+
+  const partes = file.name.split('.');
+  const extension = partes[partes.length - 1]?.toLowerCase();
+  if (partes.length < 2 || !EXTENSIONES_IMAGEN_PERMITIDAS.has(extension)) {
+    return 'Solo se permiten imágenes JPG, PNG o WEBP';
+  }
+  if (partes.slice(1, -1).some((segmento) => EXTENSIONES_PELIGROSAS.has(segmento.toLowerCase()))) {
+    return 'Nombre de archivo no permitido';
+  }
+  if (file.size > TAMANIO_MAXIMO_IMAGEN) return 'La imagen no puede superar los 5MB';
+  return undefined;
+}
