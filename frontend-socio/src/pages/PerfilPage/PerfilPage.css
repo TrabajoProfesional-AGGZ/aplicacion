@@ -71,8 +71,14 @@
   padding: var(--space-6) var(--space-4);
 }
 
-.perfil-avatar {
+.perfil-avatar-wrapper {
+  position: relative;
   flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+}
+
+.perfil-avatar {
   width: 56px;
   height: 56px;
   border-radius: var(--radius-full);
@@ -84,6 +90,100 @@
   font-size: 1.1rem;
   font-weight: 600;
   letter-spacing: 0.02em;
+}
+
+.perfil-avatar-img {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.perfil-avatar-edit-btn {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-surface);
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: transform var(--transition-fast);
+}
+
+.perfil-avatar-edit-btn:hover {
+  background-color: var(--color-text-secondary);
+}
+
+.perfil-avatar-edit-btn:active {
+  transform: scale(0.92);
+}
+
+.foto-modal-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.foto-modal-opcion-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.foto-modal-opcion-btn:hover:not(:disabled) {
+  background-color: var(--color-bg-subtle);
+}
+
+.foto-modal-opcion-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.foto-modal-estado {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  font-size: 0.9rem;
+}
+
+.foto-modal-estado--subiendo {
+  color: var(--color-text-secondary);
+}
+
+.foto-modal-estado--exito {
+  color: var(--status-success-border);
+}
+
+.foto-modal-estado--error {
+  color: var(--status-danger-border);
+}
+
+.foto-modal-spinner {
+  animation: foto-modal-spin 0.9s linear infinite;
+}
+
+@keyframes foto-modal-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .perfil-card-top-text {
