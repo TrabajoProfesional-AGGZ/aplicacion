@@ -6,7 +6,7 @@ import './FinanzasPage.css';
 
 const RESUMEN_CONFIG = {
   'Al día': { tono: 'success', copy: 'Estás al día con tus cuotas.' },
-  Moroso: { tono: 'danger', copy: 'En pagos vencidos.' },
+  Moroso: { tono: 'danger', copy: 'Deuda total.' },
 };
 
 const CUOTA_ESTADO_TAG = {
