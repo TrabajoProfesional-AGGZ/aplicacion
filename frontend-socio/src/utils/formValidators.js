@@ -74,3 +74,23 @@ export function validarArchivoImagen(file) {
   if (file.size > TAMANIO_MAXIMO_IMAGEN) return 'La imagen no puede superar los 5MB';
   return undefined;
 }
+
+const TIPOS_TRAMITE_PERMITIDOS = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
+const EXTENSIONES_TRAMITE_PERMITIDAS = new Set(['jpg', 'jpeg', 'png', 'webp', 'pdf']);
+const TAMANIO_MAXIMO_TRAMITE = 10 * 1024 * 1024;
+
+export function validarArchivoTramite(file) {
+  if (!file) return undefined;
+  if (!TIPOS_TRAMITE_PERMITIDOS.has(file.type)) return 'Solo se permiten archivos JPG, PNG, WEBP o PDF';
+
+  const partes = file.name.split('.');
+  const extension = partes[partes.length - 1]?.toLowerCase();
+  if (partes.length < 2 || !EXTENSIONES_TRAMITE_PERMITIDAS.has(extension)) {
+    return 'Solo se permiten archivos JPG, PNG, WEBP o PDF';
+  }
+  if (partes.slice(1, -1).some((segmento) => EXTENSIONES_PELIGROSAS.has(segmento.toLowerCase()))) {
+    return 'Nombre de archivo no permitido';
+  }
+  if (file.size > TAMANIO_MAXIMO_TRAMITE) return 'El archivo no puede superar los 10MB';
+  return undefined;
+}

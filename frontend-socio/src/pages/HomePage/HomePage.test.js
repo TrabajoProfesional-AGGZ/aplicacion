@@ -13,6 +13,10 @@ jest.mock('../../services/finanzasService', () => ({
     cuotas: [],
   })),
 }));
+jest.mock('../../services/tramitesService', () => ({
+  getTramitesPendientes: jest.fn(() => Promise.resolve({ vencidos: [], por_vencer: [], total: 0 })),
+  getTramitesPorSocio: jest.fn(() => Promise.resolve([])),
+}));
 
 const socioFixture = {
   id: 'socio-1',
@@ -30,12 +34,28 @@ describe('HomePage', () => {
     expect(screen.getByText('1000 - Titular')).toBeInTheDocument();
   });
 
-  test('muestra las 4 tarjetas de acceso rápido', () => {
+  test('muestra las 5 tarjetas de acceso rápido', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     expect(screen.getByText('Cuotas y pagos')).toBeInTheDocument();
     expect(screen.getByText('Reservar instalación')).toBeInTheDocument();
     expect(screen.getByText('Inscribirme a actividad')).toBeInTheDocument();
     expect(screen.getByText('Última noticia')).toBeInTheDocument();
+    expect(screen.getByText('Mis trámites')).toBeInTheDocument();
+  });
+
+  test('click en "Mis trámites" navega a la página de trámites (no abre el overlay)', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Mis trámites'));
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Mis trámites' })).toBeInTheDocument();
+  });
+
+  test('"Inicio" del nav inferior vuelve a mostrar el inicio desde trámites', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Mis trámites'));
+    await screen.findByRole('heading', { name: 'Mis trámites' });
+    fireEvent.click(screen.getByText('Inicio'));
+    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
   });
 
   test('click en una tarjeta de acceso rápido abre el overlay "Próximamente" con su título', () => {

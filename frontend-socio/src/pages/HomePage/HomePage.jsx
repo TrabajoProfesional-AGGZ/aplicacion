@@ -6,6 +6,8 @@ import { BottomNav } from '../../components/BottomNav/BottomNav';
 import { ProximamenteOverlay } from '../../components/ProximamenteOverlay/ProximamenteOverlay';
 import { PerfilPage } from '../PerfilPage/PerfilPage';
 import { FinanzasPage } from '../FinanzasPage/FinanzasPage';
+import { TramitesPage } from '../TramitesPage/TramitesPage';
+import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
 import '../../socio-theme.css';
 import './HomePage.css';
 
@@ -20,10 +22,16 @@ export function HomePage({ socio, cerrarSesion }) {
       <main className="home-page">
         {vista === 'perfil' && <PerfilPage socio={socio} cerrarSesion={cerrarSesion} />}
         {vista === 'pagos' && <FinanzasPage socio={socio} />}
+        {vista === 'tramites' && <TramitesPage socio={socio} />}
         {vista === 'inicio' && (
           <>
             <WelcomeCard socio={socio} />
-            <QuickAccessGrid onProximamente={setProximamente} onPagos={() => setVista('pagos')} />
+            <CertificadoVencidoBanner socio={socio} onClick={() => setVista('tramites')} />
+            <QuickAccessGrid
+              onProximamente={setProximamente}
+              onPagos={() => setVista('pagos')}
+              onTramites={() => setVista('tramites')}
+            />
           </>
         )}
       </main>
