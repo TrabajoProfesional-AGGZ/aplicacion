@@ -38,7 +38,7 @@ describe('FinanzasPage', () => {
 
     render(<FinanzasPage socio={socioFixture} />);
 
-    expect(await screen.findByText('Deuda total.')).toBeInTheDocument();
+    expect(await screen.findByText('Por pagar.')).toBeInTheDocument();
     expect(screen.getByText('Moroso')).toBeInTheDocument();
     expect(screen.getByText('Cuota Social - 07/2026')).toBeInTheDocument();
     expect(screen.getByText('Vencida')).toBeInTheDocument();

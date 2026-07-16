@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FileText, Plus } from 'lucide-react';
 import { getTramitesPorSocio } from '../../services/tramitesService';
 import { SubirTramiteForm } from '../../components/subirTramiteForm/SubirTramiteForm';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
@@ -54,12 +55,24 @@ export function TramitesPage({ socio }) {
 
       {!cargando && !error && (
         <section className="tramites-lista">
-          <div className="tramites-header">
-            <h2 className="tramites-title">Mis trámites</h2>
-            <button type="button" className="tramites-cargar-btn" onClick={() => setFormAbierto(true)}>
-              Cargar trámite
-            </button>
-          </div>
+          <header className="tramites-page-header">
+            <div className="tramites-eyebrow">
+              <span className="tramites-eyebrow-icon" aria-hidden="true"><FileText size={13} /></span>
+              Documentación del socio
+            </div>
+            <div className="tramites-page-header-row">
+              <div className="tramites-page-header-text">
+                <h2 className="tramites-title">Mis trámites</h2>
+                <p className="tramites-subtitle">
+                  Cargá certificados y hacé seguimiento del estado de cada uno.
+                </p>
+              </div>
+              <button type="button" className="tramites-cargar-btn" onClick={() => setFormAbierto(true)}>
+                <Plus size={16} />
+                Cargar trámite
+              </button>
+            </div>
+          </header>
 
           {tramites.length === 0 && <p className="tramites-empty">No tenés trámites cargados.</p>}
 

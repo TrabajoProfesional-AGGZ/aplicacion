@@ -1,33 +1,100 @@
-.tramites-header {
-  display: flex;
+.tramites-page-header {
+  margin-bottom: var(--space-6);
+}
+
+.tramites-eyebrow {
+  display: inline-flex;
   align-items: center;
+  gap: var(--space-2);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.tramites-eyebrow-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+}
+
+.tramites-page-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.tramites-page-header-text {
+  min-width: 0;
 }
 
 .tramites-title {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.tramites-subtitle {
+  margin: var(--space-2) 0 0;
+  max-width: 42ch;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  text-wrap: pretty;
 }
 
 .tramites-cargar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
   border: none;
   background-color: var(--color-text-primary);
   color: var(--color-surface);
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-full);
   cursor: pointer;
   white-space: nowrap;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
 .tramites-cargar-btn:hover {
   background-color: var(--color-text-secondary);
+}
+
+.tramites-cargar-btn:active {
+  transform: scale(0.96);
+}
+
+@media (max-width: 480px) {
+  .tramites-title {
+    font-size: 1.65rem;
+  }
+
+  .tramites-page-header-row {
+    align-items: flex-start;
+  }
+
+  .tramites-cargar-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .tramites-empty {
