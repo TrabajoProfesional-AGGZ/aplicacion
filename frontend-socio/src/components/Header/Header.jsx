@@ -2,7 +2,7 @@ import { Bell, CircleUserRound } from 'lucide-react';
 import logoTexto from '../../assets/texto.png';
 import './Header.css';
 
-export function Header({ onPerfil, mostrarPerfil = true }) {
+export function Header({ onPerfil, onAlertas, mostrarPerfil = true }) {
   return (
     <header className="app-header">
       {mostrarPerfil ? (
@@ -13,7 +13,7 @@ export function Header({ onPerfil, mostrarPerfil = true }) {
         <span className="app-header-spacer" aria-hidden="true" />
       )}
       <img src={logoTexto} alt="SocioUnido" className="app-header-logo" />
-      <button className="app-header-bell" aria-label="Notificaciones">
+      <button onClick={onAlertas} className="app-header-bell" aria-label="Notificaciones">
         <Bell size={22} color="#111111" />
       </button>
     </header>

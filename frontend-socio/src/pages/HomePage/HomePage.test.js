@@ -17,6 +17,9 @@ jest.mock('../../services/tramitesService', () => ({
   getTramitesPendientes: jest.fn(() => Promise.resolve({ vencidos: [], por_vencer: [], total: 0 })),
   getTramitesPorSocio: jest.fn(() => Promise.resolve([])),
 }));
+jest.mock('../../services/alertasService', () => ({
+  getAlertasSocio: jest.fn(() => Promise.resolve([])),
+}));
 
 const socioFixture = {
   id: 'socio-1',
@@ -106,6 +109,20 @@ describe('HomePage', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Mi Carnet'));
     expect(screen.getByText('Próximamente...')).toBeInTheDocument();
+  });
+
+  test('click en el botón de notificaciones navega a la página de alertas', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByLabelText('Notificaciones'));
+    expect(await screen.findByRole('heading', { name: 'Mis alertas' })).toBeInTheDocument();
+  });
+
+  test('"Inicio" del nav inferior vuelve a mostrar el inicio desde alertas', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByLabelText('Notificaciones'));
+    await screen.findByRole('heading', { name: 'Mis alertas' });
+    fireEvent.click(screen.getByText('Inicio'));
+    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
   });
 
   test('click en el botón de perfil del header navega a la página de perfil, sin flecha de volver', () => {
