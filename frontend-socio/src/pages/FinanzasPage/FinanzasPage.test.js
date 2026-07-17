@@ -6,6 +6,15 @@ jest.mock('../../services/finanzasService', () => ({
   getEstadoFinanciero: jest.fn(),
 }));
 
+jest.mock('../../components/pagoCuota/PagoCuotaFlow', () => ({
+  PagoCuotaFlow: ({ cuota, onVolver }) => (
+    <div>
+      <p>pago-flow-stub {cuota.concepto}</p>
+      <button onClick={onVolver}>Volver al stub</button>
+    </div>
+  ),
+}));
+
 const socioFixture = { id: 'socio-1' };
 
 describe('FinanzasPage', () => {
@@ -44,7 +53,7 @@ describe('FinanzasPage', () => {
     expect(screen.getByText('Vencida')).toBeInTheDocument();
   });
 
-  test('muestra un botón "Pagar" por cada cuota no pagada, que abre el placeholder "Próximamente"', async () => {
+  test('muestra un botón "Pagar" por cada cuota no pagada, que abre el flujo de pago', async () => {
     getEstadoFinanciero.mockResolvedValue({
       id_socio: 'socio-1',
       estado_financiero: 'Moroso',
@@ -66,7 +75,37 @@ describe('FinanzasPage', () => {
     const boton = await screen.findByRole('button', { name: 'Pagar' });
     fireEvent.click(boton);
 
-    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
+    expect(screen.getByText('pago-flow-stub Cuota Social - 07/2026')).toBeInTheDocument();
+  });
+
+  test('al volver del flujo de pago, se refetchea el estado financiero y se muestra la lista', async () => {
+    getEstadoFinanciero.mockResolvedValue({
+      id_socio: 'socio-1',
+      estado_financiero: 'Moroso',
+      deuda_total: '1500.00',
+      cuotas: [
+        {
+          id: 'c1',
+          concepto: 'Cuota Social - 07/2026',
+          monto: '1500.00',
+          fecha_emision: '2026-07-13',
+          fecha_vencimiento: '2026-07-23',
+          estado: 'Pendiente',
+        },
+      ],
+    });
+
+    render(<FinanzasPage socio={socioFixture} />);
+
+    const botonPagar = await screen.findByRole('button', { name: 'Pagar' });
+    fireEvent.click(botonPagar);
+
+    const botonVolver = await screen.findByText('Volver al stub');
+    fireEvent.click(botonVolver);
+
+    await waitFor(() => expect(getEstadoFinanciero).toHaveBeenCalledTimes(2));
+    expect(await screen.findByText('Cuota Social - 07/2026')).toBeInTheDocument();
+    expect(screen.getByText('Pendiente')).toBeInTheDocument();
   });
 
   test('no muestra el botón "Pagar" para una cuota ya pagada', async () => {

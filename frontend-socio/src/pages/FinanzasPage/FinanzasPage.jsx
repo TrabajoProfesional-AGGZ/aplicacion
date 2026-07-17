@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getEstadoFinanciero } from '../../services/finanzasService';
-import { ProximamenteOverlay } from '../../components/ProximamenteOverlay/ProximamenteOverlay';
+import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
 import './FinanzasPage.css';
 
@@ -32,7 +32,8 @@ export function FinanzasPage({ socio }) {
   const [resumen, setResumen] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
-  const [proximamente, setProximamente] = useState(null);
+  const [cuotaAPagar, setCuotaAPagar] = useState(null);
+  const [recarga, setRecarga] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,7 +44,9 @@ export function FinanzasPage({ socio }) {
       .catch((err) => { if (!cancelled) setError(err.message); })
       .finally(() => { if (!cancelled) setCargando(false); });
     return () => { cancelled = true; };
-  }, [socio.id]);
+  }, [socio.id, recarga]);
+
+  const volverALista = () => { setCuotaAPagar(null); setRecarga((n) => n + 1); };
 
   return (
     <>
@@ -51,7 +54,11 @@ export function FinanzasPage({ socio }) {
 
       {!cargando && error && <p className="finanzas-error">No se pudo cargar tu estado financiero.</p>}
 
-      {!cargando && !error && resumen && (
+      {!cargando && !error && resumen && cuotaAPagar && (
+        <PagoCuotaFlow cuota={cuotaAPagar} socio={socio} onVolver={volverALista} />
+      )}
+
+      {!cargando && !error && resumen && !cuotaAPagar && (
         <>
           {(() => {
             const config = RESUMEN_CONFIG[resumen.estado_financiero] ?? { tono: 'warning', copy: '' };
@@ -91,7 +98,7 @@ export function FinanzasPage({ socio }) {
                       <button
                         type="button"
                         className="finanzas-pagar-btn"
-                        onClick={() => setProximamente('Pagar')}
+                        onClick={() => setCuotaAPagar(cuota)}
                       >
                         Pagar
                       </button>
@@ -102,10 +109,6 @@ export function FinanzasPage({ socio }) {
             })}
           </section>
         </>
-      )}
-
-      {proximamente && (
-        <ProximamenteOverlay titulo={proximamente} onClose={() => setProximamente(null)} />
       )}
     </>
   );
