@@ -19,6 +19,13 @@ describe('Header', () => {
     expect(onPerfil).toHaveBeenCalledTimes(1);
   });
 
+  test('click en el botón de notificaciones llama a onAlertas', () => {
+    const onAlertas = jest.fn();
+    render(<Header onPerfil={jest.fn()} onAlertas={onAlertas} />);
+    fireEvent.click(screen.getByLabelText('Notificaciones'));
+    expect(onAlertas).toHaveBeenCalledTimes(1);
+  });
+
   test('no muestra el ícono de perfil cuando mostrarPerfil es false', () => {
     render(<Header onPerfil={jest.fn()} mostrarPerfil={false} />);
     expect(screen.queryByLabelText('Mi perfil')).not.toBeInTheDocument();
