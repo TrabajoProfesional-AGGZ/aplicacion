@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { auth } from '../firebase';
+import { messaging } from '../firebase';
+import { getToken } from 'firebase/messaging';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
 import { AuthContext } from './authContextObject';
@@ -18,6 +20,7 @@ export function AuthProvider({ children }) {
         try {
           const token = await firebaseUser.getIdToken();
           localStorage.setItem('socioToken', token); 
+          await new Promise(resolve => setTimeout(resolve, 3000));
           let res = await fetchTo(`/api/v1/socios/por-email/${encodeURIComponent(firebaseUser.email)}`, 'GET');
 
           if (res.ok) {
@@ -43,6 +46,39 @@ export function AuthProvider({ children }) {
 
     return () => unsubscribe(); 
   }, []);
+
+  useEffect(() => {
+    console.log('intento de notif ', socio)
+    // Si no hay un socio cargado en el contexto, no hacemos nada
+    if (!socio) return;
+
+    const registrarPushToken = async () => {
+      try {
+        // Pedimos permiso al sistema operativo/navegador
+        const permission = await Notification.requestPermission();
+        console.log(permission)
+        
+        if (permission === 'granted') {
+          // Generamos el token de Firebase usando tu VAPID Key
+          const currentToken = await getToken(messaging, { 
+            vapidKey: 'BFym3vvw3wJ9zIT2jdASxMNHKKaXATa9tnwoHIUEpmsUPsezXU8VjA3tABIc1XdaooM0MiYYsp60290b98A6lhM'
+          });
+          console.log(currentToken)
+          if (currentToken) {
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            await fetchTo('/api/v1/notificaciones/token', 'POST', {token: currentToken,plataforma: 'web'});
+            console.log('Token de notificaciones registrado exitosamente.');
+          } else {
+            console.warn('No se pudo generar el token de Firebase.');
+          }
+        }
+      } catch (error) {
+        console.error('Error al registrar dispositivo para notificaciones:', error);
+      }
+    };
+
+    registrarPushToken();
+  }, [socio]); // Solo se ejecuta cuando el estado "socio" cambia
 
   const cerrarSesion = useCallback(async () => {
     await signOut(auth);
