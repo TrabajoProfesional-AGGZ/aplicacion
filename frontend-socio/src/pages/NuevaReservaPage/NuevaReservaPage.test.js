@@ -134,7 +134,7 @@ describe('NuevaReservaPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
 
     expect(await screen.findByText(
-      'Todos los socios deben regularizar su situación financiera con el club para poder realizar una reserva.'
+      'Los siguientes socios no estan al día con sus pagos y deben regularizar su estado para poder realizar reservas:'
     )).toBeInTheDocument();
     expect(screen.getByText('Ana Pérez (N° 1000)')).toBeInTheDocument();
   });

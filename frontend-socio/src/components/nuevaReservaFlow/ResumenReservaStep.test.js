@@ -74,7 +74,7 @@ describe('ResumenReservaStep', () => {
         {...baseProps}
         socioTitular={titular}
         sociosAgregados={[agregado]}
-        submitError="Todos los socios deben regularizar su situación financiera con el club para poder realizar una reserva."
+        submitError="Los siguientes socios no estan al día con sus pagos y deben regularizar su estado para poder realizar reservas:"
         sociosIncumplen={['1002']}
       />
     );
@@ -85,7 +85,7 @@ describe('ResumenReservaStep', () => {
     render(
       <ResumenReservaStep
         {...baseProps}
-        submitError="Todos los socios deben regularizar su situación financiera con el club para poder realizar una reserva."
+        submitError="Los siguientes socios no estan al día con sus pagos y deben regularizar su estado para poder realizar reservas:"
         sociosIncumplen={['9999']}
       />
     );
