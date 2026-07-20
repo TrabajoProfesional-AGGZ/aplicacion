@@ -122,24 +122,31 @@ export function ReservasPage({ socio }) {
 
       {!cargando && !error && (
         <section className="reservas-lista">
-          <header className="reservas-page-header">
-            <div className="reservas-eyebrow">
-              <span className="reservas-eyebrow-icon" aria-hidden="true"><Calendar size={13} /></span>
-              Instalaciones del club
-            </div>
-            <div className="reservas-page-header-row">
-              <div className="reservas-page-header-text">
-                <h2 className="reservas-title">Mis Reservas</h2>
-                <p className="reservas-subtitle">
-                  Tenés {cantidadConfirmadas} reserva{cantidadConfirmadas === 1 ? '' : 's'} confirmada{cantidadConfirmadas === 1 ? '' : 's'} y {cantidadPendientes} pendiente{cantidadPendientes === 1 ? '' : 's'}.
-                </p>
-              </div>
-              <button type="button" className="reservas-nueva-btn" onClick={() => setFormAbierto(true)}>
+          <section className="reservas-banner">
+            <div className="reservas-banner-texture" aria-hidden="true" />
+            <div className="reservas-banner-top">
+              <span className="reservas-banner-eyebrow">
+                <Calendar size={13} />
+                Instalaciones del club
+              </span>
+              <button type="button" className="reservas-banner-nueva-btn" onClick={() => setFormAbierto(true)}>
                 <Plus size={16} />
                 Nueva reserva
               </button>
             </div>
-          </header>
+            <h2 className="reservas-banner-title">Mis Reservas</h2>
+            <div className="reservas-banner-stats">
+              <div className="reservas-banner-stat" aria-label={`Reservas confirmadas: ${cantidadConfirmadas}`}>
+                <span className="reservas-banner-stat-value reservas-banner-stat-value--success">{cantidadConfirmadas}</span>
+                <span className="reservas-banner-stat-label">Confirmadas</span>
+              </div>
+              <div className="reservas-banner-stat-divider" aria-hidden="true" />
+              <div className="reservas-banner-stat" aria-label={`Reservas pendientes: ${cantidadPendientes}`}>
+                <span className="reservas-banner-stat-value reservas-banner-stat-value--warning">{cantidadPendientes}</span>
+                <span className="reservas-banner-stat-label">Pendientes</span>
+              </div>
+            </div>
+          </section>
 
           <div className="reservas-filtros" role="group" aria-label="Filtrar reservas por estado">
             {FILTROS.map((f) => (

@@ -47,6 +47,11 @@ export function TramitesPage({ socio }) {
     setTramites((prev) => [nuevo, ...prev]);
   }
 
+  const cantidadCargados = tramites.length;
+  const cantidadAprobados = tramites.filter((t) => t.estado === 'aprobado').length;
+  const cantidadEnRevision = tramites.filter((t) => t.estado === 'en_revision').length;
+  const cantidadRechazados = tramites.filter((t) => t.estado === 'rechazado').length;
+
   return (
     <>
       {cargando && <LoadingScreen />}
@@ -55,24 +60,38 @@ export function TramitesPage({ socio }) {
 
       {!cargando && !error && (
         <section className="tramites-lista">
-          <header className="tramites-page-header">
-            <div className="tramites-eyebrow">
-              <span className="tramites-eyebrow-icon" aria-hidden="true"><FileText size={13} /></span>
-              Documentación del socio
-            </div>
-            <div className="tramites-page-header-row">
-              <div className="tramites-page-header-text">
-                <h2 className="tramites-title">Mis trámites</h2>
-                <p className="tramites-subtitle">
-                  Cargá certificados y hacé seguimiento del estado de cada uno.
-                </p>
-              </div>
-              <button type="button" className="tramites-cargar-btn" onClick={() => setFormAbierto(true)}>
+          <section className="tramites-banner">
+            <div className="tramites-banner-texture" aria-hidden="true" />
+            <div className="tramites-banner-top">
+              <span className="tramites-banner-eyebrow">
+                <FileText size={13} />
+                Documentación del socio
+              </span>
+              <button type="button" className="tramites-banner-cargar-btn" onClick={() => setFormAbierto(true)}>
                 <Plus size={16} />
                 Cargar trámite
               </button>
             </div>
-          </header>
+            <h2 className="tramites-banner-title">Mis trámites</h2>
+            <div className="tramites-banner-stats">
+              <div className="tramites-banner-stat" aria-label={`Trámites cargados: ${cantidadCargados}`}>
+                <span className="tramites-banner-stat-value">{cantidadCargados}</span>
+                <span className="tramites-banner-stat-label">Cargados</span>
+              </div>
+              <div className="tramites-banner-stat" aria-label={`Trámites aprobados: ${cantidadAprobados}`}>
+                <span className="tramites-banner-stat-value tramites-banner-stat-value--success">{cantidadAprobados}</span>
+                <span className="tramites-banner-stat-label">Aprobados</span>
+              </div>
+              <div className="tramites-banner-stat" aria-label={`Trámites en revisión: ${cantidadEnRevision}`}>
+                <span className="tramites-banner-stat-value tramites-banner-stat-value--warning">{cantidadEnRevision}</span>
+                <span className="tramites-banner-stat-label">En revisión</span>
+              </div>
+              <div className="tramites-banner-stat" aria-label={`Trámites rechazados: ${cantidadRechazados}`}>
+                <span className="tramites-banner-stat-value tramites-banner-stat-value--danger">{cantidadRechazados}</span>
+                <span className="tramites-banner-stat-label">Rechazados</span>
+              </div>
+            </div>
+          </section>
 
           {tramites.length === 0 && <p className="tramites-empty">No tenés trámites cargados.</p>}
 

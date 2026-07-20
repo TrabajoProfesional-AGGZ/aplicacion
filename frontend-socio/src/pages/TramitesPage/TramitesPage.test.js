@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { TramitesPage } from './TramitesPage';
 import { getTramitesPorSocio } from '../../services/tramitesService';
 
@@ -55,8 +55,9 @@ describe('TramitesPage', () => {
   test('lista los trámites con su tipo y estado', async () => {
     getTramitesPorSocio.mockResolvedValue([TRAMITE_MOCK]);
     render(<TramitesPage socio={socioFixture} />);
-    expect(await screen.findByText('Apto médico')).toBeInTheDocument();
-    expect(screen.getByText('En revisión')).toBeInTheDocument();
+    const tipo = await screen.findByText('Apto médico');
+    expect(tipo).toBeInTheDocument();
+    expect(within(tipo.closest('.tramite-card')).getByText('En revisión')).toBeInTheDocument();
   });
 
   test('muestra un mensaje de error si falla la carga', async () => {
@@ -83,6 +84,19 @@ describe('TramitesPage', () => {
     fireEvent.click(screen.getByText('Simular creado'));
 
     expect(await screen.findByText('Apto médico')).toBeInTheDocument();
+  });
+
+  test('muestra la cantidad de trámites por estado en el banner', async () => {
+    getTramitesPorSocio.mockResolvedValue([
+      TRAMITE_MOCK,
+      { ...TRAMITE_MOCK, id: 't-2', estado: 'aprobado' },
+      { ...TRAMITE_MOCK, id: 't-3', estado: 'rechazado' },
+    ]);
+    render(<TramitesPage socio={socioFixture} />);
+    expect(await screen.findByLabelText('Trámites cargados: 3')).toBeInTheDocument();
+    expect(screen.getByLabelText('Trámites aprobados: 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Trámites en revisión: 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Trámites rechazados: 1')).toBeInTheDocument();
   });
 
   test('no actualiza el estado si el componente se desmonta antes de que resuelva el fetch', async () => {

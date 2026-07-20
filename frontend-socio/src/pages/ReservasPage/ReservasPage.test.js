@@ -71,11 +71,12 @@ describe('ReservasPage', () => {
     expect(screen.getByText('Pendiente')).toBeInTheDocument();
   });
 
-  test('muestra la cantidad de reservas confirmadas y pendientes en el resumen', async () => {
+  test('muestra la cantidad de reservas confirmadas y pendientes en el banner', async () => {
     getReservasPorSocio.mockResolvedValue([RESERVA_PENDIENTE, RESERVA_CONFIRMADA]);
     getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
     render(<ReservasPage socio={socioFixture} />);
-    expect(await screen.findByText('Tenés 1 reserva confirmada y 1 pendiente.')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Reservas confirmadas: 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Reservas pendientes: 1')).toBeInTheDocument();
   });
 
   test('cambiar de filtro muestra solo las reservas de ese estado', async () => {
