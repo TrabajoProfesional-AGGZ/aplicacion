@@ -13,6 +13,10 @@ jest.mock('firebase/auth', () => ({
   browserSessionPersistence: SESSION_PERSISTENCE_MARKER,
 }));
 
+jest.mock('firebase/messaging', () => ({
+  getMessaging: jest.fn(() => ({})),
+}));
+
 describe('firebase', () => {
   test('configura la sesión como browserSessionPersistence, no persistente entre cierres de la app', async () => {
     await import('./firebase');
