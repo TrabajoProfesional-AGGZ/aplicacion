@@ -111,7 +111,7 @@ describe('FinanzasPage', () => {
   test('no muestra el botón "Pagar" para una cuota ya pagada', async () => {
     getEstadoFinanciero.mockResolvedValue({
       id_socio: 'socio-1',
-      estado_financiero: 'Al día',
+      estado_financiero: 'Activo',
       deuda_total: '0.00',
       cuotas: [
         {
@@ -145,7 +145,7 @@ describe('FinanzasPage', () => {
 
     const { unmount } = render(<FinanzasPage socio={socioFixture} />);
     unmount();
-    resolverPromesa({ id_socio: 'socio-1', estado_financiero: 'Al día', deuda_total: 0, cuotas: [] });
+    resolverPromesa({ id_socio: 'socio-1', estado_financiero: 'Activo', deuda_total: 0, cuotas: [] });
 
     await waitFor(() => expect(getEstadoFinanciero).toHaveBeenCalled());
   });
