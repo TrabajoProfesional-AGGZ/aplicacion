@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+let backToRootIdCounter = 0;
+
 /**
  * Ties a "current screen" state value to browser history so the phone's
  * back gesture/button returns straight to `rootValue` instead of closing
@@ -37,7 +39,7 @@ export function useBackToRoot(current, rootValue, onBack) {
     const isAway = current !== rootValue;
 
     if (isAway && !isAwayRef.current) {
-      const state = { backToRoot: true, id: Date.now() + Math.random() };
+      const state = { backToRoot: true, id: Date.now() + '-' + (backToRootIdCounter++) };
       pushedStateRef.current = state;
       window.history.pushState(state, '');
       isAwayRef.current = true;

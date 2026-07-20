@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+let modalHistoryIdCounter = 0;
+
 /**
  * Ties a modal's lifetime to a browser history entry so the phone's back
  * gesture/button closes the modal instead of the whole app. Pushes one
@@ -21,7 +23,7 @@ export function useModalHistory(onClose) {
   }, [onClose]);
 
   useEffect(() => {
-    const state = { modalOverlay: true, id: Date.now() + Math.random() };
+    const state = { modalOverlay: true, id: Date.now() + '-' + (modalHistoryIdCounter++) };
     pushedStateRef.current = state;
     window.history.pushState(state, '');
 
