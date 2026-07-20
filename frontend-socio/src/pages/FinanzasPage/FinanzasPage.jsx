@@ -5,7 +5,7 @@ import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
 import './FinanzasPage.css';
 
 const RESUMEN_CONFIG = {
-  'Al día': { tono: 'success', copy: 'Estás al día con tus cuotas.' },
+  Activo: { tono: 'success', copy: 'Estás al día con tus cuotas.' },
   Moroso: { tono: 'danger', copy: 'Por pagar.' },
 };
 
