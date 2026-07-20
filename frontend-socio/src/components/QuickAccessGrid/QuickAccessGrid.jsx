@@ -10,12 +10,13 @@ const ACCESOS_RAPIDOS = [
   { id: 'tramites', icon: FileText, titulo: 'Mis trámites', desc: 'Cargá y consultá tus trámites y formularios.' },
 ];
 
-export function QuickAccessGrid({ onProximamente, onPagos, onTramites }) {
+export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReservas }) {
   const [destacado, ...resto] = ACCESOS_RAPIDOS;
 
   function resolverOnClick(id, titulo) {
     if (id === 'pagos') return onPagos;
     if (id === 'tramites') return onTramites;
+    if (id === 'reservas') return onReservas;
     return () => onProximamente(titulo);
   }
 
