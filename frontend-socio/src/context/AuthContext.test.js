@@ -2,7 +2,15 @@ import { render, screen, act, waitFor } from '@testing-library/react';
 import { AuthProvider } from './AuthContext';
 import { useAuth } from '../hooks/useAuth';
 
-jest.mock('../firebase', () => ({ auth: {} }));
+jest.mock('../firebase', () => (
+  {
+    auth: {currentUser: {email: 'ana@example.com'}},
+    messaging: {} 
+  }
+));
+jest.mock('firebase/messaging', () => ({
+  getToken: jest.fn(),
+}));
 
 let callbackAuthState;
 const mockSignOut = jest.fn();
@@ -35,10 +43,14 @@ describe('AuthProvider — cierre de sesión por inactividad', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    global.Notification = {
+      requestPermission: jest.fn().mockResolvedValue('denied'),
+    };
   });
 
   afterEach(() => {
     jest.useRealTimers();
+    delete global.Notification;
   });
 
   test('cierra la sesión automáticamente tras 10 minutos sin actividad', async () => {

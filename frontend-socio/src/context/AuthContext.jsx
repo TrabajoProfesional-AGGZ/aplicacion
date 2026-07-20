@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { auth } from '../firebase';
+import { messaging } from '../firebase';
+import { getToken } from 'firebase/messaging';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
 import { AuthContext } from './authContextObject';
@@ -43,6 +45,37 @@ export function AuthProvider({ children }) {
 
     return () => unsubscribe(); 
   }, []);
+
+  useEffect(() => {
+    console.log('intento de notif ', socio)
+    // Si no hay un socio cargado en el contexto, no hacemos nada
+    if (!socio) return;
+
+    const registrarPushToken = async () => {
+      try {
+        // Pedimos permiso al sistema operativo/navegador
+        const permission = await Notification.requestPermission();
+        console.log(permission)
+        
+        if (permission === 'granted') {
+          const currentToken = await getToken(messaging, { 
+            vapidKey: import.meta.env.VITE_APP_VAPID_KEY
+          });
+          console.log(currentToken)
+          if (currentToken) {
+            await fetchTo('/api/v1/notificaciones/token', 'POST', {token: currentToken, plataforma: 'web', email: auth.currentUser?.email});
+            console.log('Token de notificaciones registrado exitosamente.');
+          } else {
+            console.warn('No se pudo generar el token de Firebase.');
+          }
+        }
+      } catch (error) {
+        console.error('Error al registrar dispositivo para notificaciones:', error);
+      }
+    };
+
+    registrarPushToken();
+  }, [socio]); // Solo se ejecuta cuando el estado "socio" cambia
 
   const cerrarSesion = useCallback(async () => {
     await signOut(auth);
