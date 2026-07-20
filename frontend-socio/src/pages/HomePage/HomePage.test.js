@@ -20,6 +20,16 @@ jest.mock('../../services/tramitesService', () => ({
 jest.mock('../../services/alertasService', () => ({
   getAlertasSocio: jest.fn(() => Promise.resolve([])),
 }));
+jest.mock('../../services/reservasService', () => ({
+  getReservasPorSocio: jest.fn(() => Promise.resolve([])),
+  getReservasHistoricasPorSocio: jest.fn(() => Promise.resolve([])),
+  getTurnosDisponibles: jest.fn(() => Promise.resolve([])),
+  createReserva: jest.fn(),
+  cancelReserva: jest.fn(),
+}));
+jest.mock('../../services/instalacionesService', () => ({
+  getInstalaciones: jest.fn(() => Promise.resolve([])),
+}));
 jest.mock('../../hooks/useBiometricLogin', () => ({
   useBiometricLogin: () => ({
     soportado: false,
@@ -72,11 +82,26 @@ describe('HomePage', () => {
     expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
   });
 
-  test('click en una tarjeta de acceso rápido abre el overlay "Próximamente" con su título', () => {
+  test('click en una tarjeta de acceso rápido sin handler dedicado abre el overlay "Próximamente" con su título', () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Inscribirme a actividad'));
+    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
+    expect(screen.getAllByText('Inscribirme a actividad').length).toBeGreaterThan(1);
+  });
+
+  test('click en "Reservar instalación" navega a la página de reservas (no abre el overlay)', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Reservar instalación'));
-    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
-    expect(screen.getAllByText('Reservar instalación').length).toBeGreaterThan(1);
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Mis Reservas' })).toBeInTheDocument();
+  });
+
+  test('"Inicio" del nav inferior vuelve a mostrar el inicio desde reservas', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Reservar instalación'));
+    await screen.findByRole('heading', { name: 'Mis Reservas' });
+    fireEvent.click(screen.getByText('Inicio'));
+    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
   });
 
   test('click en "Cerrar" del overlay lo cierra', () => {
