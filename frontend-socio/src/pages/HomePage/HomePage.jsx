@@ -9,11 +9,17 @@ import { FinanzasPage } from '../FinanzasPage/FinanzasPage';
 import { TramitesPage } from '../TramitesPage/TramitesPage';
 import { AlertasPage } from '../AlertasPage/AlertasPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
+import { BiometriaOfferBanner } from '../../components/BiometriaOfferBanner/BiometriaOfferBanner';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import '../../socio-theme.css';
 import './HomePage.css';
 
-export function HomePage({ socio, cerrarSesion }) {
+export function HomePage({
+  socio,
+  cerrarSesion,
+  credencialParaEnrolar = null,
+  onDescartarCredencialParaEnrolar = () => {},
+}) {
   const [proximamente, setProximamente] = useState(null);
   const [vista, setVista] = useState('inicio');
 
@@ -35,6 +41,10 @@ export function HomePage({ socio, cerrarSesion }) {
         {vista === 'inicio' && (
           <>
             <WelcomeCard socio={socio} />
+            <BiometriaOfferBanner
+              credencial={credencialParaEnrolar}
+              onDescartar={onDescartarCredencialParaEnrolar}
+            />
             <CertificadoVencidoBanner socio={socio} onClick={() => setVista('tramites')} />
             <QuickAccessGrid
               onProximamente={setProximamente}

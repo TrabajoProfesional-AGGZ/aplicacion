@@ -11,6 +11,7 @@ import { useBackToRoot } from './hooks/useBackToRoot';
 export default function App() {
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
   const [vista, setVista] = useState('auth');
+  const [credencialParaEnrolar, setCredencialParaEnrolar] = useState(null);
 
   const { socio, cargandoAuth, cerrarSesion } = useAuth();
 
@@ -36,11 +37,19 @@ export default function App() {
             key="login"
             irARegistro={() => setMostrarRegistro(true)}
             onIngresoCompleto={() => setVista('app')}
+            onLoginManualExitoso={(email, password) => setCredencialParaEnrolar({ email, password })}
           />
         )}
       </AnimatePresence>
     );
   }
 
-  return <HomePage socio={socio} cerrarSesion={cerrarSesion} />;
+  return (
+    <HomePage
+      socio={socio}
+      cerrarSesion={cerrarSesion}
+      credencialParaEnrolar={credencialParaEnrolar}
+      onDescartarCredencialParaEnrolar={() => setCredencialParaEnrolar(null)}
+    />
+  );
 }

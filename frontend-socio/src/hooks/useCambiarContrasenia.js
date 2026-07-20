@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { changePassword } from '../utils/authService';
+import { unenroll } from '../utils/webauthnService';
 import { validarFortalezaPassword } from '../utils/formValidators';
 
 export function useCambiarContrasenia(cerrarSesion) {
@@ -26,6 +27,10 @@ export function useCambiarContrasenia(cerrarSesion) {
     setLoading(true);
     try {
       await changePassword(actual, nueva);
+      // La contraseña guardada para el desbloqueo biométrico quedó vieja:
+      // reintentarla en silencio siempre fallaría contra Firebase, así que
+      // se limpia y el usuario reactiva manualmente con la nueva.
+      await unenroll();
       await cerrarSesion();
     } catch {
       setError('Contraseña actual incorrecta o error al cambiar la contraseña');
