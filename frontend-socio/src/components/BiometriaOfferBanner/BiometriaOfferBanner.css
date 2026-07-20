@@ -1,8 +1,9 @@
 .biometria-offer-banner {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: var(--space-3);
   width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
@@ -10,9 +11,18 @@
   background-color: var(--color-bg-subtle);
 }
 
+.biometria-offer-contenido {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
 .biometria-offer-texto {
   flex: 1;
+  min-width: 0;
   font-size: 0.9rem;
+  overflow-wrap: break-word;
 }
 
 .biometria-offer-error {
@@ -23,7 +33,7 @@
 
 .biometria-offer-acciones {
   display: flex;
-  flex-direction: column;
+  justify-content: flex-end;
   gap: var(--space-2);
 }
 
@@ -33,7 +43,6 @@
   padding: var(--space-2) var(--space-3);
   font-size: 0.85rem;
   cursor: pointer;
-  white-space: nowrap;
 }
 
 .biometria-offer-btn--activar {

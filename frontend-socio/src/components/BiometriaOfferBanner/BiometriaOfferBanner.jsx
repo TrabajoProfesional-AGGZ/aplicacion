@@ -27,17 +27,19 @@ export function BiometriaOfferBanner({ credencial, onDescartar }) {
 
   return (
     <div className="biometria-offer-banner">
-      <Fingerprint size={20} aria-hidden="true" />
-      <div className="biometria-offer-texto">
-        <p>¿Querés activar el inicio de sesión con huella o Face ID en este dispositivo?</p>
-        {error && <p className="biometria-offer-error">{error}</p>}
+      <div className="biometria-offer-contenido">
+        <Fingerprint size={20} aria-hidden="true" />
+        <div className="biometria-offer-texto">
+          <p>¿Querés activar el inicio de sesión con huella o Face ID en este dispositivo?</p>
+          {error && <p className="biometria-offer-error">{error}</p>}
+        </div>
       </div>
       <div className="biometria-offer-acciones">
-        <button type="button" onClick={activar} className="biometria-offer-btn biometria-offer-btn--activar">
-          Activar
-        </button>
         <button type="button" onClick={onDescartar} className="biometria-offer-btn biometria-offer-btn--descartar">
           Ahora no
+        </button>
+        <button type="button" onClick={activar} className="biometria-offer-btn biometria-offer-btn--activar">
+          Activar
         </button>
       </div>
     </div>
