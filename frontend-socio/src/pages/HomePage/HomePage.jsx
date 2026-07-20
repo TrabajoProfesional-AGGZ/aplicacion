@@ -9,12 +9,15 @@ import { FinanzasPage } from '../FinanzasPage/FinanzasPage';
 import { TramitesPage } from '../TramitesPage/TramitesPage';
 import { AlertasPage } from '../AlertasPage/AlertasPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
+import { useBackToRoot } from '../../hooks/useBackToRoot';
 import '../../socio-theme.css';
 import './HomePage.css';
 
 export function HomePage({ socio, cerrarSesion }) {
   const [proximamente, setProximamente] = useState(null);
   const [vista, setVista] = useState('inicio');
+
+  useBackToRoot(vista, 'inicio', () => setVista('inicio'));
 
   return (
     <div>

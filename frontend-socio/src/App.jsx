@@ -6,12 +6,15 @@ import { RegistroSocioForm } from './pages/Registropage/RegistroSocioForm';
 import { HomePage } from './pages/HomePage/HomePage';
 import './socio-theme.css';
 import { useAuth } from './hooks/useAuth';
+import { useBackToRoot } from './hooks/useBackToRoot';
 
 export default function App() {
   const [mostrarRegistro, setMostrarRegistro] = useState(false);
   const [vista, setVista] = useState('auth');
 
   const { socio, cargandoAuth, cerrarSesion } = useAuth();
+
+  useBackToRoot(mostrarRegistro, false, () => setMostrarRegistro(false));
 
   const mostrarDashboard = vista === 'app' && Boolean(socio);
 
