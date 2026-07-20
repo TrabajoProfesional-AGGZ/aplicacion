@@ -33,12 +33,43 @@ describe('useBackToRoot', () => {
     expect(pushStateSpy).toHaveBeenCalledTimes(1);
   });
 
-  test('un popstate estando lejos de la raíz llama a onBack', () => {
+  test('un popstate que aterriza en una entrada distinta a la propia (gesto real) llama a onBack', () => {
     const onBack = jest.fn();
     renderHook(() => useBackToRoot('perfil', 'inicio', onBack));
 
+    // Simula dónde aterriza un back real: la posición del navegador ya no es
+    // la entrada que este hook pusheó (a diferencia de un popstate "fantasma"
+    // causado por un consumidor anidado, que aterriza de vuelta en ella).
+    window.history.replaceState({ otraEntrada: true }, '');
     window.dispatchEvent(new PopStateEvent('popstate'));
     expect(onBack).toHaveBeenCalledTimes(1);
+  });
+
+  test('un popstate que aterriza de vuelta en la propia entrada (pop anidado, ej. un modal) no llama a onBack', () => {
+    const onBack = jest.fn();
+    renderHook(() => useBackToRoot('perfil', 'inicio', onBack));
+
+    // window.history.state sigue siendo la entrada que este hook pusheó al
+    // montar (pushStateSpy es un passthrough real sobre jsdom) — simula un
+    // modal anidado que consumió su propia entrada por encima y devolvió al
+    // navegador exactamente a esta posición, sin salir del segmento de este
+    // hook.
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    expect(onBack).not.toHaveBeenCalled();
+  });
+
+  test('un popstate que aterriza en la entrada de OTRO consumidor anidado (con id, pero no la propia) no llama a onBack', () => {
+    const onBack = jest.fn();
+    renderHook(() => useBackToRoot('nueva-reserva', 'inicio', onBack));
+
+    // Simula un consumidor multi-nivel (ej. useStepHistory, un wizard de
+    // varios pasos) que empujó sus propias entradas por encima de la de
+    // este hook y retrocedió un solo nivel dentro de su propia pila: el
+    // navegador aterriza en OTRA entrada rastreada (tiene id, pero no es
+    // la de este hook) — el segmento de este hook todavía no se abandonó.
+    window.history.replaceState({ stepHistory: true, id: 'entrada-de-otro-wizard' }, '');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    expect(onBack).not.toHaveBeenCalled();
   });
 
   test('un popstate estando en la raíz no llama a onBack', () => {

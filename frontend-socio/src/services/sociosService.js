@@ -22,3 +22,11 @@ export async function subirFotoSocio(idSocio, imagenBase64) {
   if (!res.ok) throw new Error('Error al subir la foto');
   return res.json();
 }
+
+export async function getSocioByNroSocio(nroSocio) {
+  const res = await fetchTo(`/api/v1/socios/por-nro-socio/${encodeURIComponent(nroSocio)}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (res.status === 404) throw new Error('socio-no-encontrado');
+  if (!res.ok) throw new Error('Error al buscar socio');
+  return res.json();
+}

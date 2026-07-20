@@ -93,31 +93,49 @@ describe('reservasService', () => {
       await expect(createReserva({})).rejects.toThrow('superposicion');
     });
 
-    test('lanza apto-medico en 403 con tipo apto_medico', async () => {
+    test('lanza apto-medico en 403 con tipo apto_medico, incluyendo los socios sin apto', async () => {
       fetchTo.mockResolvedValue({
         ok: false,
         status: 403,
-        json: () => Promise.resolve({ detail: { tipo: 'apto_medico', socios_sin_apto_medico: ['1000'] } }),
+        json: () => Promise.resolve({ detail: { tipo: 'apto_medico', socios_sin_apto_medico: ['1000', '1002'] } }),
       });
-      await expect(createReserva({})).rejects.toThrow('apto-medico');
+      try {
+        await createReserva({});
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('apto-medico');
+        expect(e.sociosIncumplen).toEqual(['1000', '1002']);
+      }
     });
 
-    test('lanza socio-moroso en 403 con tipo moroso', async () => {
+    test('lanza socio-moroso en 403 con tipo moroso, incluyendo los socios morosos', async () => {
       fetchTo.mockResolvedValue({
         ok: false,
         status: 403,
-        json: () => Promise.resolve({ detail: { tipo: 'moroso' } }),
+        json: () => Promise.resolve({ detail: { tipo: 'moroso', socios_moroso: ['1001'], socios_suspendido: [] } }),
       });
-      await expect(createReserva({})).rejects.toThrow('socio-moroso');
+      try {
+        await createReserva({});
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('socio-moroso');
+        expect(e.sociosIncumplen).toEqual(['1001']);
+      }
     });
 
-    test('lanza socio-suspendido en 403 con tipo suspendido', async () => {
+    test('lanza socio-suspendido en 403 con tipo suspendido, incluyendo los socios suspendidos', async () => {
       fetchTo.mockResolvedValue({
         ok: false,
         status: 403,
-        json: () => Promise.resolve({ detail: { tipo: 'suspendido' } }),
+        json: () => Promise.resolve({ detail: { tipo: 'suspendido', socios_moroso: [], socios_suspendido: ['1003'] } }),
       });
-      await expect(createReserva({})).rejects.toThrow('socio-suspendido');
+      try {
+        await createReserva({});
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('socio-suspendido');
+        expect(e.sociosIncumplen).toEqual(['1003']);
+      }
     });
 
     test('lanza servicio-no-disponible en 500', async () => {

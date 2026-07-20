@@ -1,5 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { HomePage } from './HomePage';
+import { getInstalaciones } from '../../services/instalacionesService';
+import { getTurnosDisponibles } from '../../services/reservasService';
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../utils/authService', () => ({
@@ -29,6 +31,9 @@ jest.mock('../../services/reservasService', () => ({
 }));
 jest.mock('../../services/instalacionesService', () => ({
   getInstalaciones: jest.fn(() => Promise.resolve([])),
+}));
+jest.mock('../../services/sociosService', () => ({
+  getSocioByNroSocio: jest.fn(),
 }));
 jest.mock('../../hooks/useBiometricLogin', () => ({
   useBiometricLogin: () => ({
@@ -89,19 +94,73 @@ describe('HomePage', () => {
     expect(screen.getAllByText('Inscribirme a actividad').length).toBeGreaterThan(1);
   });
 
-  test('click en "Reservar instalación" navega a la página de reservas (no abre el overlay)', async () => {
+  test('click en "Reservar instalación" navega al flujo de nueva reserva (no abre el overlay ni la lista de reservas)', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Reservar instalación'));
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
+  });
+
+  test('el botón "Volver" dentro del flujo de nueva reserva retrocede un paso, no sale a Home', async () => {
+    getInstalaciones.mockResolvedValueOnce([{
+      id: 'inst-1',
+      nombre: 'Cancha de fútbol',
+      tipo: 'Deportiva',
+      capacidad_maxima: 10,
+      valor_turno: 5000,
+      duracion_turno: 60,
+      tiempo_minimo_cancelacion: null,
+      activa: true,
+    }]);
+    getTurnosDisponibles.mockResolvedValueOnce(['08:00:00']);
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Reservar instalación'));
+    await screen.findByText('Cancha de fútbol');
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+
+    // Retroceder desde el 2do paso (detalle) debería aterrizar en la lista,
+    // no en Home — ida y vuelta a un solo nivel de profundidad.
+    await screen.findByText('Volver');
+    fireEvent.click(screen.getByText('Volver'));
+    expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
+    expect(screen.queryByText('Bienvenido Ana Pérez')).not.toBeInTheDocument();
+
+    // Volver a entrar y avanzar dos pasos (detalle -> socios): retroceder
+    // desde ahí debería aterrizar en detalle, no en Home — este es el caso
+    // que reproducía el bug real (2+ niveles de profundidad en el wizard).
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+    await screen.findByText('08:00');
+    fireEvent.click(screen.getByText('08:00'));
+
+    await screen.findByText('Agregar socios');
+    fireEvent.click(screen.getByText('Volver'));
+
+    expect(await screen.findByText('Cancelación sin cargo')).toBeInTheDocument();
+    expect(screen.queryByText('Bienvenido Ana Pérez')).not.toBeInTheDocument();
+  });
+
+  test('"Inicio" del nav inferior vuelve a mostrar el inicio desde el flujo de nueva reserva', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Reservar instalación'));
+    await screen.findByRole('heading', { name: 'Realizá tu reserva' });
+    fireEvent.click(screen.getByText('Inicio'));
+    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
+  });
+
+  test('"Mis Reservas" del nav inferior navega a la lista de reservas, no al flujo de nueva reserva', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Mis Reservas'));
     expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
     expect(await screen.findByRole('heading', { name: 'Mis Reservas' })).toBeInTheDocument();
   });
 
-  test('"Inicio" del nav inferior vuelve a mostrar el inicio desde reservas', async () => {
+  test('"Nueva reserva" del banner de Mis Reservas navega al flujo de nueva reserva', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Reservar instalación'));
+    fireEvent.click(screen.getByText('Mis Reservas'));
     await screen.findByRole('heading', { name: 'Mis Reservas' });
-    fireEvent.click(screen.getByText('Inicio'));
-    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /nueva reserva/i }));
+    expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
   });
 
   test('click en "Cerrar" del overlay lo cierra', () => {
