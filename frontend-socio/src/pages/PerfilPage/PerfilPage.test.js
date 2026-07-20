@@ -4,12 +4,18 @@ import { PerfilPage } from './PerfilPage';
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../utils/authService', () => ({
   changePassword: jest.fn(),
+  login: jest.fn(),
 }));
-import { changePassword } from '../../utils/authService';
+import { changePassword, login } from '../../utils/authService';
 
 const mockSetSocio = jest.fn();
 jest.mock('../../hooks/useAuth', () => ({
   useAuth: () => ({ setSocio: mockSetSocio }),
+}));
+
+let mockBiometricState;
+jest.mock('../../hooks/useBiometricLogin', () => ({
+  useBiometricLogin: () => mockBiometricState,
 }));
 
 jest.mock('../../services/sociosService', () => ({
@@ -76,6 +82,15 @@ describe('PerfilPage', () => {
     jest.clearAllMocks();
     jest.useFakeTimers();
     global.FileReader = MockFileReader;
+    mockBiometricState = {
+      soportado: false,
+      enrolado: false,
+      cargando: false,
+      error: null,
+      ofrecerEnrolamiento: jest.fn(),
+      desenrolar: jest.fn(),
+      iniciarSesionBiometrico: jest.fn(),
+    };
   });
 
   afterEach(() => {
@@ -284,5 +299,58 @@ describe('PerfilPage', () => {
 
     expect(screen.getByText('Subir desde el dispositivo')).toBeInTheDocument();
     expect(screen.getAllByLabelText('Cambiar foto de perfil').length).toBe(1);
+  });
+
+  test('no muestra la opción de biometría si el dispositivo no la soporta', () => {
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    expect(screen.queryByText(/login con biometría/i)).not.toBeInTheDocument();
+  });
+
+  test('ofrece activar la biometría cuando el dispositivo la soporta y no hay enrolamiento', () => {
+    mockBiometricState.soportado = true;
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    expect(screen.getByText('Activar login con biometría')).toBeInTheDocument();
+  });
+
+  test('activar biometría pide la contraseña actual, la valida contra Firebase y recién ahí enrola', async () => {
+    mockBiometricState.soportado = true;
+    login.mockResolvedValueOnce();
+    mockBiometricState.ofrecerEnrolamiento.mockResolvedValueOnce();
+
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Activar login con biometría'));
+
+    fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'ActualClave1' } });
+    fireEvent.click(screen.getByRole('button', { name: /^activar$/i }));
+
+    await waitFor(() => expect(login).toHaveBeenCalledWith('ana.perez@example.com', 'ActualClave1'));
+    expect(mockBiometricState.ofrecerEnrolamiento).toHaveBeenCalledWith('ana.perez@example.com', 'ActualClave1');
+    await waitFor(() => {
+      expect(screen.queryByText('Activar biometría')).not.toBeInTheDocument();
+    });
+  });
+
+  test('activar biometría muestra un error si la contraseña es incorrecta, sin llamar a ofrecerEnrolamiento', async () => {
+    mockBiometricState.soportado = true;
+    login.mockRejectedValueOnce(new Error('auth/wrong-password'));
+
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Activar login con biometría'));
+
+    fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'mala-clave' } });
+    fireEvent.click(screen.getByRole('button', { name: /^activar$/i }));
+
+    expect(await screen.findByText('Contraseña incorrecta o no se pudo activar la biometría.')).toBeInTheDocument();
+    expect(mockBiometricState.ofrecerEnrolamiento).not.toHaveBeenCalled();
+  });
+
+  test('con biometría ya enrolada, ofrece desactivarla y llama a desenrolar al hacer click', () => {
+    mockBiometricState.soportado = true;
+    mockBiometricState.enrolado = true;
+
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Desactivar login con biometría'));
+
+    expect(mockBiometricState.desenrolar).toHaveBeenCalledTimes(1);
   });
 });

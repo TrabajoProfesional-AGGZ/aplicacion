@@ -16,6 +16,11 @@ jest.mock('../../hooks/useAuth', () => ({
   useAuth: () => mockAuthState,
 }));
 
+let mockBiometricState;
+jest.mock('../../hooks/useBiometricLogin', () => ({
+  useBiometricLogin: () => mockBiometricState,
+}));
+
 jest.mock('framer-motion', () => {
   const React = require('react');
   const passthrough = (Tag) => ({ children, ...props }) => {
@@ -31,8 +36,46 @@ jest.mock('framer-motion', () => {
 describe('LoginSocio', () => {
   beforeEach(() => {
     mockAuthState = { socio: null, authError: null, cerrarSesion: jest.fn().mockResolvedValue() };
+    mockBiometricState = {
+      soportado: false,
+      enrolado: false,
+      cargando: false,
+      error: null,
+      ofrecerEnrolamiento: jest.fn(),
+      desenrolar: jest.fn(),
+      iniciarSesionBiometrico: jest.fn(),
+    };
     authService.login.mockClear();
     authService.resetPassword.mockClear();
+  });
+
+  test('no muestra el botón de biometría si no hay una credencial enrolada', () => {
+    render(<LoginSocio irARegistro={() => {}} />);
+    expect(screen.queryByRole('button', { name: /iniciar sesión con biometría/i })).not.toBeInTheDocument();
+  });
+
+  test('muestra el botón de biometría y loguea si hay una credencial enrolada y el usuario lo confirma', async () => {
+    mockBiometricState.enrolado = true;
+    mockBiometricState.iniciarSesionBiometrico.mockResolvedValue();
+    render(<LoginSocio irARegistro={() => {}} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /iniciar sesión con biometría/i }));
+
+    await waitFor(() => expect(mockBiometricState.iniciarSesionBiometrico).toHaveBeenCalledTimes(1));
+    expect(screen.queryByText(/no se pudo iniciar sesión con biometría/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra un error y deja el formulario manual usable si la biometría falla', async () => {
+    mockBiometricState.enrolado = true;
+    mockBiometricState.iniciarSesionBiometrico.mockRejectedValue(new Error('biometria-cancelada'));
+    render(<LoginSocio irARegistro={() => {}} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /iniciar sesión con biometría/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/no se pudo iniciar sesión con biometría/i)).toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', { name: /^ingresar$/i })).not.toBeDisabled();
   });
 
   test('renderiza los campos de email, contraseña y el botón de ingresar', () => {
