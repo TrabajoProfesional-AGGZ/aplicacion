@@ -20,7 +20,6 @@ export function AuthProvider({ children }) {
         try {
           const token = await firebaseUser.getIdToken();
           localStorage.setItem('socioToken', token); 
-          await new Promise(resolve => setTimeout(resolve, 3000));
           let res = await fetchTo(`/api/v1/socios/por-email/${encodeURIComponent(firebaseUser.email)}`, 'GET');
 
           if (res.ok) {
@@ -59,14 +58,12 @@ export function AuthProvider({ children }) {
         console.log(permission)
         
         if (permission === 'granted') {
-          // Generamos el token de Firebase usando tu VAPID Key
           const currentToken = await getToken(messaging, { 
-            vapidKey: 'BFym3vvw3wJ9zIT2jdASxMNHKKaXATa9tnwoHIUEpmsUPsezXU8VjA3tABIc1XdaooM0MiYYsp60290b98A6lhM'
+            vapidKey: import.meta.env.VITE_APP_VAPID_KEY
           });
           console.log(currentToken)
           if (currentToken) {
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            await fetchTo('/api/v1/notificaciones/token', 'POST', {token: currentToken,plataforma: 'web'});
+            await fetchTo('/api/v1/notificaciones/token', 'POST', {token: currentToken, plataforma: 'web', email: auth.currentUser?.email});
             console.log('Token de notificaciones registrado exitosamente.');
           } else {
             console.warn('No se pudo generar el token de Firebase.');
