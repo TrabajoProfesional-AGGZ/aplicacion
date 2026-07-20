@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Fingerprint } from 'lucide-react';
 import { login } from '../../utils/authService';
 import { useAuth } from '../../hooks/useAuth';
+import { useBiometricLogin } from '../../hooks/useBiometricLogin';
 import { MAX_LEN, validarCredencialSegura } from '../../utils/formValidators';
 import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import logoSocioAlt from '../../assets/logo_socio_login.png';
@@ -20,7 +21,7 @@ const formItemVariants = {
   exiting: { y: -20, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } },
 };
 
-export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
+export function LoginSocio({ irARegistro, onIngresoCompleto = () => {}, onLoginManualExitoso = () => {} }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -33,6 +34,7 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
   const ingresoCompletoLlamado = useRef(false);
 
   const { socio, authError, cerrarSesion } = useAuth();
+  const { enrolado: biometriaEnrolada, cargando: cargandoBiometria, iniciarSesionBiometrico } = useBiometricLogin();
 
   const exiting = Boolean(socio) && !shouldReduceMotion;
 
@@ -86,6 +88,7 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
     setCargando(true);
     try {
       await login(emailLimpio, passwordLimpia);
+      onLoginManualExitoso(emailLimpio, passwordLimpia);
     } catch (err) {
       const codigosCredencialesInvalidas = [
         'auth/invalid-credential',
@@ -98,6 +101,15 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
         setError(err.message || 'Ocurrió un error al iniciar sesión.');
       }
       setCargando(false);
+    }
+  };
+
+  const manejarLoginBiometrico = async () => {
+    setError('');
+    try {
+      await iniciarSesionBiometrico();
+    } catch {
+      setError('No se pudo iniciar sesión con biometría. Usá tu contraseña.');
     }
   };
 
@@ -214,9 +226,22 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
 
           {error && <p className="login-error">{error}</p>}
 
-          <button type="submit" disabled={cargando} className="su-button login-submit-btn">
+          <button type="submit" disabled={cargando || cargandoBiometria} className="su-button login-submit-btn">
             {cargando ? 'Ingresando...' : 'Ingresar'}
           </button>
+
+          {biometriaEnrolada && (
+            <button
+              type="button"
+              onClick={manejarLoginBiometrico}
+              disabled={cargando || cargandoBiometria}
+              className="login-biometria-btn"
+              aria-label="Iniciar sesión con biometría"
+            >
+              <Fingerprint size={18} />
+              {cargandoBiometria ? 'Verificando...' : 'Iniciar sesión con biometría'}
+            </button>
+          )}
         </motion.form>
 
         <motion.div variants={formItemVariants} className="login-registro-link">

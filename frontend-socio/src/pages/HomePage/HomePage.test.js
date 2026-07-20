@@ -20,6 +20,17 @@ jest.mock('../../services/tramitesService', () => ({
 jest.mock('../../services/alertasService', () => ({
   getAlertasSocio: jest.fn(() => Promise.resolve([])),
 }));
+jest.mock('../../hooks/useBiometricLogin', () => ({
+  useBiometricLogin: () => ({
+    soportado: false,
+    enrolado: false,
+    cargando: false,
+    error: null,
+    ofrecerEnrolamiento: jest.fn(),
+    desenrolar: jest.fn(),
+    iniciarSesionBiometrico: jest.fn(),
+  }),
+}));
 
 const socioFixture = {
   id: 'socio-1',

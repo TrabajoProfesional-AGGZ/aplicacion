@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { useModalHistory } from '../../hooks/useModalHistory';
 import './ModalOverlay.css';
 
 export function ModalOverlay({ onClose, wrapperClass, children }) {
+  useModalHistory(onClose);
+
   useEffect(() => {
     const manejarTecla = (e) => {
       if (e.key === 'Escape') onClose();

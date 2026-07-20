@@ -6,6 +6,8 @@ import {
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import { useCambiarContrasenia } from '../../hooks/useCambiarContrasenia';
 import { useAuth } from '../../hooks/useAuth';
+import { useBiometricLogin } from '../../hooks/useBiometricLogin';
+import { login } from '../../utils/authService';
 import { MAX_LEN, validarArchivoImagen, validarFortalezaPassword } from '../../utils/formValidators';
 import { subirFotoSocio } from '../../services/sociosService';
 import './PerfilPage.css';
@@ -131,6 +133,67 @@ function CambiarContraseniaModal({ cerrarSesion, onClose }) {
               </button>
               <button type="submit" className="csf-btn-submit" disabled={loading}>
                 {loading ? 'Guardando...' : 'Cambiar contraseña'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </ModalOverlay>
+  );
+}
+
+function ActivarBiometriaModal({ email, ofrecerEnrolamiento, onClose }) {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      // Confirma que la contraseña es correcta antes de guardarla cifrada:
+      // enroll() no valida contra Firebase, así que un typo acá quedaría
+      // guardado tal cual y el desbloqueo biométrico fallaría siempre después.
+      await login(email, password);
+      await ofrecerEnrolamiento(email, password);
+      onClose();
+    } catch {
+      setError('Contraseña incorrecta o no se pudo activar la biometría.');
+      setLoading(false);
+    }
+  }
+
+  return (
+    <ModalOverlay onClose={onClose}>
+      <div className="csf-outer-card">
+        <div className="csf-header">
+          <h1>Activar biometría</h1>
+        </div>
+        <div className="csf-card">
+          <form onSubmit={handleSubmit}>
+            <div className="csf-fields">
+              <div className="csf-field">
+                <label className="csf-label" htmlFor="perfil-biometria-password">
+                  <Lock size={13} strokeWidth={2} />
+                  Contraseña actual
+                </label>
+                <PasswordInput
+                  id="perfil-biometria-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
+              </div>
+              {error && <p className="csf-form-error" role="alert">{error}</p>}
+            </div>
+            <div className="csf-nav csf-nav--between">
+              <button type="button" className="csf-btn-back" onClick={onClose}>
+                Cancelar
+              </button>
+              <button type="submit" className="csf-btn-submit" disabled={loading}>
+                {loading ? 'Activando...' : 'Activar'}
               </button>
             </div>
           </form>
@@ -313,7 +376,14 @@ export function PerfilPage({ socio, cerrarSesion }) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [fotoModalAbierto, setFotoModalAbierto] = useState(false);
   const [fotoAmpliadaAbierta, setFotoAmpliadaAbierta] = useState(false);
+  const [biometriaModalAbierto, setBiometriaModalAbierto] = useState(false);
   const { setSocio } = useAuth();
+  const {
+    soportado: biometriaSoportada,
+    enrolado: biometriaEnrolada,
+    ofrecerEnrolamiento,
+    desenrolar: desenrolarBiometria,
+  } = useBiometricLogin();
 
   const datos = [
     { icon: Hash, label: 'Número de Socio', valor: socio.nro_socio },
@@ -387,6 +457,16 @@ export function PerfilPage({ socio, cerrarSesion }) {
         Cambiar contraseña
       </button>
 
+      {biometriaSoportada && (
+        <button
+          type="button"
+          className="perfil-cambiar-button"
+          onClick={() => (biometriaEnrolada ? desenrolarBiometria() : setBiometriaModalAbierto(true))}
+        >
+          {biometriaEnrolada ? 'Desactivar login con biometría' : 'Activar login con biometría'}
+        </button>
+      )}
+
       <button type="button" className="perfil-cerrar-sesion" onClick={cerrarSesion}>
         <LogOut size={18} />
         Cerrar sesión
@@ -412,6 +492,14 @@ export function PerfilPage({ socio, cerrarSesion }) {
             setFotoAmpliadaAbierta(false);
             setFotoModalAbierto(true);
           }}
+        />
+      )}
+
+      {biometriaModalAbierto && (
+        <ActivarBiometriaModal
+          email={socio.email}
+          ofrecerEnrolamiento={ofrecerEnrolamiento}
+          onClose={() => setBiometriaModalAbierto(false)}
         />
       )}
     </>
