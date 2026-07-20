@@ -11,14 +11,6 @@ jest.mock('../../services/reservasService', () => ({
 jest.mock('../../services/instalacionesService', () => ({
   getInstalaciones: jest.fn(),
 }));
-jest.mock('../../components/crearReservaFlow/CrearReservaFlow', () => ({
-  CrearReservaFlow: ({ onSuccess, onCancel }) => (
-    <div data-testid="crear-reserva-flow">
-      <button onClick={onSuccess}>Simular creada</button>
-      <button onClick={onCancel}>Cerrar form</button>
-    </div>
-  ),
-}));
 
 const socioFixture = { id: 'socio-1', nro_socio: '1000' };
 
@@ -130,27 +122,15 @@ describe('ReservasPage', () => {
     expect(screen.queryByRole('button', { name: 'Cancelar' })).not.toBeInTheDocument();
   });
 
-  test('abre el flujo de nueva reserva al hacer click en "Nueva reserva"', async () => {
+  test('el botón "Nueva reserva" del banner llama a onNuevaReserva', async () => {
     getReservasPorSocio.mockResolvedValue([]);
     getInstalaciones.mockResolvedValue([]);
-    render(<ReservasPage socio={socioFixture} />);
+    const onNuevaReserva = jest.fn();
+    render(<ReservasPage socio={socioFixture} onNuevaReserva={onNuevaReserva} />);
     await screen.findByText('No tenés reservas en este estado.');
 
     fireEvent.click(screen.getByRole('button', { name: /nueva reserva/i }));
-    expect(screen.getByTestId('crear-reserva-flow')).toBeInTheDocument();
-  });
-
-  test('cierra el flujo de nueva reserva y recarga la lista al crear una reserva', async () => {
-    getReservasPorSocio.mockResolvedValue([]);
-    getInstalaciones.mockResolvedValue([]);
-    render(<ReservasPage socio={socioFixture} />);
-    await screen.findByText('No tenés reservas en este estado.');
-
-    fireEvent.click(screen.getByRole('button', { name: /nueva reserva/i }));
-    fireEvent.click(screen.getByText('Simular creada'));
-
-    expect(screen.queryByTestId('crear-reserva-flow')).not.toBeInTheDocument();
-    await waitFor(() => expect(getReservasPorSocio).toHaveBeenCalledTimes(2));
+    expect(onNuevaReserva).toHaveBeenCalledTimes(1);
   });
 
   test('confirma la cancelación de una reserva y actualiza su estado', async () => {

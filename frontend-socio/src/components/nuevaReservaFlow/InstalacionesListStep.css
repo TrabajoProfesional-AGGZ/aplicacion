@@ -1,0 +1,169 @@
+.instalaciones-lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.instalaciones-banner {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin-bottom: var(--space-6);
+  background:
+    radial-gradient(120% 140% at 12% -10%, #3a3a3a 0%, transparent 55%),
+    linear-gradient(155deg, #1c1c1c 0%, #111111 42%, #0a0a0a 100%);
+  color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  /* espacio suficiente para que el eyebrow no quede debajo del botón volver
+     (absoluto, top var(--space-5) + 36px de alto = 56px de borde inferior) */
+  padding-top: calc(var(--space-12) + var(--space-4));
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.instalaciones-banner-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.instalaciones-banner-volver {
+  position: absolute;
+  top: var(--space-5);
+  left: var(--space-5);
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--color-surface);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.instalaciones-banner-volver:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.instalaciones-banner-eyebrow {
+  position: relative;
+  z-index: 1;
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: var(--space-2);
+}
+
+.instalaciones-banner-title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.instalaciones-error,
+.instalaciones-empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.instalaciones-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+.instalacion-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: left;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.instalacion-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+.instalacion-card-icono {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+}
+
+.instalacion-card-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.instalacion-card-nombre {
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.instalacion-card-tipo {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  text-transform: capitalize;
+}
+
+.instalacion-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-1);
+}
+
+.instalacion-card-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+}
+
+.instalacion-card-precio {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.instalacion-card-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}

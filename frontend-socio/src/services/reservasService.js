@@ -35,9 +35,19 @@ export async function createReserva(data) {
   if (res.status === 409) throw new Error('superposicion');
   if (res.status === 403) {
     const body = await res.json().catch(() => null);
-    const tipo = body?.detail?.tipo;
-    if (tipo === 'apto_medico') throw new Error('apto-medico');
-    throw new Error(tipo === 'suspendido' ? 'socio-suspendido' : 'socio-moroso');
+    const detail = body?.detail ?? {};
+    const tipo = detail.tipo;
+    const errorKey = tipo === 'apto_medico'
+      ? 'apto-medico'
+      : tipo === 'suspendido' ? 'socio-suspendido' : 'socio-moroso';
+    const sociosPorTipo = {
+      'apto-medico': detail.socios_sin_apto_medico,
+      'socio-suspendido': detail.socios_suspendido,
+      'socio-moroso': detail.socios_moroso,
+    };
+    const error = new Error(errorKey);
+    error.sociosIncumplen = sociosPorTipo[errorKey] ?? [];
+    throw error;
   }
   if (!res.ok) throw new Error('Error al crear la reserva');
   return res.json();

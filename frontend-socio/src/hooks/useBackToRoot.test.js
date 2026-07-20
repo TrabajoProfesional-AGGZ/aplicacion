@@ -58,6 +58,20 @@ describe('useBackToRoot', () => {
     expect(onBack).not.toHaveBeenCalled();
   });
 
+  test('un popstate que aterriza en la entrada de OTRO consumidor anidado (con id, pero no la propia) no llama a onBack', () => {
+    const onBack = jest.fn();
+    renderHook(() => useBackToRoot('nueva-reserva', 'inicio', onBack));
+
+    // Simula un consumidor multi-nivel (ej. useStepHistory, un wizard de
+    // varios pasos) que empujó sus propias entradas por encima de la de
+    // este hook y retrocedió un solo nivel dentro de su propia pila: el
+    // navegador aterriza en OTRA entrada rastreada (tiene id, pero no es
+    // la de este hook) — el segmento de este hook todavía no se abandonó.
+    window.history.replaceState({ stepHistory: true, id: 'entrada-de-otro-wizard' }, '');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    expect(onBack).not.toHaveBeenCalled();
+  });
+
   test('un popstate estando en la raíz no llama a onBack', () => {
     const onBack = jest.fn();
     renderHook(() => useBackToRoot('inicio', 'inicio', onBack));

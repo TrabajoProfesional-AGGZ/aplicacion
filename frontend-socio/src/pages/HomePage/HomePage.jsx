@@ -9,6 +9,7 @@ import { FinanzasPage } from '../FinanzasPage/FinanzasPage';
 import { TramitesPage } from '../TramitesPage/TramitesPage';
 import { AlertasPage } from '../AlertasPage/AlertasPage';
 import { ReservasPage } from '../ReservasPage/ReservasPage';
+import { NuevaReservaPage } from '../NuevaReservaPage/NuevaReservaPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
 import { BiometriaOfferBanner } from '../../components/BiometriaOfferBanner/BiometriaOfferBanner';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
@@ -39,7 +40,16 @@ export function HomePage({
         {vista === 'pagos' && <FinanzasPage socio={socio} />}
         {vista === 'tramites' && <TramitesPage socio={socio} />}
         {vista === 'alertas' && <AlertasPage socio={socio} />}
-        {vista === 'reservas' && <ReservasPage socio={socio} />}
+        {vista === 'reservas' && (
+          <ReservasPage socio={socio} onNuevaReserva={() => setVista('nueva-reserva')} />
+        )}
+        {vista === 'nueva-reserva' && (
+          <NuevaReservaPage
+            socio={socio}
+            onSalir={() => setVista('inicio')}
+            onExito={() => setVista('reservas')}
+          />
+        )}
         {vista === 'inicio' && (
           <>
             <WelcomeCard socio={socio} />
@@ -52,7 +62,7 @@ export function HomePage({
               onProximamente={setProximamente}
               onPagos={() => setVista('pagos')}
               onTramites={() => setVista('tramites')}
-              onReservas={() => setVista('reservas')}
+              onReservas={() => setVista('nueva-reserva')}
             />
           </>
         )}

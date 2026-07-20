@@ -21,13 +21,26 @@ let backToRootIdCounter = 0;
  *
  * A `popstate` fires for *any* browser back/forward, not just one that
  * exits this hook's own segment — e.g. a nested history consumer (a modal
- * via useModalHistory) popping its own entry, sitting above this hook's
- * entry on the stack, also dispatches a `popstate` that this hook's
- * listener receives. The handler below distinguishes the two by checking
- * where the browser actually landed: still on this hook's own pushed
- * entry means only something nested above was consumed and `onBack`
- * must NOT fire; landed anywhere else means the real gesture got past
- * this hook's own entry and `onBack` should fire.
+ * via useModalHistory, or a multi-level wizard via useStepHistory) popping
+ * one of its own entries, sitting above this hook's entry on the stack,
+ * also dispatches a `popstate` that this hook's listener receives. The
+ * handler below distinguishes the two by checking where the browser
+ * actually landed: any of our tracked entries carries an `id` (this
+ * hook's own, or one belonging to a nested consumer still stacked above
+ * it) — landing on *any* such entry means the gesture hasn't actually
+ * left this segment yet, so `onBack` must NOT fire. Only landing on a
+ * plain state with no `id` (the true pre-existing state, from before this
+ * hook ever pushed anything) means the gesture got past this hook's own
+ * entry and `onBack` should fire.
+ *
+ * Checking strictly "is this exactly my own entry" (instead of "does the
+ * landed entry have an id at all") used to work for a single-level nested
+ * consumer like a modal, where popping it always lands exactly back on
+ * this hook's entry — but it broke for a multi-level consumer like
+ * useStepHistory (one entry per wizard step): going back one step inside
+ * the wizard lands on *another* of the wizard's own entries, not this
+ * hook's, which the strict check misread as "exited past me" and fired
+ * `onBack` on every single in-wizard back navigation.
  */
 export function useBackToRoot(current, rootValue, onBack) {
   const onBackRef = useRef(onBack);
@@ -66,9 +79,12 @@ export function useBackToRoot(current, rootValue, onBack) {
     const handlePopState = () => {
       if (currentRef.current === rootValue) return;
 
-      // Still on our own pushed entry means a nested consumer's entry above
-      // ours was the one consumed — our segment hasn't been exited, ignore.
-      if (pushedStateRef.current && window.history.state?.id === pushedStateRef.current.id) {
+      // Landing on any tracked entry (ours, or a nested consumer's, e.g. a
+      // modal or a wizard step still stacked above ours) means we haven't
+      // actually exited this segment yet — ignore. Only a landed state with
+      // no `id` at all (the true pre-existing state) means the gesture got
+      // past us for real.
+      if (window.history.state?.id) {
         return;
       }
 

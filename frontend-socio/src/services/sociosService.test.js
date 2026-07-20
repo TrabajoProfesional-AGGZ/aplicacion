@@ -1,4 +1,4 @@
-import { validarSocio, reclamarCuentaSocio, subirFotoSocio } from './sociosService';
+import { validarSocio, reclamarCuentaSocio, subirFotoSocio, getSocioByNroSocio } from './sociosService';
 import { fetchTo, fetchWithOutAuth } from '../utils/utils';
 
 jest.mock('../utils/utils', () => ({
@@ -89,6 +89,33 @@ describe('sociosService', () => {
     test('lanza error genérico ante otras respuestas no exitosas', async () => {
       fetchTo.mockResolvedValue({ ok: false, status: 400 });
       await expect(subirFotoSocio(1, 'x')).rejects.toThrow('Error al subir la foto');
+    });
+  });
+
+  describe('getSocioByNroSocio', () => {
+    test('devuelve el socio cuando lo encuentra', async () => {
+      const socio = { id: 'socio-2', nro_socio: '2000', nombre: 'Luis', apellido: 'Gómez' };
+      fetchTo.mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve(socio) });
+
+      const resultado = await getSocioByNroSocio('2000');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-nro-socio/2000', 'GET');
+      expect(resultado).toEqual(socio);
+    });
+
+    test('lanza socio-no-encontrado en 404', async () => {
+      fetchTo.mockResolvedValue({ ok: false, status: 404 });
+      await expect(getSocioByNroSocio('9999')).rejects.toThrow('socio-no-encontrado');
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValue({ ok: false, status: 500 });
+      await expect(getSocioByNroSocio('2000')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico ante otras respuestas no exitosas', async () => {
+      fetchTo.mockResolvedValue({ ok: false, status: 400 });
+      await expect(getSocioByNroSocio('2000')).rejects.toThrow('Error al buscar socio');
     });
   });
 });

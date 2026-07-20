@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Calendar, Plus, MapPin } from 'lucide-react';
+import { Calendar, MapPin, Plus } from 'lucide-react';
 import { getReservasPorSocio, getReservasHistoricasPorSocio, cancelReserva } from '../../services/reservasService';
 import { getInstalaciones } from '../../services/instalacionesService';
-import { CrearReservaFlow } from '../../components/crearReservaFlow/CrearReservaFlow';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
 import './ReservasPage.css';
 
@@ -32,7 +31,7 @@ function formatearFecha(fechaIso) {
   }).format(new Date(fechaIso));
 }
 
-export function ReservasPage({ socio }) {
+export function ReservasPage({ socio, onNuevaReserva = () => {} }) {
   const [reservas, setReservas] = useState([]);
   const [historicas, setHistoricas] = useState(null);
   const [instalaciones, setInstalaciones] = useState([]);
@@ -40,11 +39,9 @@ export function ReservasPage({ socio }) {
   const [error, setError] = useState(null);
   const [cargandoHistoricas, setCargandoHistoricas] = useState(false);
   const [filtro, setFiltro] = useState('Pendiente');
-  const [formAbierto, setFormAbierto] = useState(false);
   const [reservaAConfirmarCancelacion, setReservaAConfirmarCancelacion] = useState(null);
   const [cancelandoId, setCancelandoId] = useState(null);
   const [errorCancelacion, setErrorCancelacion] = useState('');
-  const [recarga, setRecarga] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -59,7 +56,7 @@ export function ReservasPage({ socio }) {
       .catch((err) => { if (!cancelled) setError(err.message); })
       .finally(() => { if (!cancelled) setCargando(false); });
     return () => { cancelled = true; };
-  }, [socio.nro_socio, recarga]);
+  }, [socio.nro_socio]);
 
   useEffect(() => {
     if (filtro !== 'Finalizada' && filtro !== 'Todas') return;
@@ -75,12 +72,6 @@ export function ReservasPage({ socio }) {
 
   function nombreInstalacion(idInstalacion) {
     return instalaciones.find((i) => i.id === idInstalacion)?.nombre ?? 'Instalación';
-  }
-
-  function handleCreada() {
-    setHistoricas(null);
-    setFiltro('Pendiente');
-    setRecarga((r) => r + 1);
   }
 
   async function confirmarCancelacion(reserva) {
@@ -129,8 +120,8 @@ export function ReservasPage({ socio }) {
                 <Calendar size={13} />
                 Instalaciones del club
               </span>
-              <button type="button" className="reservas-banner-nueva-btn" onClick={() => setFormAbierto(true)}>
-                <Plus size={16} />
+              <button type="button" className="reservas-banner-nueva-btn" onClick={onNuevaReserva}>
+                <Plus size={15} />
                 Nueva reserva
               </button>
             </div>
@@ -197,15 +188,6 @@ export function ReservasPage({ socio }) {
             );
           })}
         </section>
-      )}
-
-      {formAbierto && (
-        <CrearReservaFlow
-          socio={socio}
-          instalaciones={instalaciones}
-          onSuccess={() => { setFormAbierto(false); handleCreada(); }}
-          onCancel={() => setFormAbierto(false)}
-        />
       )}
 
       {reservaAConfirmarCancelacion && (
