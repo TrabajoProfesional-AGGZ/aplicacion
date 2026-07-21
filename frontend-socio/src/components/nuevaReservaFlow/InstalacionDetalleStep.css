@@ -119,8 +119,18 @@
 
 @media (max-width: 480px) {
   .instalacion-banner-stats {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     row-gap: var(--space-4);
+    column-gap: var(--space-5);
+  }
+
+  .instalacion-banner-divider {
+    display: none;
+  }
+
+  .instalacion-banner-stat:last-child {
+    grid-column: 1 / -1;
   }
 
   .instalacion-banner-nombre {
