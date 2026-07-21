@@ -9,15 +9,24 @@ const ITEMS = [
   { id: 'noticias', icon: Newspaper, label: 'Noticias del Club' },
 ];
 
-export function BottomNav({ onProximamente, onInicio, onReservas, vistaActual }) {
+export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripciones, vistaActual }) {
   return (
     <nav className="bottom-nav">
       {ITEMS.map(({ id, icon: Icon, label }) => {
         const esInicio = id === 'inicio';
         const esReservas = id === 'reservas';
         const esCarnet = id === 'carnet';
-        const activo = (esInicio && vistaActual === 'inicio') || (esReservas && vistaActual === 'reservas');
-        const onClick = esInicio ? onInicio : esReservas ? onReservas : () => onProximamente(label);
+        const esInscripciones = id === 'inscripciones';
+        const activo = (esInicio && vistaActual === 'inicio')
+          || (esReservas && vistaActual === 'reservas')
+          || (esInscripciones && vistaActual === 'inscripciones');
+        const onClick = esInicio
+          ? onInicio
+          : esReservas
+            ? onReservas
+            : esInscripciones
+              ? onMisInscripciones
+              : () => onProximamente(label);
         return (
           <button
             key={id}

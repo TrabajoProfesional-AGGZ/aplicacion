@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles, createReserva } from '../../services/reservasService';
-import { useStepHistory } from '../../hooks/useStepHistory';
+import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { InstalacionesListStep } from '../../components/nuevaReservaFlow/InstalacionesListStep';
 import { InstalacionDetalleStep } from '../../components/nuevaReservaFlow/InstalacionDetalleStep';
 import { AgregarSociosStep } from '../../components/nuevaReservaFlow/AgregarSociosStep';
 import { ResumenReservaStep } from '../../components/nuevaReservaFlow/ResumenReservaStep';
-
-const STEP_ORDER = ['lista', 'detalle', 'socios', 'resumen'];
 
 const MENSAJES_ERROR_SUBMIT = {
   superposicion: 'Ese turno ya no está disponible. Elegí otro horario.',
@@ -41,7 +39,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
   const [submitError, setSubmitError] = useState('');
   const [sociosIncumplen, setSociosIncumplen] = useState([]);
 
-  useStepHistory(step, STEP_ORDER, setStep);
+  useBackToRoot(step, 'lista', volverAInstalaciones);
 
   useEffect(() => {
     let cancelled = false;
@@ -144,7 +142,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
         cargandoTurnos={cargandoTurnos}
         errorTurnos={errorTurnos}
         onSeleccionarTurno={irASocios}
-        onVolver={() => setStep('lista')}
+        onVolver={volverAInstalaciones}
       />
     );
   }
@@ -157,7 +155,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
         onAgregar={(s) => setSociosAgregados((prev) => [...prev, s])}
         onQuitar={(id) => setSociosAgregados((prev) => prev.filter((s) => s.id !== id))}
         onContinuar={() => setStep('resumen')}
-        onVolver={() => setStep('detalle')}
+        onVolver={volverAInstalaciones}
       />
     );
   }
@@ -171,7 +169,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
       sociosAgregados={sociosAgregados}
       onConfirmar={confirmarReserva}
       onCancelar={volverAInstalaciones}
-      onVolver={() => setStep('socios')}
+      onVolver={volverAInstalaciones}
       enviando={enviando}
       submitted={submitted}
       submitError={submitError}

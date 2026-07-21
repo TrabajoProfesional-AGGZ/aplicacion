@@ -148,7 +148,7 @@ describe('NuevaReservaPage', () => {
     expect(onSalir).toHaveBeenCalled();
   });
 
-  test('los botones de volver retroceden un paso por vez', async () => {
+  test('el botón "Volver" en cualquier paso del flujo vuelve directo a la lista de instalaciones', async () => {
     render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
@@ -163,6 +163,60 @@ describe('NuevaReservaPage', () => {
 
     await screen.findByText('Agregar socios');
     fireEvent.click(screen.getAllByText('Volver')[0]);
+    await screen.findByText('Realizá tu reserva');
+  });
+
+  test('el gesto de atrás del celular no cierra el flujo: vuelve a la lista de instalaciones', async () => {
+    const onSalir = jest.fn();
+    render(<NuevaReservaPage socio={SOCIO} onSalir={onSalir} onExito={jest.fn()} />);
+    await screen.findByText('Cancha de fútbol');
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+
     await screen.findByText('08:00');
+    fireEvent.click(screen.getByText('08:00'));
+    await screen.findByText('Agregar socios');
+
+    window.history.replaceState({ otraEntrada: true }, '');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+
+    await screen.findByText('Realizá tu reserva');
+    expect(onSalir).not.toHaveBeenCalled();
+  });
+
+  test('volver desde el resumen no deja memoria "vieja" para el siguiente intento de reserva', async () => {
+    getSocioByNroSocio.mockResolvedValue(OTRO_SOCIO);
+    createReserva.mockResolvedValue({ id: 'reserva-1', estado: 'Pendiente' });
+    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+
+    await screen.findByText('Cancha de fútbol');
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+    await screen.findByText('08:00');
+    fireEvent.click(screen.getByText('08:00'));
+
+    await screen.findByText('Agregar socios');
+    fireEvent.change(screen.getByPlaceholderText('Número de socio'), { target: { value: '2000' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Agregar' }));
+    await screen.findByText('Luis Gómez');
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
+
+    await screen.findByText('Confirmá tu reserva');
+    fireEvent.click(screen.getAllByText('Volver')[0]);
+
+    await screen.findByText('Realizá tu reserva');
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+
+    await screen.findByText('08:00');
+    fireEvent.click(screen.getByText('08:00'));
+
+    await screen.findByText('Agregar socios');
+    expect(screen.queryByText('Luis Gómez')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
+
+    await screen.findByText('Confirmá tu reserva');
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
+
+    await waitFor(() => expect(createReserva).toHaveBeenCalledWith(
+      expect.objectContaining({ ids_socios: ['socio-1'] })
+    ));
   });
 });

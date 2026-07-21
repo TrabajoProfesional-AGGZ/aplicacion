@@ -48,4 +48,26 @@ describe('BottomNav', () => {
     expect(onInicio).toHaveBeenCalled();
     expect(onProximamente).not.toHaveBeenCalled();
   });
+
+  test('"Mis Inscripciones" está marcado como activo cuando vistaActual es "inscripciones"', () => {
+    render(<BottomNav onProximamente={jest.fn()} onInicio={jest.fn()} onReservas={jest.fn()} vistaActual="inscripciones" />);
+    expect(screen.getByText('Mis Inscripciones').closest('button')).toHaveAttribute('aria-current', 'page');
+  });
+
+  test('click en "Mis Inscripciones" llama a onMisInscripciones en vez de onProximamente', () => {
+    const onProximamente = jest.fn();
+    const onMisInscripciones = jest.fn();
+    render(
+      <BottomNav
+        onProximamente={onProximamente}
+        onInicio={jest.fn()}
+        onReservas={jest.fn()}
+        onMisInscripciones={onMisInscripciones}
+        vistaActual="inicio"
+      />
+    );
+    fireEvent.click(screen.getByText('Mis Inscripciones'));
+    expect(onMisInscripciones).toHaveBeenCalled();
+    expect(onProximamente).not.toHaveBeenCalled();
+  });
 });
