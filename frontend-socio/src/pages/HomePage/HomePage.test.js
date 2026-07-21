@@ -32,6 +32,11 @@ jest.mock('../../services/reservasService', () => ({
 jest.mock('../../services/instalacionesService', () => ({
   getInstalaciones: jest.fn(() => Promise.resolve([])),
 }));
+jest.mock('../../services/disciplinasService', () => ({
+  getDisciplinasActivas: jest.fn(() => Promise.resolve([])),
+  getDisciplinaById: jest.fn(),
+  getDisciplinasPorSocio: jest.fn(() => Promise.resolve([])),
+}));
 jest.mock('../../services/sociosService', () => ({
   getSocioByNroSocio: jest.fn(),
 }));
@@ -89,9 +94,32 @@ describe('HomePage', () => {
 
   test('click en una tarjeta de acceso rápido sin handler dedicado abre el overlay "Próximamente" con su título', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Inscribirme a actividad'));
+    fireEvent.click(screen.getByText('Última noticia'));
     expect(screen.getByText('Próximamente...')).toBeInTheDocument();
-    expect(screen.getAllByText('Inscribirme a actividad').length).toBeGreaterThan(1);
+    expect(screen.getAllByText('Última noticia').length).toBeGreaterThan(1);
+  });
+
+  test('click en "Inscribirme a actividad" navega a la grilla de disciplinas (no abre el overlay)', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Inscribirme a actividad'));
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Inscribite a una actividad' })).toBeInTheDocument();
+  });
+
+  test('"Mis Inscripciones" del nav inferior navega a la página de inscripciones', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Mis Inscripciones'));
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Mis inscripciones' })).toBeInTheDocument();
+  });
+
+  test('"Nueva Inscripcion" del banner de Mis Inscripciones navega a la grilla de disciplinas', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Mis Inscripciones'));
+    await screen.findByRole('heading', { name: 'Mis inscripciones' });
+
+    fireEvent.click(screen.getByRole('button', { name: /nueva inscripcion/i }));
+    expect(await screen.findByRole('heading', { name: 'Inscribite a una actividad' })).toBeInTheDocument();
   });
 
   test('click en "Reservar instalación" navega al flujo de nueva reserva (no abre el overlay ni la lista de reservas)', async () => {
@@ -166,7 +194,7 @@ describe('HomePage', () => {
 
   test('click en "Cerrar" del overlay lo cierra', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Inscribirme a actividad'));
+    fireEvent.click(screen.getByText('Mi Carnet'));
     expect(screen.getByText('Próximamente...')).toBeInTheDocument();
     fireEvent.click(screen.getByText('Cerrar'));
     expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();

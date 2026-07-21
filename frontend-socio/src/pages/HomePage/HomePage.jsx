@@ -10,6 +10,8 @@ import { TramitesPage } from '../TramitesPage/TramitesPage';
 import { AlertasPage } from '../AlertasPage/AlertasPage';
 import { ReservasPage } from '../ReservasPage/ReservasPage';
 import { NuevaReservaPage } from '../NuevaReservaPage/NuevaReservaPage';
+import { InscripcionesPage } from '../InscripcionesPage/InscripcionesPage';
+import { NuevaInscripcionPage } from '../NuevaInscripcionPage/NuevaInscripcionPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
 import { BiometriaOfferBanner } from '../../components/BiometriaOfferBanner/BiometriaOfferBanner';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
@@ -50,6 +52,12 @@ export function HomePage({
             onExito={() => setVista('reservas')}
           />
         )}
+        {vista === 'inscripciones' && (
+          <InscripcionesPage socio={socio} onNuevaInscripcion={() => setVista('nueva-inscripcion')} />
+        )}
+        {vista === 'nueva-inscripcion' && (
+          <NuevaInscripcionPage onSalir={() => setVista('inicio')} />
+        )}
         {vista === 'inicio' && (
           <>
             <WelcomeCard socio={socio} />
@@ -63,6 +71,7 @@ export function HomePage({
               onPagos={() => setVista('pagos')}
               onTramites={() => setVista('tramites')}
               onReservas={() => setVista('nueva-reserva')}
+              onInscripciones={() => setVista('nueva-inscripcion')}
             />
           </>
         )}
@@ -72,6 +81,7 @@ export function HomePage({
         onProximamente={setProximamente}
         onInicio={() => setVista('inicio')}
         onReservas={() => setVista('reservas')}
+        onMisInscripciones={() => setVista('inscripciones')}
         vistaActual={vista}
       />
 
