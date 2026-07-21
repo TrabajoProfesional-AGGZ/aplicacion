@@ -1,10 +1,20 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { NuevaInscripcionPage } from './NuevaInscripcionPage';
-import { getDisciplinasActivas } from '../../services/disciplinasService';
+import {
+  getDisciplinasActivas,
+  getDisciplinasPorSocio,
+  inscribirseADisciplina,
+  sumarseAListaEspera,
+} from '../../services/disciplinasService';
 
 jest.mock('../../services/disciplinasService', () => ({
   getDisciplinasActivas: jest.fn(),
+  getDisciplinasPorSocio: jest.fn(),
+  inscribirseADisciplina: jest.fn(),
+  sumarseAListaEspera: jest.fn(),
 }));
+
+const SOCIO = { id: 'socio-1', nombre: 'Ana', apellido: 'Gómez' };
 
 const DISCIPLINA = {
   id: 'disc-1',
@@ -18,19 +28,23 @@ const DISCIPLINA = {
 };
 
 describe('NuevaInscripcionPage', () => {
+  beforeEach(() => {
+    getDisciplinasPorSocio.mockResolvedValue([]);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   test('muestra el banner de la grilla de disciplinas', async () => {
     getDisciplinasActivas.mockResolvedValue([]);
-    render(<NuevaInscripcionPage onSalir={jest.fn()} />);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
     expect(await screen.findByRole('heading', { name: 'Inscribite a una actividad' })).toBeInTheDocument();
   });
 
   test('lista las disciplinas activas con cupos, categoría y sede', async () => {
     getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
-    render(<NuevaInscripcionPage onSalir={jest.fn()} />);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
     expect(await screen.findByText('Natación')).toBeInTheDocument();
     expect(screen.getByText('5/20 cupos')).toBeInTheDocument();
     expect(screen.getByText('Infantil')).toBeInTheDocument();
@@ -39,25 +53,69 @@ describe('NuevaInscripcionPage', () => {
 
   test('click en una disciplina navega al detalle con el arancel mensual', async () => {
     getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
-    render(<NuevaInscripcionPage onSalir={jest.fn()} />);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
     fireEvent.click(await screen.findByText('Natación'));
 
     expect(screen.getByRole('heading', { name: 'Natación' })).toBeInTheDocument();
     expect(screen.getByText('$ 5.000,00')).toBeInTheDocument();
   });
 
-  test('click en "Inscribirme" abre el overlay "Próximamente"', async () => {
+  test('click en "Inscribirme" con éxito muestra la confirmación', async () => {
     getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
-    render(<NuevaInscripcionPage onSalir={jest.fn()} />);
+    inscribirseADisciplina.mockResolvedValue({ estado_suscripcion: 'activa' });
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
     fireEvent.click(await screen.findByText('Natación'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
-    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
+
+    expect(await screen.findByText('¡Inscripción confirmada!')).toBeInTheDocument();
+    expect(inscribirseADisciplina).toHaveBeenCalledWith('disc-1', 'socio-1');
+  });
+
+  test('muestra el error de apto médico y ofrece ir a trámites', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    inscribirseADisciplina.mockRejectedValue(new Error('apto-medico'));
+    const onIrATramites = jest.fn();
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} onIrATramites={onIrATramites} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/apto médico/);
+    fireEvent.click(screen.getByRole('button', { name: 'Actualizar apto médico' }));
+    expect(onIrATramites).toHaveBeenCalled();
+  });
+
+  test('muestra el error de deuda (moroso)', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    inscribirseADisciplina.mockRejectedValue(new Error('moroso'));
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
+
+    expect(await screen.findByText(/Tenés pagos pendientes/)).toBeInTheDocument();
+  });
+
+  test('cuando no hay cupo, ofrece sumarse a la lista de espera', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    inscribirseADisciplina.mockRejectedValue(new Error('sin-cupo'));
+    sumarseAListaEspera.mockResolvedValue({ estado_suscripcion: 'en_espera' });
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
+
+    const botonEspera = await screen.findByRole('button', { name: 'Sumarme a lista de espera' });
+    fireEvent.click(botonEspera);
+
+    expect(await screen.findByText('¡Te sumaste a la lista de espera!')).toBeInTheDocument();
+    expect(sumarseAListaEspera).toHaveBeenCalledWith('disc-1', 'socio-1');
   });
 
   test('"Volver" desde el detalle vuelve a la grilla', async () => {
     getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
-    render(<NuevaInscripcionPage onSalir={jest.fn()} />);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
     fireEvent.click(await screen.findByText('Natación'));
 
     fireEvent.click(screen.getByText('Volver'));
@@ -67,10 +125,44 @@ describe('NuevaInscripcionPage', () => {
   test('el botón volver del banner llama a onSalir', async () => {
     getDisciplinasActivas.mockResolvedValue([]);
     const onSalir = jest.fn();
-    render(<NuevaInscripcionPage onSalir={onSalir} />);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={onSalir} />);
     await screen.findByRole('heading', { name: 'Inscribite a una actividad' });
 
     fireEvent.click(screen.getByLabelText('Volver'));
     expect(onSalir).toHaveBeenCalled();
+  });
+
+  test('si el socio ya está inscripto, el detalle muestra el badge y oculta el botón de inscripción', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    getDisciplinasPorSocio.mockResolvedValue([{ id: 'disc-1', estado_suscripcion: 'activa' }]);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    expect(await screen.findByText('Ya estás inscripto a esta disciplina')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Inscribirme' })).not.toBeInTheDocument();
+  });
+
+  test('el socio en lista de espera también ve el badge de ya inscripto', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    getDisciplinasPorSocio.mockResolvedValue([{ id: 'disc-1', estado_suscripcion: 'en_espera' }]);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    expect(await screen.findByText('Ya estás inscripto a esta disciplina')).toBeInTheDocument();
+  });
+
+  test('muestra la categoría requerida interpolada cuando la categoría no coincide', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    const error = new Error('categoria-no-coincide');
+    error.categoriaRequerida = 'Infantil';
+    inscribirseADisciplina.mockRejectedValue(error);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Esta disciplina es solamente para socios de categoría: Infantil'
+    );
   });
 });
