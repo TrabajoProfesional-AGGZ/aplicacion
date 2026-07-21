@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   getDisciplinasActivas,
+  getDisciplinasPorSocio,
   inscribirseADisciplina,
   sumarseAListaEspera,
 } from '../../services/disciplinasService';
@@ -18,7 +19,10 @@ const MENSAJES_ERROR_INSCRIPCION = {
   'servicio-no-disponible': 'El servicio no está disponible. Intentá más tarde.',
 };
 
-function mensajeError(codigo) {
+function mensajeError(codigo, categoriaRequerida) {
+  if (codigo === 'categoria-no-coincide' && categoriaRequerida) {
+    return `Esta disciplina es solamente para socios de categoría: ${categoriaRequerida}`;
+  }
   return MENSAJES_ERROR_INSCRIPCION[codigo] || 'No se pudo registrar la inscripción. Intentá de nuevo.';
 }
 
@@ -28,11 +32,14 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
   const [disciplinas, setDisciplinas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
+  const [estadoPorDisciplina, setEstadoPorDisciplina] = useState(new Map());
 
   const [disciplinaSeleccionada, setDisciplinaSeleccionada] = useState(null);
+  const [yaInscripto, setYaInscripto] = useState(false);
 
   const [enviando, setEnviando] = useState(false);
   const [errorTipo, setErrorTipo] = useState('');
+  const [categoriaRequerida, setCategoriaRequerida] = useState('');
   const [sinCupo, setSinCupo] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [enEspera, setEnEspera] = useState(false);
@@ -43,16 +50,22 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
     let cancelled = false;
     setCargando(true);
     setError(false);
-    getDisciplinasActivas()
-      .then((data) => { if (!cancelled) setDisciplinas(data); })
+    Promise.all([getDisciplinasActivas(), getDisciplinasPorSocio(socio.id)])
+      .then(([activas, propias]) => {
+        if (cancelled) return;
+        setDisciplinas(activas);
+        setEstadoPorDisciplina(new Map(propias.map((d) => [d.id, d.estado_suscripcion])));
+      })
       .catch(() => { if (!cancelled) setError(true); })
       .finally(() => { if (!cancelled) setCargando(false); });
     return () => { cancelled = true; };
-  }, []);
+  }, [socio.id]);
 
   function irADetalle(disciplina) {
     setDisciplinaSeleccionada(disciplina);
+    setYaInscripto(estadoPorDisciplina.has(disciplina.id));
     setErrorTipo('');
+    setCategoriaRequerida('');
     setSinCupo(false);
     setSubmitted(false);
     setEnEspera(false);
@@ -67,6 +80,7 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
   async function handleInscribirme() {
     setEnviando(true);
     setErrorTipo('');
+    setCategoriaRequerida('');
     setSinCupo(false);
     try {
       await inscribirseADisciplina(disciplinaSeleccionada.id, socio.id);
@@ -77,6 +91,7 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
         setSinCupo(true);
       } else {
         setErrorTipo(e.message);
+        if (e.message === 'categoria-no-coincide') setCategoriaRequerida(e.categoriaRequerida || '');
       }
     } finally {
       setEnviando(false);
@@ -102,13 +117,14 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
     return (
       <DisciplinaDetalleStep
         disciplina={disciplinaSeleccionada}
+        yaInscripto={yaInscripto}
         onInscribirme={handleInscribirme}
         onVolver={volverALista}
         enviando={enviando}
         submitted={submitted}
         enEspera={enEspera}
         sinCupo={sinCupo}
-        submitError={errorTipo ? mensajeError(errorTipo) : ''}
+        submitError={errorTipo ? mensajeError(errorTipo, categoriaRequerida) : ''}
         onSumarseListaEspera={handleSumarseListaEspera}
         mostrarBotonTramites={errorTipo === 'apto-medico'}
         onIrATramites={onIrATramites}

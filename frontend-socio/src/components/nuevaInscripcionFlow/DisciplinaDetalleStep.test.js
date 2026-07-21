@@ -110,4 +110,23 @@ describe('DisciplinaDetalleStep', () => {
     );
     expect(screen.getByText('¡Te sumaste a la lista de espera!')).toBeInTheDocument();
   });
+
+  test('cuando yaInscripto es true, muestra el badge y oculta el botón de inscripción', () => {
+    render(
+      <DisciplinaDetalleStep
+        disciplina={DISCIPLINA_ARANCELADA}
+        onInscribirme={jest.fn()}
+        onVolver={jest.fn()}
+        yaInscripto
+      />
+    );
+    expect(screen.getByText('Ya estás inscripto a esta disciplina')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Inscribirme' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sumarme a lista de espera' })).not.toBeInTheDocument();
+  });
+
+  test('cuando yaInscripto es false, no muestra el badge', () => {
+    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} onVolver={jest.fn()} />);
+    expect(screen.queryByText('Ya estás inscripto a esta disciplina')).not.toBeInTheDocument();
+  });
 });

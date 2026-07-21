@@ -2,12 +2,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { NuevaInscripcionPage } from './NuevaInscripcionPage';
 import {
   getDisciplinasActivas,
+  getDisciplinasPorSocio,
   inscribirseADisciplina,
   sumarseAListaEspera,
 } from '../../services/disciplinasService';
 
 jest.mock('../../services/disciplinasService', () => ({
   getDisciplinasActivas: jest.fn(),
+  getDisciplinasPorSocio: jest.fn(),
   inscribirseADisciplina: jest.fn(),
   sumarseAListaEspera: jest.fn(),
 }));
@@ -26,6 +28,10 @@ const DISCIPLINA = {
 };
 
 describe('NuevaInscripcionPage', () => {
+  beforeEach(() => {
+    getDisciplinasPorSocio.mockResolvedValue([]);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -124,5 +130,39 @@ describe('NuevaInscripcionPage', () => {
 
     fireEvent.click(screen.getByLabelText('Volver'));
     expect(onSalir).toHaveBeenCalled();
+  });
+
+  test('si el socio ya está inscripto, el detalle muestra el badge y oculta el botón de inscripción', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    getDisciplinasPorSocio.mockResolvedValue([{ id: 'disc-1', estado_suscripcion: 'activa' }]);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    expect(await screen.findByText('Ya estás inscripto a esta disciplina')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Inscribirme' })).not.toBeInTheDocument();
+  });
+
+  test('el socio en lista de espera también ve el badge de ya inscripto', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    getDisciplinasPorSocio.mockResolvedValue([{ id: 'disc-1', estado_suscripcion: 'en_espera' }]);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    expect(await screen.findByText('Ya estás inscripto a esta disciplina')).toBeInTheDocument();
+  });
+
+  test('muestra la categoría requerida interpolada cuando la categoría no coincide', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    const error = new Error('categoria-no-coincide');
+    error.categoriaRequerida = 'Infantil';
+    inscribirseADisciplina.mockRejectedValue(error);
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Esta disciplina es solamente para socios de categoría: Infantil'
+    );
   });
 });

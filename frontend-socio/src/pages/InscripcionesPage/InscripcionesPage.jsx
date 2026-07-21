@@ -8,6 +8,7 @@ const FILTROS = [
   { id: 'Todas', label: 'Todas' },
   { id: 'Arancelada', label: 'Aranceladas' },
   { id: 'Sin costo', label: 'Sin costo' },
+  { id: 'En espera', label: 'En espera' },
 ];
 
 function formatearMonto(monto) {
@@ -33,10 +34,12 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
 
   const cantidadAranceladas = inscripciones.filter((i) => i.arancelada).length;
   const cantidadSinCosto = inscripciones.filter((i) => !i.arancelada).length;
+  const cantidadEnEspera = inscripciones.filter((i) => i.estado_suscripcion === 'en_espera').length;
 
   const inscripcionesVisibles = inscripciones.filter((i) => {
     if (filtro === 'Arancelada') return i.arancelada;
     if (filtro === 'Sin costo') return !i.arancelada;
+    if (filtro === 'En espera') return i.estado_suscripcion === 'en_espera';
     return true;
   });
 
@@ -71,6 +74,11 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
                 <span className="inscripciones-banner-stat-value">{cantidadSinCosto}</span>
                 <span className="inscripciones-banner-stat-label">Sin costo</span>
               </div>
+              <div className="inscripciones-banner-stat-divider" aria-hidden="true" />
+              <div className="inscripciones-banner-stat" aria-label={`Inscripciones en espera: ${cantidadEnEspera}`}>
+                <span className="inscripciones-banner-stat-value">{cantidadEnEspera}</span>
+                <span className="inscripciones-banner-stat-label">En espera</span>
+              </div>
             </div>
           </section>
 
@@ -104,9 +112,14 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
                   {i.sede.nombre}
                 </span>
               </div>
-              <span className={`inscripcion-tag inscripcion-tag--${i.arancelada ? 'arancelada' : 'sin-costo'}`}>
-                {i.arancelada ? formatearMonto(i.monto_mensual) : 'Sin costo'}
-              </span>
+              <div className="inscripcion-tags">
+                {i.estado_suscripcion === 'en_espera' && (
+                  <span className="inscripcion-tag inscripcion-tag--en-espera">En espera</span>
+                )}
+                <span className={`inscripcion-tag inscripcion-tag--${i.arancelada ? 'arancelada' : 'sin-costo'}`}>
+                  {i.arancelada ? formatearMonto(i.monto_mensual) : 'Sin costo'}
+                </span>
+              </div>
             </div>
           ))}
         </section>

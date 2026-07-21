@@ -12,6 +12,7 @@ function textoCupos(disciplina) {
 
 export function DisciplinaDetalleStep({
   disciplina,
+  yaInscripto = false,
   onInscribirme,
   onVolver,
   enviando = false,
@@ -48,6 +49,9 @@ export function DisciplinaDetalleStep({
 
       <section className="disciplina-banner">
         <div className="disciplina-banner-texture" aria-hidden="true" />
+        {yaInscripto && (
+          <span className="disciplina-banner-badge">Ya estás inscripto a esta disciplina</span>
+        )}
         <div className="disciplina-banner-content">
           <h2 className="disciplina-banner-nombre">{disciplina.nombre}</h2>
 
@@ -91,29 +95,31 @@ export function DisciplinaDetalleStep({
         </div>
       )}
 
-      {sinCupo ? (
-        <>
-          <p className="detalle-sin-cupo-texto" role="alert">
-            Esta disciplina alcanzó su cupo máximo. Podés sumarte a la lista de espera.
-          </p>
+      {!yaInscripto && (
+        sinCupo ? (
+          <>
+            <p className="detalle-sin-cupo-texto" role="alert">
+              Esta disciplina alcanzó su cupo máximo. Podés sumarte a la lista de espera.
+            </p>
+            <button
+              type="button"
+              className="disciplina-inscribirme-btn"
+              onClick={onSumarseListaEspera}
+              disabled={enviando}
+            >
+              {enviando ? 'Enviando...' : 'Sumarme a lista de espera'}
+            </button>
+          </>
+        ) : (
           <button
             type="button"
             className="disciplina-inscribirme-btn"
-            onClick={onSumarseListaEspera}
+            onClick={onInscribirme}
             disabled={enviando}
           >
-            {enviando ? 'Enviando...' : 'Sumarme a lista de espera'}
+            {enviando ? 'Inscribiendo...' : 'Inscribirme'}
           </button>
-        </>
-      ) : (
-        <button
-          type="button"
-          className="disciplina-inscribirme-btn"
-          onClick={onInscribirme}
-          disabled={enviando}
-        >
-          {enviando ? 'Inscribiendo...' : 'Inscribirme'}
-        </button>
+        )
       )}
     </section>
   );

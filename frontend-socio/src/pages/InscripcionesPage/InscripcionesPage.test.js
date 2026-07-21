@@ -26,6 +26,16 @@ const INSCRIPCION_SIN_COSTO = {
   sede: { nombre: 'Sede Central' },
 };
 
+const INSCRIPCION_EN_ESPERA = {
+  id: 'disc-3',
+  nombre: 'Básquet',
+  arancelada: true,
+  monto_mensual: 3000,
+  categoria_socio: { nombre: 'Activo' },
+  sede: { nombre: 'Sede Central' },
+  estado_suscripcion: 'en_espera',
+};
+
 describe('InscripcionesPage', () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -83,5 +93,30 @@ describe('InscripcionesPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /nueva inscripcion/i }));
     expect(onNuevaInscripcion).toHaveBeenCalled();
+  });
+
+  test('muestra la cantidad de inscripciones en espera en el banner', async () => {
+    getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA, INSCRIPCION_EN_ESPERA]);
+    render(<InscripcionesPage socio={socioFixture} />);
+    expect(await screen.findByLabelText('Inscripciones en espera: 1')).toBeInTheDocument();
+  });
+
+  test('el filtro "En espera" muestra solo las inscripciones en lista de espera', async () => {
+    getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA, INSCRIPCION_EN_ESPERA]);
+    render(<InscripcionesPage socio={socioFixture} />);
+    await screen.findByText('Natación');
+
+    fireEvent.click(screen.getByRole('button', { name: 'En espera' }));
+
+    expect(screen.queryByText('Natación')).not.toBeInTheDocument();
+    expect(screen.getByText('Básquet')).toBeInTheDocument();
+  });
+
+  test('muestra un tag "En espera" en la card de una inscripción en lista de espera', async () => {
+    getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA, INSCRIPCION_EN_ESPERA]);
+    render(<InscripcionesPage socio={socioFixture} />);
+    await screen.findByText('Básquet');
+
+    expect(screen.getByText('En espera', { selector: '.inscripcion-tag--en-espera' })).toBeInTheDocument();
   });
 });

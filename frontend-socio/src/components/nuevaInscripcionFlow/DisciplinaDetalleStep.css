@@ -52,6 +52,22 @@
   z-index: 1;
 }
 
+.disciplina-banner-badge {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  text-align: right;
+  max-width: 45%;
+}
+
 .disciplina-banner-nombre {
   margin: 0 0 var(--space-5);
   font-size: 1.6rem;
