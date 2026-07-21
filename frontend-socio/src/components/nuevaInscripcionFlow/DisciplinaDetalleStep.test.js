@@ -51,4 +51,63 @@ describe('DisciplinaDetalleStep', () => {
     fireEvent.click(screen.getByText('Volver'));
     expect(onVolver).toHaveBeenCalled();
   });
+
+  test('deshabilita "Inscribirme" mientras enviando', () => {
+    render(
+      <DisciplinaDetalleStep
+        disciplina={DISCIPLINA_ARANCELADA}
+        onInscribirme={jest.fn()}
+        onVolver={jest.fn()}
+        enviando
+      />
+    );
+    expect(screen.getByRole('button', { name: 'Inscribiendo...' })).toBeDisabled();
+  });
+
+  test('muestra el mensaje de error y el botón de trámites cuando falta el apto médico', () => {
+    const onIrATramites = jest.fn();
+    render(
+      <DisciplinaDetalleStep
+        disciplina={DISCIPLINA_ARANCELADA}
+        onInscribirme={jest.fn()}
+        onVolver={jest.fn()}
+        submitError="Necesitás actualizar tu apto médico."
+        mostrarBotonTramites
+        onIrATramites={onIrATramites}
+      />
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Necesitás actualizar tu apto médico.');
+    fireEvent.click(screen.getByRole('button', { name: 'Actualizar apto médico' }));
+    expect(onIrATramites).toHaveBeenCalled();
+  });
+
+  test('sin cupo: oculta "Inscribirme" y ofrece sumarse a la lista de espera', () => {
+    const onSumarseListaEspera = jest.fn();
+    render(
+      <DisciplinaDetalleStep
+        disciplina={DISCIPLINA_ARANCELADA}
+        onInscribirme={jest.fn()}
+        onVolver={jest.fn()}
+        sinCupo
+        onSumarseListaEspera={onSumarseListaEspera}
+      />
+    );
+    expect(screen.queryByRole('button', { name: 'Inscribirme' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Sumarme a lista de espera' }));
+    expect(onSumarseListaEspera).toHaveBeenCalled();
+  });
+
+  test('muestra la confirmación de inscripción exitosa', () => {
+    render(
+      <DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} onVolver={jest.fn()} submitted />
+    );
+    expect(screen.getByText('¡Inscripción confirmada!')).toBeInTheDocument();
+  });
+
+  test('muestra la confirmación de lista de espera', () => {
+    render(
+      <DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} onVolver={jest.fn()} enEspera />
+    );
+    expect(screen.getByText('¡Te sumaste a la lista de espera!')).toBeInTheDocument();
+  });
 });

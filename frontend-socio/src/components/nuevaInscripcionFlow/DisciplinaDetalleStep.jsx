@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 import './DisciplinaDetalleStep.css';
 
 function formatearMonto(monto) {
@@ -10,7 +10,35 @@ function textoCupos(disciplina) {
   return `${disciplina.cupos_ocupados}/${disciplina.cupo_maximo}`;
 }
 
-export function DisciplinaDetalleStep({ disciplina, onInscribirme, onVolver }) {
+export function DisciplinaDetalleStep({
+  disciplina,
+  onInscribirme,
+  onVolver,
+  enviando = false,
+  submitted = false,
+  enEspera = false,
+  sinCupo = false,
+  submitError = '',
+  onSumarseListaEspera = () => {},
+  mostrarBotonTramites = false,
+  onIrATramites = () => {},
+}) {
+  if (submitted || enEspera) {
+    return (
+      <section className="detalle-disciplina detalle-disciplina--exito">
+        <CheckCircle2 size={40} color="var(--status-success-border)" />
+        <h2 className="detalle-exito-titulo">
+          {enEspera ? '¡Te sumaste a la lista de espera!' : '¡Inscripción confirmada!'}
+        </h2>
+        <p className="detalle-exito-texto">
+          {enEspera
+            ? 'Te avisaremos si se libera un cupo en esta disciplina.'
+            : 'Ya podés disfrutar de esta disciplina.'}
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section className="detalle-disciplina">
       <button type="button" className="detalle-volver-btn" onClick={onVolver}>
@@ -49,9 +77,44 @@ export function DisciplinaDetalleStep({ disciplina, onInscribirme, onVolver }) {
         </div>
       </section>
 
-      <button type="button" className="disciplina-inscribirme-btn" onClick={onInscribirme}>
-        Inscribirme
-      </button>
+      {submitError && (
+        <div className="detalle-error-box">
+          <p className="detalle-error" role="alert">
+            <AlertCircle size={14} />
+            {submitError}
+          </p>
+          {mostrarBotonTramites && (
+            <button type="button" className="detalle-error-accion-btn" onClick={onIrATramites}>
+              Actualizar apto médico
+            </button>
+          )}
+        </div>
+      )}
+
+      {sinCupo ? (
+        <>
+          <p className="detalle-sin-cupo-texto" role="alert">
+            Esta disciplina alcanzó su cupo máximo. Podés sumarte a la lista de espera.
+          </p>
+          <button
+            type="button"
+            className="disciplina-inscribirme-btn"
+            onClick={onSumarseListaEspera}
+            disabled={enviando}
+          >
+            {enviando ? 'Enviando...' : 'Sumarme a lista de espera'}
+          </button>
+        </>
+      ) : (
+        <button
+          type="button"
+          className="disciplina-inscribirme-btn"
+          onClick={onInscribirme}
+          disabled={enviando}
+        >
+          {enviando ? 'Inscribiendo...' : 'Inscribirme'}
+        </button>
+      )}
     </section>
   );
 }

@@ -130,3 +130,63 @@
 .disciplina-inscribirme-btn:hover {
   opacity: 0.9;
 }
+
+.disciplina-inscribirme-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.detalle-error-box {
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.detalle-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--status-danger-border);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.detalle-error-accion-btn {
+  border: 1px solid var(--status-danger-border);
+  background: none;
+  color: var(--status-danger-border);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  margin-top: var(--space-3);
+}
+
+.detalle-sin-cupo-texto {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  margin: 0 0 var(--space-4);
+}
+
+.detalle-disciplina--exito {
+  align-items: center;
+  text-align: center;
+  gap: var(--space-3);
+  padding: var(--space-8) var(--space-4);
+}
+
+.detalle-exito-titulo {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.detalle-exito-texto {
+  margin: 0;
+  color: var(--color-text-secondary);
+}

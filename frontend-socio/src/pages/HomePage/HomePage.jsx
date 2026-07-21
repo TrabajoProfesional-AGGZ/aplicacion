@@ -56,7 +56,12 @@ export function HomePage({
           <InscripcionesPage socio={socio} onNuevaInscripcion={() => setVista('nueva-inscripcion')} />
         )}
         {vista === 'nueva-inscripcion' && (
-          <NuevaInscripcionPage onSalir={() => setVista('inicio')} />
+          <NuevaInscripcionPage
+            socio={socio}
+            onSalir={() => setVista('inicio')}
+            onExito={() => setVista('inscripciones')}
+            onIrATramites={() => setVista('tramites')}
+          />
         )}
         {vista === 'inicio' && (
           <>

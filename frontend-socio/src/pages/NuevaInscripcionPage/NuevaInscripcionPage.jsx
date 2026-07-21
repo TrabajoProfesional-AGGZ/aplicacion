@@ -1,11 +1,28 @@
 import { useEffect, useState } from 'react';
-import { getDisciplinasActivas } from '../../services/disciplinasService';
+import {
+  getDisciplinasActivas,
+  inscribirseADisciplina,
+  sumarseAListaEspera,
+} from '../../services/disciplinasService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { DisciplinasListStep } from '../../components/nuevaInscripcionFlow/DisciplinasListStep';
 import { DisciplinaDetalleStep } from '../../components/nuevaInscripcionFlow/DisciplinaDetalleStep';
-import { ProximamenteOverlay } from '../../components/ProximamenteOverlay/ProximamenteOverlay';
 
-export function NuevaInscripcionPage({ onSalir }) {
+const MENSAJES_ERROR_INSCRIPCION = {
+  'no-encontrado': 'No se pudo procesar la inscripción. Volvé a intentarlo.',
+  'ya-inscripto': 'Ya estás inscripto o en la lista de espera de esta disciplina.',
+  'categoria-no-coincide': 'Tu categoría de socio no coincide con la requerida para esta disciplina.',
+  'apto-medico': 'Necesitás actualizar tu apto médico para poder inscribirte en actividades deportivas.',
+  moroso: 'Tenés pagos pendientes. Regularizá tu situación para poder inscribirte.',
+  'no-autorizado': 'No pudimos procesar tu inscripción.',
+  'servicio-no-disponible': 'El servicio no está disponible. Intentá más tarde.',
+};
+
+function mensajeError(codigo) {
+  return MENSAJES_ERROR_INSCRIPCION[codigo] || 'No se pudo registrar la inscripción. Intentá de nuevo.';
+}
+
+export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrATramites = () => {} }) {
   const [step, setStep] = useState('lista');
 
   const [disciplinas, setDisciplinas] = useState([]);
@@ -13,7 +30,12 @@ export function NuevaInscripcionPage({ onSalir }) {
   const [error, setError] = useState(false);
 
   const [disciplinaSeleccionada, setDisciplinaSeleccionada] = useState(null);
-  const [mostrarProximamente, setMostrarProximamente] = useState(false);
+
+  const [enviando, setEnviando] = useState(false);
+  const [errorTipo, setErrorTipo] = useState('');
+  const [sinCupo, setSinCupo] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [enEspera, setEnEspera] = useState(false);
 
   useBackToRoot(step, 'lista', volverALista);
 
@@ -30,6 +52,10 @@ export function NuevaInscripcionPage({ onSalir }) {
 
   function irADetalle(disciplina) {
     setDisciplinaSeleccionada(disciplina);
+    setErrorTipo('');
+    setSinCupo(false);
+    setSubmitted(false);
+    setEnEspera(false);
     setStep('detalle');
   }
 
@@ -38,18 +64,55 @@ export function NuevaInscripcionPage({ onSalir }) {
     setStep('lista');
   }
 
+  async function handleInscribirme() {
+    setEnviando(true);
+    setErrorTipo('');
+    setSinCupo(false);
+    try {
+      await inscribirseADisciplina(disciplinaSeleccionada.id, socio.id);
+      setSubmitted(true);
+      setTimeout(() => onExito(), 1800);
+    } catch (e) {
+      if (e.message === 'sin-cupo') {
+        setSinCupo(true);
+      } else {
+        setErrorTipo(e.message);
+      }
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  async function handleSumarseListaEspera() {
+    setEnviando(true);
+    setErrorTipo('');
+    try {
+      await sumarseAListaEspera(disciplinaSeleccionada.id, socio.id);
+      setSinCupo(false);
+      setEnEspera(true);
+      setTimeout(() => onExito(), 1800);
+    } catch (e) {
+      setErrorTipo(e.message);
+    } finally {
+      setEnviando(false);
+    }
+  }
+
   if (step === 'detalle') {
     return (
-      <>
-        <DisciplinaDetalleStep
-          disciplina={disciplinaSeleccionada}
-          onInscribirme={() => setMostrarProximamente(true)}
-          onVolver={volverALista}
-        />
-        {mostrarProximamente && (
-          <ProximamenteOverlay titulo="Inscribirme" onClose={() => setMostrarProximamente(false)} />
-        )}
-      </>
+      <DisciplinaDetalleStep
+        disciplina={disciplinaSeleccionada}
+        onInscribirme={handleInscribirme}
+        onVolver={volverALista}
+        enviando={enviando}
+        submitted={submitted}
+        enEspera={enEspera}
+        sinCupo={sinCupo}
+        submitError={errorTipo ? mensajeError(errorTipo) : ''}
+        onSumarseListaEspera={handleSumarseListaEspera}
+        mostrarBotonTramites={errorTipo === 'apto-medico'}
+        onIrATramites={onIrATramites}
+      />
     );
   }
 
