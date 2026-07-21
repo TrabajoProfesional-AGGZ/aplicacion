@@ -1,5 +1,7 @@
 import { fetchTo } from '../utils/utils';
 
+const FECHA_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
 async function fetchReservas(url, errorMsg = 'Error al obtener reservas') {
   const res = await fetchTo(url, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -20,6 +22,7 @@ export async function getReservasHistoricasPorSocio(nroSocio) {
 }
 
 export async function getTurnosDisponibles(idInstalacion, fecha) {
+  if (!FECHA_REGEX.test(fecha)) throw new Error('Fecha inválida');
   const res = await fetchTo(
     `/api/v1/reservas/turnos-disponibles/${encodeURIComponent(idInstalacion)}?fecha=${encodeURIComponent(fecha)}`,
     'GET'

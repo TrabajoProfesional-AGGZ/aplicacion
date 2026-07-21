@@ -50,6 +50,17 @@ describe('utils', () => {
         expect.objectContaining({ headers: expect.objectContaining({ Authorization: 'Bearer undefined' }) })
       );
     });
+
+    test.each([
+      ['con esquema absoluto', 'https://evil.com/api/v1/socios'],
+      ['protocol-relative', '//evil.com/api/v1/socios'],
+      ['que no empieza con /', 'api/v1/socios'],
+      ['con esquema embebido más adelante', '/api/v1/socios?next=javascript://evil.com'],
+      ['no string', null],
+    ])('rechaza un path %s sin llegar a llamar a fetch', async (_desc, path) => {
+      await expect(fetchTo(path, 'GET')).rejects.toThrow('Ruta de API inválida');
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
   });
 
   describe('fetchWithOutAuth', () => {
@@ -70,6 +81,11 @@ describe('utils', () => {
         'http://localhost:8080/api/v1/algo',
         expect.objectContaining({ body: null })
       );
+    });
+
+    test('rechaza un path protocol-relative sin llegar a llamar a fetch', async () => {
+      await expect(fetchWithOutAuth('//evil.com/api/v1/socios', 'GET')).rejects.toThrow('Ruta de API inválida');
+      expect(global.fetch).not.toHaveBeenCalled();
     });
   });
 });
