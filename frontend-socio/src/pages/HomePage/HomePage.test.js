@@ -101,8 +101,8 @@ describe('HomePage', () => {
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
   });
 
-  test('el botón "Volver" dentro del flujo de nueva reserva retrocede un paso, no sale a Home', async () => {
-    getInstalaciones.mockResolvedValueOnce([{
+  test('el botón "Volver" dentro del flujo de nueva reserva vuelve directo a la lista de instalaciones, no sale a Home', async () => {
+    getInstalaciones.mockResolvedValue([{
       id: 'inst-1',
       nombre: 'Cancha de fútbol',
       tipo: 'Deportiva',
@@ -112,30 +112,31 @@ describe('HomePage', () => {
       tiempo_minimo_cancelacion: null,
       activa: true,
     }]);
-    getTurnosDisponibles.mockResolvedValueOnce(['08:00:00']);
+    getTurnosDisponibles.mockResolvedValue(['08:00:00']);
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Reservar instalación'));
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
-    // Retroceder desde el 2do paso (detalle) debería aterrizar en la lista,
-    // no en Home — ida y vuelta a un solo nivel de profundidad.
-    await screen.findByText('Volver');
-    fireEvent.click(screen.getByText('Volver'));
+    // "Volver" desde el paso de detalle aterriza en la lista de
+    // instalaciones, no en Home.
+    await screen.findByText('08:00');
+    fireEvent.click(screen.getAllByText('Volver')[0]);
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
     expect(screen.queryByText('Bienvenido Ana Pérez')).not.toBeInTheDocument();
 
-    // Volver a entrar y avanzar dos pasos (detalle -> socios): retroceder
-    // desde ahí debería aterrizar en detalle, no en Home — este es el caso
-    // que reproducía el bug real (2+ niveles de profundidad en el wizard).
+    // Avanzando dos pasos (detalle -> socios), "Volver" también aterriza
+    // directo en la lista de instalaciones, no un paso atrás (detalle) ni
+    // en Home — ya no hay retroceso paso a paso dentro del flujo.
     fireEvent.click(screen.getByText('Cancha de fútbol'));
     await screen.findByText('08:00');
     fireEvent.click(screen.getByText('08:00'));
 
     await screen.findByText('Agregar socios');
-    fireEvent.click(screen.getByText('Volver'));
+    fireEvent.click(screen.getAllByText('Volver')[0]);
 
-    expect(await screen.findByText('Cancelación sin cargo')).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
+    expect(screen.getByText('Cancha de fútbol')).toBeInTheDocument();
     expect(screen.queryByText('Bienvenido Ana Pérez')).not.toBeInTheDocument();
   });
 
