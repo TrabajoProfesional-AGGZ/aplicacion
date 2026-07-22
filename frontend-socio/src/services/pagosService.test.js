@@ -15,15 +15,19 @@ describe('pagosService', () => {
     const respuesta = { id_pago: 'pago-1', estado: 'approved', estado_detalle: 'accredited' };
     fetchTo.mockResolvedValue({ ok: true, json: () => Promise.resolve(respuesta) });
 
-    const resultado = await procesarPago(formData, 'cuota-1');
+    const resultado = await procesarPago(formData, 'cuota-1', 'cuota'); 
 
-    expect(fetchTo).toHaveBeenCalledWith('/api/v1/pagos/procesar', 'POST', { ...formData, id_cuota: 'cuota-1' });
+    expect(fetchTo).toHaveBeenCalledWith('/api/v1/pagos/procesar', 'POST', { 
+      ...formData, 
+      id_item: 'cuota-1', 
+      tipo_item: 'cuota' 
+    });
     expect(resultado).toEqual(respuesta);
   });
 
   test('lanza pago-fallido si la respuesta no es ok', async () => {
     fetchTo.mockResolvedValue({ ok: false, status: 400, json: () => Promise.resolve({ detail: 'MP rechazó la petición' }) });
 
-    await expect(procesarPago({ token: 'tok' }, 'cuota-1')).rejects.toThrow('pago-fallido');
+    await expect(procesarPago({ token: 'tok' }, 'cuota-1', 'cuota')).rejects.toThrow('pago-fallido');
   });
 });

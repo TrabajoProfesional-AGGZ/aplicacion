@@ -55,7 +55,19 @@ export function FinanzasPage({ socio }) {
       {!cargando && error && <p className="finanzas-error">No se pudo cargar tu estado financiero.</p>}
 
       {!cargando && !error && resumen && cuotaAPagar && (
-        <PagoCuotaFlow cuota={cuotaAPagar} socio={socio} onVolver={volverALista} />
+        (() => {
+          const esReserva = cuotaAPagar.concepto.startsWith('Reserva');
+          const tipoItem = esReserva ? 'reserva' : 'cuota';
+
+          return (
+            <PagoCuotaFlow 
+              item={cuotaAPagar} 
+              tipoItem={tipoItem} 
+              socio={socio} 
+              onVolver={volverALista} 
+            />
+          );
+        })()
       )}
 
       {!cargando && !error && resumen && !cuotaAPagar && (

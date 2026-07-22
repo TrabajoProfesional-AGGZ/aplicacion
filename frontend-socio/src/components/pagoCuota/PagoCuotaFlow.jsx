@@ -17,7 +17,7 @@ function formatearMonto(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
-export function PagoCuotaFlow({ cuota, socio, onVolver }) {
+export function PagoCuotaFlow({ item, tipoItem, socio, onVolver }) {
   const [paso, setPaso] = useState('pago');
   const [idPago, setIdPago] = useState(null);
   const [errorPago, setErrorPago] = useState(null);
@@ -25,7 +25,7 @@ export function PagoCuotaFlow({ cuota, socio, onVolver }) {
   const onSubmitPago = async ({ formData }) => {
     setErrorPago(null);
     try {
-      const data = await procesarPago(formData, cuota.id);
+      const data = await procesarPago(formData, item.id, tipoItem);
       if (data.estado === 'approved' || data.estado === 'in_process') {
         setIdPago(String(data.id_pago));
         setPaso('resultado');
@@ -50,8 +50,8 @@ export function PagoCuotaFlow({ cuota, socio, onVolver }) {
           </button>
 
           <div className="pago-resumen-card">
-            <span>{cuota.concepto}</span>
-            <span className="pago-resumen-monto">{formatearMonto(cuota.monto)}</span>
+            <span>{item.concepto}</span>
+            <span className="pago-resumen-monto">{formatearMonto(item.monto)}</span>
           </div>
 
           {errorPago && (
@@ -59,7 +59,7 @@ export function PagoCuotaFlow({ cuota, socio, onVolver }) {
           )}
 
           <Payment
-            initialization={{ amount: Number(cuota.monto), payer: { email: socio.email } }}
+            initialization={{ amount: Number(item.monto), payer: { email: socio.email } }}
             customization={{ paymentMethods: { creditCard: 'all', debitCard: 'all' } }}
             onSubmit={onSubmitPago}
             onError={() => setErrorPago('brick')}

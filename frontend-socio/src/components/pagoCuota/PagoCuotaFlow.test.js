@@ -20,7 +20,7 @@ describe('PagoCuotaFlow', () => {
   });
 
   test('muestra el concepto y el monto de la cuota', () => {
-    render(<PagoCuotaFlow cuota={cuotaFixture} socio={socioFixture} onVolver={jest.fn()} />);
+    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
 
     expect(screen.getByText('Cuota Social - 07/2026')).toBeInTheDocument();
     expect(screen.getByText('$ 1.500,00')).toBeInTheDocument();
@@ -29,7 +29,7 @@ describe('PagoCuotaFlow', () => {
   test('pago aprobado avanza a la pantalla de resultado con el id_pago', async () => {
     procesarPago.mockResolvedValue({ id_pago: 42, estado: 'approved' });
 
-    render(<PagoCuotaFlow cuota={cuotaFixture} socio={socioFixture} onVolver={jest.fn()} />);
+    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
     fireEvent.click(screen.getByText('Simular pago'));
 
     expect(await screen.findByText('status-screen 42')).toBeInTheDocument();
@@ -38,7 +38,7 @@ describe('PagoCuotaFlow', () => {
   test('pago in_process avanza a la pantalla de resultado', async () => {
     procesarPago.mockResolvedValue({ id_pago: 43, estado: 'in_process' });
 
-    render(<PagoCuotaFlow cuota={cuotaFixture} socio={socioFixture} onVolver={jest.fn()} />);
+    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
     fireEvent.click(screen.getByText('Simular pago'));
 
     expect(await screen.findByText('status-screen 43')).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('PagoCuotaFlow', () => {
   test('pago rechazado muestra una alerta y se queda en el paso de pago', async () => {
     procesarPago.mockResolvedValue({ id_pago: 44, estado: 'rejected' });
 
-    render(<PagoCuotaFlow cuota={cuotaFixture} socio={socioFixture} onVolver={jest.fn()} />);
+    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
     fireEvent.click(screen.getByText('Simular pago'));
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
@@ -58,7 +58,7 @@ describe('PagoCuotaFlow', () => {
   test('fallo de red muestra una alerta de procesamiento sin StatusScreen', async () => {
     procesarPago.mockRejectedValue(new Error('pago-fallido'));
 
-    render(<PagoCuotaFlow cuota={cuotaFixture} socio={socioFixture} onVolver={jest.fn()} />);
+    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
     fireEvent.click(screen.getByText('Simular pago'));
 
     expect(await screen.findByRole('alert')).toBeInTheDocument();
@@ -67,7 +67,7 @@ describe('PagoCuotaFlow', () => {
 
   test('el botón volver llama a onVolver', () => {
     const onVolver = jest.fn();
-    render(<PagoCuotaFlow cuota={cuotaFixture} socio={socioFixture} onVolver={onVolver} />);
+    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={onVolver} />);
 
     fireEvent.click(screen.getByLabelText('Volver'));
 
