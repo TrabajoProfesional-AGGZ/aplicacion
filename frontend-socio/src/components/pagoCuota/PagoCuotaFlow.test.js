@@ -67,7 +67,7 @@ describe('PagoCuotaFlow', () => {
 
   test('el botón volver llama a onVolver', () => {
     const onVolver = jest.fn();
-    render(<PagoCuotaFlow cuota={cuotaFixture} socio={socioFixture} onVolver={onVolver} />);
+    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={onVolver} />);
 
     fireEvent.click(screen.getByLabelText('Volver'));
 
