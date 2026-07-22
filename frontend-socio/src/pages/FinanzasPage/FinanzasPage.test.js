@@ -7,9 +7,9 @@ jest.mock('../../services/finanzasService', () => ({
 }));
 
 jest.mock('../../components/pagoCuota/PagoCuotaFlow', () => ({
-  PagoCuotaFlow: ({ cuota, onVolver }) => (
+  PagoCuotaFlow: ({ item, onVolver }) => ( 
     <div>
-      <p>pago-flow-stub {cuota.concepto}</p>
+      <p>pago-flow-stub {item.concepto}</p> 
       <button onClick={onVolver}>Volver al stub</button>
     </div>
   ),
