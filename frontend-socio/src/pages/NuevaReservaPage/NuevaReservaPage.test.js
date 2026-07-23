@@ -42,13 +42,33 @@ async function irHastaResumen() {
   await screen.findByText('Confirmá tu reserva');
 }
 
+const RealDate = global.Date;
+
+// Mockea solo `new Date()`/`Date.now()` a una hora fija, sin tocar setTimeout/setInterval
+// (jest.useFakeTimers rompía el setTimeout real del que depende confirmarReserva para onExito).
+function mockearAhora(iso) {
+  global.Date = class extends RealDate {
+    constructor(...args) {
+      if (args.length === 0) return new RealDate(iso);
+      return new RealDate(...args);
+    }
+    static now() {
+      return new RealDate(iso).getTime();
+    }
+  };
+}
+
 describe('NuevaReservaPage', () => {
   beforeEach(() => {
+    // Fija la hora "actual" bien temprano en la mañana para que los turnos de prueba
+    // (08:00, 09:00) nunca queden filtrados por el chequeo de "turno ya pasado".
+    mockearAhora('2024-06-15T06:30:00');
     getInstalaciones.mockResolvedValue([INSTALACION]);
     getTurnosDisponibles.mockResolvedValue(['08:00:00', '09:00:00']);
   });
 
   afterEach(() => {
+    global.Date = RealDate;
     jest.clearAllMocks();
   });
 
@@ -137,6 +157,35 @@ describe('NuevaReservaPage', () => {
       'Los siguientes socios no estan al día con sus pagos y deben regularizar su estado para poder realizar reservas:'
     )).toBeInTheDocument();
     expect(screen.getByText('Ana Pérez (N° 1000)')).toBeInTheDocument();
+  });
+
+  test('si la fecha elegida es hoy, no muestra turnos cuya hora de inicio ya pasó', async () => {
+    mockearAhora('2024-06-15T14:00:00');
+    getTurnosDisponibles.mockResolvedValue(['09:00:00', '13:30:00', '14:00:00', '15:00:00']);
+
+    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+    await screen.findByText('Cancha de fútbol');
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+
+    await screen.findByText('15:00');
+    expect(screen.getByText('14:00')).toBeInTheDocument();
+    expect(screen.queryByText('09:00')).not.toBeInTheDocument();
+    expect(screen.queryByText('13:30')).not.toBeInTheDocument();
+  });
+
+  test('si la fecha elegida es una fecha futura, muestra todos los turnos aunque ya haya pasado ese horario hoy', async () => {
+    mockearAhora('2024-06-15T14:00:00');
+    getTurnosDisponibles.mockResolvedValue(['09:00:00', '10:00:00']);
+
+    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+    await screen.findByText('Cancha de fútbol');
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+
+    await screen.findByText('Turnos disponibles');
+    fireEvent.change(screen.getByLabelText('Fecha'), { target: { value: '2024-06-16' } });
+
+    expect(await screen.findByText('09:00')).toBeInTheDocument();
+    expect(screen.getByText('10:00')).toBeInTheDocument();
   });
 
   test('el botón de volver en la lista de instalaciones llama a onSalir', async () => {

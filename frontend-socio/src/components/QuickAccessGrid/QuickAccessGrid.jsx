@@ -7,8 +7,8 @@ const ACCESOS_RAPIDOS = [
   { id: 'reservas', icon: Calendar, titulo: 'Reservar instalación', desc: 'Administrá reservas de espacios físicos del club.' },
   { id: 'inscripciones', icon: ClipboardList, titulo: 'Inscribirme a actividad', desc: 'Sumate a una disciplina o actividad del club.' },
   { id: 'eventos', icon: Ticket, titulo: 'Comprar entradas', desc: 'Comprá tu entrada para los próximos eventos del club.' },
-  { id: 'noticias', icon: Newspaper, titulo: 'Última noticia', desc: 'Enterate de las últimas novedades del club.' },
   { id: 'tramites', icon: FileText, titulo: 'Mis trámites', desc: 'Cargá y consultá tus trámites y formularios.' },
+  { id: 'noticias', icon: Newspaper, titulo: 'Noticias', desc: 'Enterate de las últimas novedades del club.' },
 ];
 
 export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReservas, onInscripciones, onEventos }) {

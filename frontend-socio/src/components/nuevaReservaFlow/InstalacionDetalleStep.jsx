@@ -9,6 +9,22 @@ function hoyISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function abrirCalendario(e) {
+  try {
+    e.target.showPicker?.();
+  } catch {
+    // Navegadores sin soporte (Safari viejo, Firefox <101) o sin gesto de usuario
+    // válido: el input sigue siendo clickeable/enfocable normalmente.
+  }
+}
+
+function bloquearEdicionManual(e) {
+  // Solo se puede cambiar la fecha a través del calendario nativo (showPicker),
+  // no tipeando sobre el input — evita fechas mal formadas / fuera de la grilla.
+  if (e.key === 'Tab' || e.key === 'Escape') return;
+  e.preventDefault();
+}
+
 export function InstalacionDetalleStep({
   instalacion,
   fecha,
@@ -62,6 +78,9 @@ export function InstalacionDetalleStep({
         min={hoyISO()}
         value={fecha}
         onChange={(e) => onFechaChange(e.target.value)}
+        onClick={abrirCalendario}
+        onFocus={abrirCalendario}
+        onKeyDown={bloquearEdicionManual}
       />
 
       <h3 className="detalle-turnos-titulo">Turnos disponibles</h3>
