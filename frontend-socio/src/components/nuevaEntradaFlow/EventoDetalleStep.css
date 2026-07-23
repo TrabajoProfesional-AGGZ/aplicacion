@@ -47,24 +47,13 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.evento-banner-foto {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: var(--radius-lg);
-  margin-bottom: var(--space-5);
-  display: block;
-}
-
 .evento-banner-content {
   position: relative;
   z-index: 1;
 }
 
 .evento-banner-nombre {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-4);
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -73,11 +62,21 @@
   text-wrap: balance;
 }
 
-.evento-banner-descripcion {
-  margin: 0 0 var(--space-5);
-  color: rgba(255, 255, 255, 0.75);
+.evento-detalle-foto {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-5);
+  display: block;
+}
+
+.evento-detalle-descripcion {
+  margin: 0 0 var(--space-6);
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
   line-height: 1.5;
+  max-width: 65ch;
 }
 
 .evento-banner-stats {

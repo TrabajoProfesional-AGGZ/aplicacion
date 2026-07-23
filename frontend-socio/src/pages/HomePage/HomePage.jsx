@@ -28,7 +28,7 @@ export function HomePage({
 }) {
   const [proximamente, setProximamente] = useState(null);
   const [vista, setVista] = useState('inicio');
-  const [reservaAPagarId, setReservaAPagarId] = useState(null);
+  const [itemAPagarId, setItemAPagarId] = useState(null);
 
   useBackToRoot(vista, 'inicio', () => setVista('inicio'));
 
@@ -45,8 +45,8 @@ export function HomePage({
         {vista === 'pagos' && (
           <FinanzasPage
             socio={socio}
-            reservaAPagarId={reservaAPagarId}
-            onConsumirReservaAPagar={() => setReservaAPagarId(null)}
+            itemAPagarId={itemAPagarId}
+            onConsumirItemAPagar={() => setItemAPagarId(null)}
           />
         )}
         {vista === 'tramites' && <TramitesPage socio={socio} />}
@@ -55,7 +55,7 @@ export function HomePage({
           <ReservasPage
             socio={socio}
             onNuevaReserva={() => setVista('nueva-reserva')}
-            onPagarReserva={(reserva) => { setReservaAPagarId(reserva.id); setVista('pagos'); }}
+            onPagarReserva={(reserva) => { setItemAPagarId(reserva.id); setVista('pagos'); }}
           />
         )}
         {vista === 'nueva-reserva' && (
@@ -83,7 +83,12 @@ export function HomePage({
             onExito={() => setVista('mis-entradas')}
           />
         )}
-        {vista === 'mis-entradas' && <MisEntradasPage socio={socio} />}
+        {vista === 'mis-entradas' && (
+          <MisEntradasPage
+            socio={socio}
+            onPagarEntrada={(entrada) => { setItemAPagarId(entrada.id); setVista('pagos'); }}
+          />
+        )}
         {vista === 'inicio' && (
           <>
             <WelcomeCard socio={socio} />

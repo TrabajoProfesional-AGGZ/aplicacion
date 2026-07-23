@@ -47,3 +47,10 @@ export async function getEntradasHistoricas(idSocio) {
   if (!res.ok) throw new Error('Error al obtener tu historial de entradas');
   return res.json();
 }
+
+export async function getEntradasPendientes(idSocio) {
+  const res = await fetchTo(`/api/v1/entradas/pendientes/por-socio/${encodeURIComponent(idSocio)}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener tus entradas pendientes');
+  return res.json();
+}

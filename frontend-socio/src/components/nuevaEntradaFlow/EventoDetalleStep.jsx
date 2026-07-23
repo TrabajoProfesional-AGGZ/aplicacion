@@ -30,12 +30,8 @@ export function EventoDetalleStep({
 
       <section className="evento-banner">
         <div className="evento-banner-texture" aria-hidden="true" />
-        {evento.foto_url && (
-          <img src={evento.foto_url} alt="" className="evento-banner-foto" referrerPolicy="no-referrer" />
-        )}
         <div className="evento-banner-content">
           <h2 className="evento-banner-nombre">{evento.nombre}</h2>
-          <p className="evento-banner-descripcion">{evento.descripcion}</p>
 
           <div className="evento-banner-stats">
             <div className="evento-banner-stat">
@@ -63,6 +59,17 @@ export function EventoDetalleStep({
         </div>
       </section>
 
+      {evento.foto_url && (
+        <img
+          src={evento.foto_url}
+          alt={`Foto del evento ${evento.nombre}`}
+          className="evento-detalle-foto"
+          referrerPolicy="no-referrer"
+        />
+      )}
+
+      {evento.descripcion && <p className="evento-detalle-descripcion">{evento.descripcion}</p>}
+
       {submitError && (
         <div className="detalle-error-box">
           <p className="detalle-error" role="alert">
@@ -78,7 +85,7 @@ export function EventoDetalleStep({
         onClick={onPagarEntrada}
         disabled={enviando}
       >
-        {enviando ? 'Procesando...' : 'Pagar Entrada'}
+        {enviando ? 'Procesando...' : 'Reserva tu entrada'}
       </button>
     </section>
   );

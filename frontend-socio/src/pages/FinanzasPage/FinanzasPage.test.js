@@ -7,9 +7,10 @@ jest.mock('../../services/finanzasService', () => ({
 }));
 
 jest.mock('../../components/pagoCuota/PagoCuotaFlow', () => ({
-  PagoCuotaFlow: ({ item, onVolver }) => ( 
+  PagoCuotaFlow: ({ item, tipoItem, onVolver }) => (
     <div>
-      <p>pago-flow-stub {item.concepto}</p> 
+      <p>pago-flow-stub {item.concepto}</p>
+      <p>tipo-item-stub {tipoItem}</p>
       <button onClick={onVolver}>Volver al stub</button>
     </div>
   ),
@@ -131,7 +132,7 @@ describe('FinanzasPage', () => {
     expect(screen.queryByRole('button', { name: 'Pagar' })).not.toBeInTheDocument();
   });
 
-  test('si recibe reservaAPagarId, abre directamente el flujo de pago de ese item y avisa que fue consumido', async () => {
+  test('si recibe itemAPagarId, abre directamente el flujo de pago de ese item y avisa que fue consumido', async () => {
     getEstadoFinanciero.mockResolvedValue({
       id_socio: 'socio-1',
       estado_financiero: 'Activo',
@@ -147,21 +148,52 @@ describe('FinanzasPage', () => {
         },
       ],
     });
-    const onConsumirReservaAPagar = jest.fn();
+    const onConsumirItemAPagar = jest.fn();
 
     render(
       <FinanzasPage
         socio={socioFixture}
-        reservaAPagarId="reserva-1"
-        onConsumirReservaAPagar={onConsumirReservaAPagar}
+        itemAPagarId="reserva-1"
+        onConsumirItemAPagar={onConsumirItemAPagar}
       />
     );
 
     expect(await screen.findByText('pago-flow-stub Reserva: Cancha de fútbol')).toBeInTheDocument();
-    expect(onConsumirReservaAPagar).toHaveBeenCalledTimes(1);
+    expect(onConsumirItemAPagar).toHaveBeenCalledTimes(1);
   });
 
-  test('si el reservaAPagarId no matchea ninguna cuota, muestra la lista normal', async () => {
+  test('si recibe itemAPagarId de una entrada, abre directamente el flujo de pago con tipoItem entrada', async () => {
+    getEstadoFinanciero.mockResolvedValue({
+      id_socio: 'socio-1',
+      estado_financiero: 'Activo',
+      deuda_total: '0.00',
+      cuotas: [
+        {
+          id: 'entrada-1',
+          concepto: 'Entrada: Fiesta de fin de año',
+          monto: '800.00',
+          fecha_emision: '2026-07-13',
+          fecha_vencimiento: '2026-07-23',
+          estado: 'Pendiente',
+        },
+      ],
+    });
+    const onConsumirItemAPagar = jest.fn();
+
+    render(
+      <FinanzasPage
+        socio={socioFixture}
+        itemAPagarId="entrada-1"
+        onConsumirItemAPagar={onConsumirItemAPagar}
+      />
+    );
+
+    expect(await screen.findByText('pago-flow-stub Entrada: Fiesta de fin de año')).toBeInTheDocument();
+    expect(await screen.findByText('tipo-item-stub entrada')).toBeInTheDocument();
+    expect(onConsumirItemAPagar).toHaveBeenCalledTimes(1);
+  });
+
+  test('si el itemAPagarId no matchea ninguna cuota, muestra la lista normal', async () => {
     getEstadoFinanciero.mockResolvedValue({
       id_socio: 'socio-1',
       estado_financiero: 'Activo',
@@ -178,7 +210,7 @@ describe('FinanzasPage', () => {
       ],
     });
 
-    render(<FinanzasPage socio={socioFixture} reservaAPagarId="reserva-inexistente" />);
+    render(<FinanzasPage socio={socioFixture} itemAPagarId="item-inexistente" />);
 
     expect(await screen.findByText('Cuota Social - 07/2026')).toBeInTheDocument();
     expect(screen.queryByText(/pago-flow-stub/)).not.toBeInTheDocument();

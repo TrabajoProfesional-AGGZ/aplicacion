@@ -60,13 +60,13 @@ describe('NuevaEntradaPage', () => {
     expect(screen.getByText('Un evento para todos los socios.')).toBeInTheDocument();
   });
 
-  test('click en "Pagar Entrada" con éxito avanza al flujo de pago', async () => {
+  test('click en "Reserva tu entrada" con éxito avanza al flujo de pago', async () => {
     getEventos.mockResolvedValue([EVENTO]);
     comprarEntrada.mockResolvedValue(ENTRADA);
     render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Pagar Entrada' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
 
     expect(await screen.findByTestId('payment-brick')).toBeInTheDocument();
     expect(comprarEntrada).toHaveBeenCalledWith('ev-1', 'socio-1');
@@ -78,7 +78,7 @@ describe('NuevaEntradaPage', () => {
     render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Pagar Entrada' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
 
     expect(await screen.findByText('Este evento ya no tiene entradas disponibles.')).toBeInTheDocument();
   });
@@ -89,7 +89,7 @@ describe('NuevaEntradaPage', () => {
     render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Pagar Entrada' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
 
     expect(await screen.findByText(/Tenés pagos pendientes/)).toBeInTheDocument();
   });

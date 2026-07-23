@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { QrCode, Calendar } from 'lucide-react';
-import { getEntradasActivas, getEntradasHistoricas } from '../../services/eventosService';
+import { getEntradasActivas, getEntradasHistoricas, getEntradasPendientes } from '../../services/eventosService';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
 import { ProximamenteOverlay } from '../../components/ProximamenteOverlay/ProximamenteOverlay';
 import './MisEntradasPage.css';
 
 const ESTADO_TAG = {
   Pagada: 'success',
+  Pendiente: 'warning',
   Vencida: 'neutral',
   Cancelada: 'danger',
 };
@@ -20,7 +21,7 @@ function formatearFecha(fechaIso) {
   }).format(new Date(fechaIso));
 }
 
-export function MisEntradasPage({ socio }) {
+export function MisEntradasPage({ socio, onPagarEntrada = () => {} }) {
   const [vista, setVista] = useState('activas');
   const [entradas, setEntradas] = useState([]);
   const [historicas, setHistoricas] = useState(null);
@@ -32,8 +33,8 @@ export function MisEntradasPage({ socio }) {
     let cancelled = false;
     setCargando(true);
     setError(false);
-    getEntradasActivas(socio.id)
-      .then((data) => { if (!cancelled) setEntradas(data); })
+    Promise.all([getEntradasActivas(socio.id), getEntradasPendientes(socio.id)])
+      .then(([activas, pendientes]) => { if (!cancelled) setEntradas([...pendientes, ...activas]); })
       .catch(() => { if (!cancelled) setError(true); })
       .finally(() => { if (!cancelled) setCargando(false); });
     return () => { cancelled = true; };
@@ -109,7 +110,16 @@ export function MisEntradasPage({ socio }) {
                   </span>
                   <span className={`entrada-tag entrada-tag--${tono}`}>{entrada.estado}</span>
                 </div>
-                {vista === 'activas' && (
+                {vista === 'activas' && entrada.estado === 'Pendiente' && (
+                  <button
+                    type="button"
+                    className="entrada-pagar-btn"
+                    onClick={() => onPagarEntrada(entrada)}
+                  >
+                    Ir a pagar
+                  </button>
+                )}
+                {vista === 'activas' && entrada.estado === 'Pagada' && (
                   <button
                     type="button"
                     className="entrada-qr-btn"

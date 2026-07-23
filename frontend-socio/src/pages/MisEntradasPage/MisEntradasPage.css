@@ -99,6 +99,7 @@
 }
 
 .entrada-card--success { border-left-color: var(--status-success-border); }
+.entrada-card--warning { border-left-color: var(--status-warning-border); }
 .entrada-card--danger { border-left-color: var(--status-danger-border); }
 .entrada-card--neutral { border-left-color: var(--color-border-medium); }
 
@@ -133,8 +134,32 @@
 }
 
 .entrada-tag--success { background-color: var(--status-success-border); }
+.entrada-tag--warning { background-color: var(--status-warning-border); }
 .entrada-tag--danger { background-color: var(--status-danger-border); }
 .entrada-tag--neutral { background-color: var(--color-text-secondary); }
+
+.entrada-pagar-btn {
+  flex-shrink: 0;
+  border: none;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.entrada-pagar-btn:hover {
+  background-color: var(--color-text-secondary);
+}
+
+.entrada-pagar-btn:active {
+  transform: scale(0.96);
+}
 
 .entrada-qr-btn {
   flex-shrink: 0;
