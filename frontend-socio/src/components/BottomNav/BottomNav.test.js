@@ -4,7 +4,7 @@ import { BottomNav } from './BottomNav';
 describe('BottomNav', () => {
   test('muestra los 5 botones de navegación', () => {
     render(<BottomNav onProximamente={jest.fn()} onInicio={jest.fn()} onReservas={jest.fn()} vistaActual="inicio" />);
-    ['Inicio', 'Mis Reservas', 'Mi Carnet', 'Mis Inscripciones', 'Noticias del Club'].forEach((label) => {
+    ['Inicio', 'Mis Reservas', 'Mi Carnet', 'Mis Inscripciones', 'Mis Entradas'].forEach((label) => {
       expect(screen.getByText(label)).toBeInTheDocument();
     });
   });
