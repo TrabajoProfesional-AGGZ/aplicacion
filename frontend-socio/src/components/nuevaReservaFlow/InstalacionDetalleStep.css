@@ -52,10 +52,12 @@
 .instalacion-banner-content {
   position: relative;
   z-index: 1;
+  text-align: center;
 }
 
 .instalacion-banner-tag {
-  display: inline-block;
+  display: table;
+  text-align: left;
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -87,6 +89,7 @@
 .instalacion-banner-stats {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-5);
   padding-top: var(--space-4);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -95,7 +98,9 @@
 .instalacion-banner-stat {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: var(--space-1);
+  text-align: center;
 }
 
 .instalacion-banner-stat-label {

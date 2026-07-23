@@ -18,6 +18,16 @@ function hoyISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function filtrarTurnosPasados(turnos, fecha) {
+  if (fecha !== hoyISO()) return turnos;
+  const ahora = new Date();
+  const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
+  return turnos.filter((turno) => {
+    const [h, m] = turno.split(':').map(Number);
+    return h * 60 + m >= horaActual;
+  });
+}
+
 export function NuevaReservaPage({ socio, onSalir, onExito }) {
   const [step, setStep] = useState('lista');
 
@@ -63,7 +73,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
     getTurnosDisponibles(instalacionSeleccionada.id, fecha)
       .then((data) => {
         if (cancelled) return;
-        setTurnos(data);
+        setTurnos(filtrarTurnosPasados(data, fecha));
         setTurnoSeleccionado(null);
       })
       .catch(() => {

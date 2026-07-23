@@ -73,7 +73,7 @@ describe('HomePage', () => {
     expect(screen.getByText('Cuotas y pagos')).toBeInTheDocument();
     expect(screen.getByText('Reservar instalación')).toBeInTheDocument();
     expect(screen.getByText('Inscribirme a actividad')).toBeInTheDocument();
-    expect(screen.getByText('Última noticia')).toBeInTheDocument();
+    expect(screen.getByText('Noticias')).toBeInTheDocument();
     expect(screen.getByText('Mis trámites')).toBeInTheDocument();
   });
 
@@ -94,9 +94,9 @@ describe('HomePage', () => {
 
   test('click en una tarjeta de acceso rápido sin handler dedicado abre el overlay "Próximamente" con su título', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Última noticia'));
+    fireEvent.click(screen.getByText('Noticias'));
     expect(screen.getByText('Próximamente...')).toBeInTheDocument();
-    expect(screen.getAllByText('Última noticia').length).toBeGreaterThan(1);
+    expect(screen.getAllByText('Noticias').length).toBeGreaterThan(1);
   });
 
   test('click en "Inscribirme a actividad" navega a la grilla de disciplinas (no abre el overlay)', async () => {
@@ -130,6 +130,19 @@ describe('HomePage', () => {
   });
 
   test('el botón "Volver" dentro del flujo de nueva reserva vuelve directo a la lista de instalaciones, no sale a Home', async () => {
+    // Fija la hora "actual" a la madrugada para que el turno mockeado (08:00)
+    // no quede filtrado por el chequeo de "turno ya pasado" según cuándo corra el test.
+    const RealDate = global.Date;
+    global.Date = class extends RealDate {
+      constructor(...args) {
+        if (args.length === 0) return new RealDate('2024-06-15T06:30:00');
+        return new RealDate(...args);
+      }
+      static now() {
+        return new RealDate('2024-06-15T06:30:00').getTime();
+      }
+    };
+
     getInstalaciones.mockResolvedValue([{
       id: 'inst-1',
       nombre: 'Cancha de fútbol',
@@ -166,6 +179,8 @@ describe('HomePage', () => {
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
     expect(screen.getByText('Cancha de fútbol')).toBeInTheDocument();
     expect(screen.queryByText('Bienvenido Ana Pérez')).not.toBeInTheDocument();
+
+    global.Date = RealDate;
   });
 
   test('"Inicio" del nav inferior vuelve a mostrar el inicio desde el flujo de nueva reserva', async () => {

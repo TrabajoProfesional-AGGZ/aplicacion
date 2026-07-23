@@ -28,16 +28,22 @@ function formatearMonto(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
-export function FinanzasPage({ socio, reservaAPagarId = null, onConsumirReservaAPagar = () => {} }) {
+function inferirTipoItem(concepto) {
+  if (concepto.startsWith('Reserva')) return 'reserva';
+  if (concepto.startsWith('Entrada')) return 'entrada';
+  return 'cuota';
+}
+
+export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar = () => {} }) {
   const [resumen, setResumen] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [cuotaAPagar, setCuotaAPagar] = useState(null);
   const [recarga, setRecarga] = useState(0);
-  const reservaAPagarIdRef = useRef(reservaAPagarId);
-  const onConsumirReservaAPagarRef = useRef(onConsumirReservaAPagar);
+  const itemAPagarIdRef = useRef(itemAPagarId);
+  const onConsumirItemAPagarRef = useRef(onConsumirItemAPagar);
   useEffect(() => {
-    onConsumirReservaAPagarRef.current = onConsumirReservaAPagar;
+    onConsumirItemAPagarRef.current = onConsumirItemAPagar;
   });
 
   useEffect(() => {
@@ -48,10 +54,10 @@ export function FinanzasPage({ socio, reservaAPagarId = null, onConsumirReservaA
       .then((data) => {
         if (cancelled) return;
         setResumen(data);
-        const idBuscado = reservaAPagarIdRef.current;
+        const idBuscado = itemAPagarIdRef.current;
         if (idBuscado) {
-          reservaAPagarIdRef.current = null;
-          onConsumirReservaAPagarRef.current();
+          itemAPagarIdRef.current = null;
+          onConsumirItemAPagarRef.current();
           const item = data.cuotas.find((c) => c.id === idBuscado);
           if (item) setCuotaAPagar(item);
         }
@@ -70,19 +76,12 @@ export function FinanzasPage({ socio, reservaAPagarId = null, onConsumirReservaA
       {!cargando && error && <p className="finanzas-error">No se pudo cargar tu estado financiero.</p>}
 
       {!cargando && !error && resumen && cuotaAPagar && (
-        (() => {
-          const esReserva = cuotaAPagar.concepto.startsWith('Reserva');
-          const tipoItem = esReserva ? 'reserva' : 'cuota';
-
-          return (
-            <PagoCuotaFlow 
-              item={cuotaAPagar} 
-              tipoItem={tipoItem} 
-              socio={socio} 
-              onVolver={volverALista} 
-            />
-          );
-        })()
+        <PagoCuotaFlow
+          item={cuotaAPagar}
+          tipoItem={inferirTipoItem(cuotaAPagar.concepto)}
+          socio={socio}
+          onVolver={volverALista}
+        />
       )}
 
       {!cargando && !error && resumen && !cuotaAPagar && (

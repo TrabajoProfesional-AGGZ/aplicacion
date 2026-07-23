@@ -51,6 +51,36 @@ describe('InstalacionDetalleStep', () => {
     expect(onFechaChange).toHaveBeenCalledWith('2027-01-15');
   });
 
+  test('clickear el input de fecha abre el calendario nativo en vez de permitir tipear', () => {
+    render(<InstalacionDetalleStep {...baseProps} />);
+    const input = screen.getByLabelText('Fecha');
+    input.showPicker = jest.fn();
+
+    fireEvent.click(input);
+
+    expect(input.showPicker).toHaveBeenCalled();
+  });
+
+  test('no permite editar la fecha con el teclado (solo vía el calendario)', () => {
+    const onFechaChange = jest.fn();
+    render(<InstalacionDetalleStep {...baseProps} onFechaChange={onFechaChange} />);
+    const input = screen.getByLabelText('Fecha');
+
+    const evento = fireEvent.keyDown(input, { key: '5' });
+
+    expect(evento).toBe(false); // false === preventDefault() fue llamado
+    expect(onFechaChange).not.toHaveBeenCalled();
+  });
+
+  test('permite navegar con Tab fuera del input de fecha', () => {
+    render(<InstalacionDetalleStep {...baseProps} />);
+    const input = screen.getByLabelText('Fecha');
+
+    const evento = fireEvent.keyDown(input, { key: 'Tab' });
+
+    expect(evento).toBe(true); // no se llamó preventDefault()
+  });
+
   test('muestra un esqueleto de carga mientras llegan los turnos', () => {
     render(<InstalacionDetalleStep {...baseProps} cargandoTurnos />);
     expect(screen.getByLabelText('Cargando turnos')).toBeInTheDocument();

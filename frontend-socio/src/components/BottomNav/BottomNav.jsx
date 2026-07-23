@@ -1,4 +1,4 @@
-import { Home, Calendar, QrCode, ClipboardList, Newspaper } from 'lucide-react';
+import { Home, Calendar, QrCode, ClipboardList, Ticket } from 'lucide-react';
 import './BottomNav.css';
 
 const ITEMS = [
@@ -6,10 +6,10 @@ const ITEMS = [
   { id: 'reservas', icon: Calendar, label: 'Mis Reservas' },
   { id: 'carnet', icon: QrCode, label: 'Mi Carnet' },
   { id: 'inscripciones', icon: ClipboardList, label: 'Mis Inscripciones' },
-  { id: 'noticias', icon: Newspaper, label: 'Noticias del Club' },
+  { id: 'entradas', icon: Ticket, label: 'Mis Entradas' },
 ];
 
-export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripciones, vistaActual }) {
+export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripciones, onMisEntradas, vistaActual }) {
   return (
     <nav className="bottom-nav">
       {ITEMS.map(({ id, icon: Icon, label }) => {
@@ -17,16 +17,20 @@ export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripci
         const esReservas = id === 'reservas';
         const esCarnet = id === 'carnet';
         const esInscripciones = id === 'inscripciones';
+        const esEntradas = id === 'entradas';
         const activo = (esInicio && vistaActual === 'inicio')
           || (esReservas && vistaActual === 'reservas')
-          || (esInscripciones && vistaActual === 'inscripciones');
+          || (esInscripciones && vistaActual === 'inscripciones')
+          || (esEntradas && vistaActual === 'mis-entradas');
         const onClick = esInicio
           ? onInicio
           : esReservas
             ? onReservas
             : esInscripciones
               ? onMisInscripciones
-              : () => onProximamente(label);
+              : esEntradas
+                ? onMisEntradas
+                : () => onProximamente(label);
         return (
           <button
             key={id}
