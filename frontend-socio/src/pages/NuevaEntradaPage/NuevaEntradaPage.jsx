@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { getEventos, comprarEntrada } from '../../services/eventosService';
+import {
+  getEventos,
+  comprarEntrada,
+  getEntradasActivas,
+  getEntradasPendientes,
+} from '../../services/eventosService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { EventosListStep } from '../../components/nuevaEntradaFlow/EventosListStep';
 import { EventoDetalleStep } from '../../components/nuevaEntradaFlow/EventoDetalleStep';
@@ -26,8 +31,10 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
   const [eventos, setEventos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
+  const [eventosConEntradaIds, setEventosConEntradaIds] = useState(new Set());
 
   const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
+  const [yaTieneEntrada, setYaTieneEntrada] = useState(false);
   const [entradaPendiente, setEntradaPendiente] = useState(null);
   const [enviando, setEnviando] = useState(false);
   const [errorCompra, setErrorCompra] = useState('');
@@ -38,15 +45,20 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
     let cancelled = false;
     setCargando(true);
     setError(false);
-    getEventos()
-      .then((data) => { if (!cancelled) setEventos(data); })
+    Promise.all([getEventos(), getEntradasActivas(socio.id), getEntradasPendientes(socio.id)])
+      .then(([listaEventos, activas, pendientes]) => {
+        if (cancelled) return;
+        setEventos(listaEventos);
+        setEventosConEntradaIds(new Set([...activas, ...pendientes].map((e) => e.evento.id)));
+      })
       .catch(() => { if (!cancelled) setError(true); })
       .finally(() => { if (!cancelled) setCargando(false); });
     return () => { cancelled = true; };
-  }, []);
+  }, [socio.id]);
 
   function irADetalle(evento) {
     setEventoSeleccionado(evento);
+    setYaTieneEntrada(eventosConEntradaIds.has(evento.id));
     setErrorCompra('');
     setStep('detalle');
   }
@@ -54,6 +66,7 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
   function volverALista() {
     setEventoSeleccionado(null);
     setEntradaPendiente(null);
+    setYaTieneEntrada(false);
     setStep('lista');
   }
 
@@ -90,6 +103,7 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
     return (
       <EventoDetalleStep
         evento={eventoSeleccionado}
+        yaTieneEntrada={yaTieneEntrada}
         onPagarEntrada={handlePagarEntrada}
         onVolver={volverALista}
         enviando={enviando}

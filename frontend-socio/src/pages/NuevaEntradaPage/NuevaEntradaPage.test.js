@@ -1,10 +1,17 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { NuevaEntradaPage } from './NuevaEntradaPage';
-import { getEventos, comprarEntrada } from '../../services/eventosService';
+import {
+  getEventos,
+  comprarEntrada,
+  getEntradasActivas,
+  getEntradasPendientes,
+} from '../../services/eventosService';
 
 jest.mock('../../services/eventosService', () => ({
   getEventos: jest.fn(),
   comprarEntrada: jest.fn(),
+  getEntradasActivas: jest.fn(),
+  getEntradasPendientes: jest.fn(),
 }));
 
 jest.mock('../../components/pagoCuota/PagoCuotaFlow', () => ({
@@ -34,6 +41,11 @@ const ENTRADA = {
 };
 
 describe('NuevaEntradaPage', () => {
+  beforeEach(() => {
+    getEntradasActivas.mockResolvedValue([]);
+    getEntradasPendientes.mockResolvedValue([]);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -101,6 +113,16 @@ describe('NuevaEntradaPage', () => {
 
     fireEvent.click(screen.getByText('Volver'));
     expect(await screen.findByRole('heading', { name: 'Comprá tu entrada' })).toBeInTheDocument();
+  });
+
+  test('si el socio ya tiene una entrada para el evento, no muestra el botón y avisa en el banner', async () => {
+    getEventos.mockResolvedValue([EVENTO]);
+    getEntradasPendientes.mockResolvedValue([ENTRADA]);
+    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
+    fireEvent.click(await screen.findByText('Fiesta de fin de año'));
+
+    expect(await screen.findByText('Ya tenés una entrada para este evento')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reserva tu entrada' })).not.toBeInTheDocument();
   });
 
   test('el botón volver del banner llama a onSalir', async () => {

@@ -16,6 +16,7 @@ function formatearMonto(monto) {
 
 export function EventoDetalleStep({
   evento,
+  yaTieneEntrada = false,
   onPagarEntrada,
   onVolver,
   enviando = false,
@@ -30,6 +31,9 @@ export function EventoDetalleStep({
 
       <section className="evento-banner">
         <div className="evento-banner-texture" aria-hidden="true" />
+        {yaTieneEntrada && (
+          <span className="evento-banner-badge">Ya tenés una entrada para este evento</span>
+        )}
         <div className="evento-banner-content">
           <h2 className="evento-banner-nombre">{evento.nombre}</h2>
 
@@ -68,7 +72,12 @@ export function EventoDetalleStep({
         />
       )}
 
-      {evento.descripcion && <p className="evento-detalle-descripcion">{evento.descripcion}</p>}
+      {evento.descripcion && (
+        <div className="evento-descripcion-box">
+          <span className="evento-descripcion-label">Descripción</span>
+          <p className="evento-descripcion-texto">{evento.descripcion}</p>
+        </div>
+      )}
 
       {submitError && (
         <div className="detalle-error-box">
@@ -79,14 +88,16 @@ export function EventoDetalleStep({
         </div>
       )}
 
-      <button
-        type="button"
-        className="evento-pagar-btn"
-        onClick={onPagarEntrada}
-        disabled={enviando}
-      >
-        {enviando ? 'Procesando...' : 'Reserva tu entrada'}
-      </button>
+      {!yaTieneEntrada && (
+        <button
+          type="button"
+          className="evento-pagar-btn"
+          onClick={onPagarEntrada}
+          disabled={enviando}
+        >
+          {enviando ? 'Procesando...' : 'Reserva tu entrada'}
+        </button>
+      )}
     </section>
   );
 }

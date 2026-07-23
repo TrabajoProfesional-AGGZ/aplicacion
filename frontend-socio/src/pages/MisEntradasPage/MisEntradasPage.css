@@ -46,6 +46,8 @@
   letter-spacing: -0.03em;
   line-height: 1.05;
   text-wrap: balance;
+  justify-content: center;
+  text-align: center;
 }
 
 @media (max-width: 480px) {
