@@ -31,7 +31,7 @@ function formatearFecha(fechaIso) {
   }).format(new Date(fechaIso));
 }
 
-export function ReservasPage({ socio, onNuevaReserva = () => {} }) {
+export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva = () => {} }) {
   const [reservas, setReservas] = useState([]);
   const [historicas, setHistoricas] = useState(null);
   const [instalaciones, setInstalaciones] = useState([]);
@@ -52,6 +52,11 @@ export function ReservasPage({ socio, onNuevaReserva = () => {} }) {
         if (cancelled) return;
         setReservas(reservasData);
         setInstalaciones(instalacionesData);
+        const hayPendientes = reservasData.some((r) => r.estado === 'Pendiente');
+        const hayConfirmadas = reservasData.some((r) => r.estado === 'Confirmada');
+        if (!hayPendientes && hayConfirmadas) {
+          setFiltro('Confirmada');
+        }
       })
       .catch((err) => { if (!cancelled) setError(err.message); })
       .finally(() => { if (!cancelled) setCargando(false); });
@@ -171,9 +176,18 @@ export function ReservasPage({ socio, onNuevaReserva = () => {} }) {
                   </span>
                   <span className="reserva-fecha">{formatearFecha(r.fecha_reserva)}</span>
                   <span className="reserva-horario">{r.hora_inicio.slice(0, 5)} - {r.hora_fin.slice(0, 5)}</span>
+                  <span className={`reserva-tag reserva-tag--${tono}`}>{r.estado}</span>
                 </div>
                 <div className="reserva-acciones">
-                  <span className={`reserva-tag reserva-tag--${tono}`}>{r.estado}</span>
+                  {r.estado === 'Pendiente' && (
+                    <button
+                      type="button"
+                      className="reserva-pagar-btn"
+                      onClick={() => onPagarReserva(r)}
+                    >
+                      Pagar
+                    </button>
+                  )}
                   {CANCELABLES.has(r.estado) && (
                     <button
                       type="button"

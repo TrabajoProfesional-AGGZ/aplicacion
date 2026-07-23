@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getEstadoFinanciero } from '../../services/finanzasService';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
@@ -28,19 +28,34 @@ function formatearMonto(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
-export function FinanzasPage({ socio }) {
+export function FinanzasPage({ socio, reservaAPagarId = null, onConsumirReservaAPagar = () => {} }) {
   const [resumen, setResumen] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [cuotaAPagar, setCuotaAPagar] = useState(null);
   const [recarga, setRecarga] = useState(0);
+  const reservaAPagarIdRef = useRef(reservaAPagarId);
+  const onConsumirReservaAPagarRef = useRef(onConsumirReservaAPagar);
+  useEffect(() => {
+    onConsumirReservaAPagarRef.current = onConsumirReservaAPagar;
+  });
 
   useEffect(() => {
     let cancelled = false;
     setCargando(true);
     setError(null);
     getEstadoFinanciero(socio.id)
-      .then((data) => { if (!cancelled) setResumen(data); })
+      .then((data) => {
+        if (cancelled) return;
+        setResumen(data);
+        const idBuscado = reservaAPagarIdRef.current;
+        if (idBuscado) {
+          reservaAPagarIdRef.current = null;
+          onConsumirReservaAPagarRef.current();
+          const item = data.cuotas.find((c) => c.id === idBuscado);
+          if (item) setCuotaAPagar(item);
+        }
+      })
       .catch((err) => { if (!cancelled) setError(err.message); })
       .finally(() => { if (!cancelled) setCargando(false); });
     return () => { cancelled = true; };

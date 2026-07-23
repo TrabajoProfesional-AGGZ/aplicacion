@@ -163,6 +163,47 @@ describe('ReservasPage', () => {
     expect(await screen.findByText('No podés cancelar esta reserva a menos de 60 minutos del turno.')).toBeInTheDocument();
   });
 
+  test('si no hay reservas pendientes pero sí confirmadas, muestra las confirmadas en vez de la lista pendiente vacía', async () => {
+    getReservasPorSocio.mockResolvedValue([RESERVA_CONFIRMADA]);
+    getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
+    render(<ReservasPage socio={socioFixture} />);
+
+    expect(await screen.findByText('Cancha de fútbol')).toBeInTheDocument();
+    expect(screen.getByText('Confirmada')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Confirmadas' })).toHaveClass('reservas-filtro-btn--activo');
+    expect(screen.queryByText('No tenés reservas en este estado.')).not.toBeInTheDocument();
+  });
+
+  test('si hay reservas pendientes, se sigue mostrando el filtro "Pendientes" aunque también haya confirmadas', async () => {
+    getReservasPorSocio.mockResolvedValue([RESERVA_PENDIENTE, RESERVA_CONFIRMADA]);
+    getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
+    render(<ReservasPage socio={socioFixture} />);
+
+    await screen.findByText('Cancha de fútbol');
+    expect(screen.getByRole('button', { name: 'Pendientes' })).toHaveClass('reservas-filtro-btn--activo');
+    expect(screen.getByText('Pendiente')).toBeInTheDocument();
+  });
+
+  test('muestra un botón "Pagar" en una reserva pendiente y llama a onPagarReserva con la reserva', async () => {
+    getReservasPorSocio.mockResolvedValue([RESERVA_PENDIENTE]);
+    getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
+    const onPagarReserva = jest.fn();
+    render(<ReservasPage socio={socioFixture} onPagarReserva={onPagarReserva} />);
+    await screen.findByText('Cancha de fútbol');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pagar' }));
+    expect(onPagarReserva).toHaveBeenCalledWith(RESERVA_PENDIENTE);
+  });
+
+  test('no muestra el botón "Pagar" en una reserva confirmada', async () => {
+    getReservasPorSocio.mockResolvedValue([RESERVA_CONFIRMADA]);
+    getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
+    render(<ReservasPage socio={socioFixture} />);
+    await screen.findByText('Cancha de fútbol');
+
+    expect(screen.queryByRole('button', { name: 'Pagar' })).not.toBeInTheDocument();
+  });
+
   test('"Volver" cierra la confirmación de cancelación sin cancelar', async () => {
     getReservasPorSocio.mockResolvedValue([RESERVA_PENDIENTE]);
     getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);

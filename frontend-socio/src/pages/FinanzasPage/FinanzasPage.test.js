@@ -131,6 +131,59 @@ describe('FinanzasPage', () => {
     expect(screen.queryByRole('button', { name: 'Pagar' })).not.toBeInTheDocument();
   });
 
+  test('si recibe reservaAPagarId, abre directamente el flujo de pago de ese item y avisa que fue consumido', async () => {
+    getEstadoFinanciero.mockResolvedValue({
+      id_socio: 'socio-1',
+      estado_financiero: 'Activo',
+      deuda_total: '0.00',
+      cuotas: [
+        {
+          id: 'reserva-1',
+          concepto: 'Reserva: Cancha de fútbol',
+          monto: '500.00',
+          fecha_emision: '2026-07-13',
+          fecha_vencimiento: '2026-07-23',
+          estado: 'Pendiente',
+        },
+      ],
+    });
+    const onConsumirReservaAPagar = jest.fn();
+
+    render(
+      <FinanzasPage
+        socio={socioFixture}
+        reservaAPagarId="reserva-1"
+        onConsumirReservaAPagar={onConsumirReservaAPagar}
+      />
+    );
+
+    expect(await screen.findByText('pago-flow-stub Reserva: Cancha de fútbol')).toBeInTheDocument();
+    expect(onConsumirReservaAPagar).toHaveBeenCalledTimes(1);
+  });
+
+  test('si el reservaAPagarId no matchea ninguna cuota, muestra la lista normal', async () => {
+    getEstadoFinanciero.mockResolvedValue({
+      id_socio: 'socio-1',
+      estado_financiero: 'Activo',
+      deuda_total: '0.00',
+      cuotas: [
+        {
+          id: 'c1',
+          concepto: 'Cuota Social - 07/2026',
+          monto: '1500.00',
+          fecha_emision: '2026-07-13',
+          fecha_vencimiento: '2026-07-23',
+          estado: 'Pendiente',
+        },
+      ],
+    });
+
+    render(<FinanzasPage socio={socioFixture} reservaAPagarId="reserva-inexistente" />);
+
+    expect(await screen.findByText('Cuota Social - 07/2026')).toBeInTheDocument();
+    expect(screen.queryByText(/pago-flow-stub/)).not.toBeInTheDocument();
+  });
+
   test('muestra un mensaje de error si falla la carga', async () => {
     getEstadoFinanciero.mockRejectedValue(new Error('servicio-no-disponible'));
 
