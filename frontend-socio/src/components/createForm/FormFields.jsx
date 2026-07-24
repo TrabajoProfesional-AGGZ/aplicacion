@@ -30,7 +30,7 @@ export const StyledSelect = React.forwardRef(({ error, children, ...props }, ref
 export const Field = ({ label, icon: Icon, error, children }) => (
   <div className="csf-field">
     <label className="csf-label">
-      {Icon && <Icon size={16} color="#4A4A4A" />} {label}
+      {Icon && <Icon size={16} color="#5C7285" />} {label}
     </label>
     {children}
     {error && (

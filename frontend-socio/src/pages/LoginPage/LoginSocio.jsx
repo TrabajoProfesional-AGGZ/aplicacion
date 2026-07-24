@@ -143,7 +143,7 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {}, onLoginM
           initial={{ height: '100%' }}
           animate={
             exiting
-              ? { height: '100%', backgroundColor: ['#111111', '#4A4A4A', '#F5F5F5'] }
+              ? { height: '100%', backgroundColor: ['#003C82', '#5C7285', '#F3F6F9'] }
               : { height: animStarted ? '30%' : '100%' }
           }
           transition={
