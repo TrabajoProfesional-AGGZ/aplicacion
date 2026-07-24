@@ -13,19 +13,19 @@
 .finanzas-resumen--success {
   background:
     radial-gradient(130% 150% at 15% -10%, rgba(13, 110, 13, 0.4) 0%, transparent 55%),
-    linear-gradient(155deg, #16341c 0%, #101c12 45%, #0a0a0a 100%);
+    linear-gradient(155deg, #16341c 0%, #101c12 45%, #040a10 100%);
 }
 
 .finanzas-resumen--danger {
   background:
     radial-gradient(130% 150% at 15% -10%, rgba(160, 20, 20, 0.45) 0%, transparent 55%),
-    linear-gradient(155deg, #3a1512 0%, #200e0d 45%, #0a0a0a 100%);
+    linear-gradient(155deg, #3a1512 0%, #200e0d 45%, #040a10 100%);
 }
 
 .finanzas-resumen--warning {
   background:
     radial-gradient(130% 150% at 15% -10%, rgba(154, 98, 0, 0.4) 0%, transparent 55%),
-    linear-gradient(155deg, #362a12 0%, #1c160b 45%, #0a0a0a 100%);
+    linear-gradient(155deg, #362a12 0%, #1c160b 45%, #040a10 100%);
 }
 
 .finanzas-resumen-texture {

@@ -31,8 +31,8 @@
   padding: var(--space-6);
   margin-bottom: var(--space-6);
   background:
-    radial-gradient(120% 140% at 12% -10%, #3a3a3a 0%, transparent 55%),
-    linear-gradient(155deg, #1c1c1c 0%, #111111 42%, #0a0a0a 100%);
+    radial-gradient(120% 140% at 12% -10%, #203a54 0%, transparent 55%),
+    linear-gradient(155deg, #0d1c2b 0%, #07111b 42%, #040a10 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
 }
