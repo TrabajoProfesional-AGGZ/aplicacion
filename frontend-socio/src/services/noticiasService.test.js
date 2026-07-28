@@ -1,3 +1,5 @@
+global.fetch = jest.fn();
+
 import { getNoticiasVigentes, getNoticia } from './noticiasService';
 
 beforeEach(() => { global.fetch = jest.fn(); });

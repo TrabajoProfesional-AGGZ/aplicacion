@@ -92,11 +92,10 @@ describe('HomePage', () => {
     expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
   });
 
-  test('click en una tarjeta de acceso rápido sin handler dedicado abre el overlay "Próximamente" con su título', () => {
+  test('click en "Noticias" abre la vista de noticias', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Noticias'));
-    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
-    expect(screen.getAllByText('Noticias').length).toBeGreaterThan(1);
+    expect(screen.getByText('Cargando noticias...')).toBeInTheDocument();
   });
 
   test('click en "Inscribirme a actividad" navega a la grilla de disciplinas (no abre el overlay)', async () => {
