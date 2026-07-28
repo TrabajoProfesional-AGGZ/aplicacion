@@ -11,7 +11,7 @@ const ACCESOS_RAPIDOS = [
   { id: 'noticias', icon: Newspaper, titulo: 'Noticias', desc: 'Enterate de las últimas novedades del club.' },
 ];
 
-export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReservas, onInscripciones, onEventos }) {
+export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReservas, onInscripciones, onEventos, onNoticias }) {
   const [destacado, ...resto] = ACCESOS_RAPIDOS;
 
   function resolverOnClick(id, titulo) {
@@ -20,6 +20,7 @@ export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReserva
     if (id === 'reservas') return onReservas;
     if (id === 'inscripciones') return onInscripciones;
     if (id === 'eventos') return onEventos;
+    if (id === 'noticias') return onNoticias;
     return () => onProximamente(titulo);
   }
 

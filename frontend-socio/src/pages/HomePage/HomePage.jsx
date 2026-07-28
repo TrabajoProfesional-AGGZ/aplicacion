@@ -14,6 +14,7 @@ import { InscripcionesPage } from '../InscripcionesPage/InscripcionesPage';
 import { NuevaInscripcionPage } from '../NuevaInscripcionPage/NuevaInscripcionPage';
 import { NuevaEntradaPage } from '../NuevaEntradaPage/NuevaEntradaPage';
 import { MisEntradasPage } from '../MisEntradasPage/MisEntradasPage';
+import { NoticiasPage } from '../NoticiasPage/NoticiasPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
 import { BiometriaOfferBanner } from '../../components/BiometriaOfferBanner/BiometriaOfferBanner';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
@@ -76,6 +77,7 @@ export function HomePage({
             onIrATramites={() => setVista('tramites')}
           />
         )}
+        {vista === 'noticias' && <NoticiasPage />}
         {vista === 'nueva-entrada' && (
           <NuevaEntradaPage
             socio={socio}
@@ -104,6 +106,7 @@ export function HomePage({
               onReservas={() => setVista('nueva-reserva')}
               onInscripciones={() => setVista('nueva-inscripcion')}
               onEventos={() => setVista('nueva-entrada')}
+              onNoticias={() => setVista('noticias')}
             />
           </>
         )}
