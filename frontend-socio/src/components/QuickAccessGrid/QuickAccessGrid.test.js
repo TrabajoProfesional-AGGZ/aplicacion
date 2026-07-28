@@ -11,11 +11,22 @@ describe('QuickAccessGrid', () => {
     expect(screen.getByText('Mis trámites')).toBeInTheDocument();
   });
 
-  test('click en una tarjeta sin handler dedicado llama a onProximamente con su título', () => {
+  test('click en "Noticias" llama a onNoticias en vez de onProximamente', () => {
     const onProximamente = jest.fn();
-    render(<QuickAccessGrid onProximamente={onProximamente} onPagos={jest.fn()} />);
+    const onNoticias = jest.fn();
+    render(<QuickAccessGrid onProximamente={onProximamente} onPagos={jest.fn()} onNoticias={onNoticias} />);
     fireEvent.click(screen.getByText('Noticias'));
-    expect(onProximamente).toHaveBeenCalledWith('Noticias');
+    expect(onNoticias).toHaveBeenCalled();
+    expect(onProximamente).not.toHaveBeenCalled();
+  });
+
+  test('click en "Comprar entradas" llama a onEventos en vez de onProximamente', () => {
+    const onProximamente = jest.fn();
+    const onEventos = jest.fn();
+    render(<QuickAccessGrid onProximamente={onProximamente} onPagos={jest.fn()} onEventos={onEventos} />);
+    fireEvent.click(screen.getByText('Comprar entradas'));
+    expect(onEventos).toHaveBeenCalled();
+    expect(onProximamente).not.toHaveBeenCalled();
   });
 
   test('click en "Inscribirme a actividad" llama a onInscripciones en vez de onProximamente', () => {
