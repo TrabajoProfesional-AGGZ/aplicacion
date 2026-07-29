@@ -2,13 +2,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { QuickAccessGrid } from './QuickAccessGrid';
 
 describe('QuickAccessGrid', () => {
-  test('muestra las 5 tarjetas de acceso rápido con sus títulos', () => {
+  test('muestra las 7 tarjetas de acceso rápido con sus títulos', () => {
     render(<QuickAccessGrid onProximamente={jest.fn()} />);
     expect(screen.getByText('Cuotas y pagos')).toBeInTheDocument();
     expect(screen.getByText('Reservar instalación')).toBeInTheDocument();
     expect(screen.getByText('Inscribirme a actividad')).toBeInTheDocument();
-    expect(screen.getByText('Noticias')).toBeInTheDocument();
+    expect(screen.getByText('Comprar entradas')).toBeInTheDocument();
     expect(screen.getByText('Mis trámites')).toBeInTheDocument();
+    expect(screen.getByText('Noticias')).toBeInTheDocument();
+    expect(screen.getByText('Tienda')).toBeInTheDocument();
   });
 
   test('click en "Noticias" llama a onNoticias en vez de onProximamente', () => {
@@ -62,6 +64,15 @@ describe('QuickAccessGrid', () => {
     render(<QuickAccessGrid onProximamente={onProximamente} onPagos={jest.fn()} onTramites={onTramites} />);
     fireEvent.click(screen.getByText('Mis trámites'));
     expect(onTramites).toHaveBeenCalled();
+    expect(onProximamente).not.toHaveBeenCalled();
+  });
+  
+  test('click en "Tienda" llama a onTienda en vez de onProximamente', () => {
+    const onProximamente = jest.fn();
+    const onTienda = jest.fn();
+    render(<QuickAccessGrid onProximamente={onProximamente} onPagos={jest.fn()} onTienda={onTienda} />);
+    fireEvent.click(screen.getByText('Tienda'));
+    expect(onTienda).toHaveBeenCalled();
     expect(onProximamente).not.toHaveBeenCalled();
   });
 });

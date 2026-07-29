@@ -1,0 +1,41 @@
+.tienda-page { padding: 16px; max-width: 600px; margin: 0 auto; }
+.tienda-titulo { display: flex; align-items: center; gap: 8px; font-size: 22px; font-weight: 700; color: var(--color-text, #fff); margin-bottom: 16px; }
+.tienda-loading, .tienda-empty { text-align: center; color: var(--color-text-secondary, #999); padding: 40px 0; }
+.tienda-error { background: #ff444420; border: 1px solid #ff4444; border-radius: 10px; padding: 12px; color: #ff4444; font-size: 14px; margin-bottom: 12px; }
+
+/* Grid de productos */
+.tienda-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.tienda-card {
+  display: flex; flex-direction: column; align-items: center;
+  background: var(--color-surface, #1a1a1a); border: 1px solid var(--color-border, #333);
+  border-radius: 12px; padding: 14px; cursor: pointer;
+  text-align: center; width: 100%; transition: background 0.15s;
+}
+.tienda-card:hover { background: var(--color-surface-hover, #222); }
+
+.tienda-card-img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+.tienda-card-img-placeholder {
+  width: 100%; height: 120px; display: flex; align-items: center; justify-content: center;
+  background: var(--color-bg, #111); border-radius: 8px; margin-bottom: 10px; color: var(--color-text-secondary, #666);
+}
+.tienda-card-nombre { font-weight: 600; color: var(--color-text, #fff); font-size: 14px; margin-bottom: 4px; }
+.tienda-card-precio { color: var(--color-primary, #4f46e5); font-weight: 700; font-size: 16px; }
+.tienda-card-stock { color: var(--color-text-secondary, #999); font-size: 12px; margin-top: 2px; }
+
+/* Detalle */
+.tienda-volver {
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; color: var(--color-primary, #4f46e5);
+  font-size: 15px; cursor: pointer; padding: 0; margin-bottom: 16px;
+}
+.tienda-detalle { text-align: center; }
+.tienda-detalle-img { width: 100%; max-height: 280px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; }
+.tienda-detalle-img-placeholder {
+  width: 100%; height: 200px; display: flex; align-items: center; justify-content: center;
+  background: var(--color-bg, #111); border-radius: 12px; margin-bottom: 16px; color: var(--color-text-secondary, #666);
+}
+.tienda-detalle-nombre { font-size: 22px; font-weight: 700; color: var(--color-text, #fff); margin: 0 0 8px 0; }
+.tienda-detalle-precio { display: block; color: var(--color-primary, #4f46e5); font-weight: 700; font-size: 24px; margin-bottom: 6px; }
+.tienda-detalle-stock { display: block; color: var(--color-text-secondary, #999); font-size: 14px; margin-bottom: 16px; }
+.tienda-detalle-desc { color: var(--color-text, #ddd); font-size: 15px; line-height: 1.6; text-align: left; white-space: pre-wrap; }

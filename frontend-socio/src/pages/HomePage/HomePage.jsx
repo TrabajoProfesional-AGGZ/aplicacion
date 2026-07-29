@@ -15,6 +15,7 @@ import { NuevaInscripcionPage } from '../NuevaInscripcionPage/NuevaInscripcionPa
 import { NuevaEntradaPage } from '../NuevaEntradaPage/NuevaEntradaPage';
 import { MisEntradasPage } from '../MisEntradasPage/MisEntradasPage';
 import { NoticiasPage } from '../NoticiasPage/NoticiasPage';
+import { TiendaPage } from '../TiendaPage/TiendaPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
 import { BiometriaOfferBanner } from '../../components/BiometriaOfferBanner/BiometriaOfferBanner';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
@@ -78,6 +79,7 @@ export function HomePage({
           />
         )}
         {vista === 'noticias' && <NoticiasPage />}
+        {vista === 'tienda' && <TiendaPage />}
         {vista === 'nueva-entrada' && (
           <NuevaEntradaPage
             socio={socio}
@@ -107,6 +109,7 @@ export function HomePage({
               onInscripciones={() => setVista('nueva-inscripcion')}
               onEventos={() => setVista('nueva-entrada')}
               onNoticias={() => setVista('noticias')}
+              onTienda={() => setVista('tienda')}
             />
           </>
         )}

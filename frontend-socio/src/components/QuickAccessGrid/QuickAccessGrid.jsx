@@ -1,4 +1,4 @@
-import { CreditCard, Calendar, ClipboardList, Newspaper, FileText, Ticket } from 'lucide-react';
+import { CreditCard, Calendar, ClipboardList, Newspaper, FileText, Ticket, ShoppingBag } from 'lucide-react';
 import { QuickAccessCard } from './QuickAccessCard';
 import './QuickAccessGrid.css';
 
@@ -9,9 +9,10 @@ const ACCESOS_RAPIDOS = [
   { id: 'eventos', icon: Ticket, titulo: 'Comprar entradas', desc: 'Comprá tu entrada para los próximos eventos del club.' },
   { id: 'tramites', icon: FileText, titulo: 'Mis trámites', desc: 'Cargá y consultá tus trámites y formularios.' },
   { id: 'noticias', icon: Newspaper, titulo: 'Noticias', desc: 'Enterate de las últimas novedades del club.' },
+  { id: 'tienda', icon: ShoppingBag, titulo: 'Tienda', desc: 'Explorá los productos del club.' },
 ];
 
-export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReservas, onInscripciones, onEventos, onNoticias }) {
+export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReservas, onInscripciones, onEventos, onNoticias, onTienda }) {
   const [destacado, ...resto] = ACCESOS_RAPIDOS;
 
   function resolverOnClick(id, titulo) {
@@ -21,6 +22,7 @@ export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReserva
     if (id === 'inscripciones') return onInscripciones;
     if (id === 'eventos') return onEventos;
     if (id === 'noticias') return onNoticias;
+    if (id === 'tienda') return onTienda;
     return () => onProximamente(titulo);
   }
 
