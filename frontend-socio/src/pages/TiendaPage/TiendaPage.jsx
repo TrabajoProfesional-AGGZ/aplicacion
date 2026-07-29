@@ -10,15 +10,12 @@ export function TiendaPage() {
   const [loadingDetalle, setLoadingDetalle] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    cargarProductos();
-  }, []);
+  useEffect(() => { cargarProductos(); }, []);
 
   async function cargarProductos() {
     try {
       setLoading(true);
-      const data = await getProductosDisponibles();
-      setProductos(data);
+      setProductos(await getProductosDisponibles());
     } catch {
       setError('No se pudieron cargar los productos.');
     } finally {
@@ -29,8 +26,7 @@ export function TiendaPage() {
   async function abrirDetalle(id) {
     try {
       setLoadingDetalle(true);
-      const data = await getProducto(id);
-      setDetalle(data);
+      setDetalle(await getProducto(id));
     } catch {
       setError('No se pudo cargar el producto.');
     } finally {
@@ -38,22 +34,17 @@ export function TiendaPage() {
     }
   }
 
-  function volverALista() {
-    setDetalle(null);
-    setError(null);
-  }
-
-  if (loading) return <div className="tienda-loading">Cargando tienda...</div>;
+  if (loading) return <p className="tienda-empty">Cargando tienda...</p>;
 
   // ─── Detalle ───
   if (detalle) {
     return (
       <div className="tienda-page">
-        <button className="tienda-volver" onClick={volverALista}>
+        <button className="tienda-volver" onClick={() => { setDetalle(null); setError(null); }}>
           <ArrowLeft size={20} /> Volver
         </button>
 
-        <div className="tienda-detalle">
+        <div className="tienda-detalle-card">
           {detalle.imagen_url ? (
             <img src={detalle.imagen_url} alt={detalle.nombre} className="tienda-detalle-img" />
           ) : (
@@ -64,9 +55,7 @@ export function TiendaPage() {
           <span className="tienda-detalle-stock">
             {detalle.stock > 0 ? `${detalle.stock} disponibles` : 'Sin stock'}
           </span>
-          {detalle.descripcion && (
-            <p className="tienda-detalle-desc">{detalle.descripcion}</p>
-          )}
+          {detalle.descripcion && <p className="tienda-detalle-desc">{detalle.descripcion}</p>}
         </div>
       </div>
     );
@@ -75,11 +64,21 @@ export function TiendaPage() {
   // ─── Lista ───
   return (
     <div className="tienda-page">
-      <h2 className="tienda-titulo">
-        <ShoppingBag size={22} /> Tienda del Club
-      </h2>
+      <div className="tienda-banner">
+        <div className="tienda-banner-texture" />
+        <div className="tienda-banner-top">
+          <span className="tienda-banner-eyebrow"><ShoppingBag size={14} /> TIENDA DEL CLUB</span>
+        </div>
+        <h2 className="tienda-banner-title">Explorá nuestros productos</h2>
+        <div className="tienda-banner-stats">
+          <div className="tienda-banner-stat">
+            <span className="tienda-banner-stat-value">{productos.length}</span>
+            <span className="tienda-banner-stat-label">Disponibles</span>
+          </div>
+        </div>
+      </div>
 
-      {error && <div className="tienda-error">{error}</div>}
+      {error && <p className="tienda-error">{error}</p>}
 
       {productos.length === 0 ? (
         <p className="tienda-empty">No hay productos disponibles por el momento.</p>
@@ -92,15 +91,17 @@ export function TiendaPage() {
               ) : (
                 <div className="tienda-card-img-placeholder"><Package size={32} /></div>
               )}
-              <span className="tienda-card-nombre">{p.nombre}</span>
-              <span className="tienda-card-precio">${Number(p.precio).toLocaleString('es-AR')}</span>
-              <span className="tienda-card-stock">{p.stock} disp.</span>
+              <div className="tienda-card-info">
+                <span className="tienda-card-nombre">{p.nombre}</span>
+                <span className="tienda-card-precio">${Number(p.precio).toLocaleString('es-AR')}</span>
+                <span className="tienda-card-stock">{p.stock} disponibles</span>
+              </div>
             </button>
           ))}
         </div>
       )}
 
-      {loadingDetalle && <div className="tienda-loading">Cargando...</div>}
+      {loadingDetalle && <p className="tienda-empty">Cargando...</p>}
     </div>
   );
 }
