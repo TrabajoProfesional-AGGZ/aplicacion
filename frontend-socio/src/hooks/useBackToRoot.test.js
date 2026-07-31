@@ -58,18 +58,34 @@ describe('useBackToRoot', () => {
     expect(onBack).not.toHaveBeenCalled();
   });
 
-  test('un popstate que aterriza en la entrada de OTRO consumidor anidado (con id, pero no la propia) no llama a onBack', () => {
+  test('un popstate que aterriza en la entrada de un consumidor anidado por ENCIMA (id posterior a la propia) no llama a onBack', () => {
     const onBack = jest.fn();
     renderHook(() => useBackToRoot('nueva-reserva', 'inicio', onBack));
 
+    const ownId = pushStateSpy.mock.calls[0][0].id;
     // Simula un consumidor multi-nivel (ej. useStepHistory, un wizard de
     // varios pasos) que empujó sus propias entradas por encima de la de
     // este hook y retrocedió un solo nivel dentro de su propia pila: el
-    // navegador aterriza en OTRA entrada rastreada (tiene id, pero no es
-    // la de este hook) — el segmento de este hook todavía no se abandonó.
-    window.history.replaceState({ stepHistory: true, id: 'entrada-de-otro-wizard' }, '');
+    // navegador aterriza en OTRA entrada rastreada, pusheada DESPUÉS de la
+    // de este hook — el segmento de este hook todavía no se abandonó.
+    window.history.replaceState({ stepHistory: true, id: ownId + 1 }, '');
     window.dispatchEvent(new PopStateEvent('popstate'));
     expect(onBack).not.toHaveBeenCalled();
+  });
+
+  test('un popstate que aterriza en la entrada de un consumidor externo por DEBAJO (id anterior a la propia) sí llama a onBack', () => {
+    const onBack = jest.fn();
+    renderHook(() => useBackToRoot('detalle', 'lista', onBack));
+
+    const ownId = pushStateSpy.mock.calls[0][0].id;
+    // Simula dos useBackToRoot encadenados (ej. HomePage con vista=
+    // 'nueva-inscripcion' por fuera, y NuevaInscripcionPage con su propio
+    // step='detalle' por dentro): el navegador aterriza en la entrada del
+    // consumidor EXTERNO, pusheada ANTES que la de este hook — el gesto sí
+    // abandonó este segmento y debe resolver un solo nivel del chain.
+    window.history.replaceState({ backToRoot: true, id: ownId - 1 }, '');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 
   test('un popstate estando en la raíz no llama a onBack', () => {

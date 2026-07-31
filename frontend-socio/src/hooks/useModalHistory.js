@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
-
-let modalHistoryIdCounter = 0;
+import { nextHistoryEntryId } from './historyEntryId';
 
 /**
  * Ties a modal's lifetime to a browser history entry so the phone's back
@@ -58,7 +57,7 @@ export function useModalHistory(onClose) {
       state = pushedStateRef.current;
       pendingConsumeRef.current = false;
     } else {
-      state = { modalOverlay: true, id: Date.now() + '-' + (modalHistoryIdCounter++) };
+      state = { modalOverlay: true, id: nextHistoryEntryId() };
       pushedStateRef.current = state;
       window.history.pushState(state, '');
     }
