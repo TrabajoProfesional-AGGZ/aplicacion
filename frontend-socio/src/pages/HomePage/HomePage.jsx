@@ -17,20 +17,15 @@ import { MisEntradasPage } from '../MisEntradasPage/MisEntradasPage';
 import { NoticiasPage } from '../NoticiasPage/NoticiasPage';
 import { TiendaPage } from '../TiendaPage/TiendaPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
-import { BiometriaOfferBanner } from '../../components/BiometriaOfferBanner/BiometriaOfferBanner';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import '../../socio-theme.css';
 import './HomePage.css';
 
-export function HomePage({
-  socio,
-  cerrarSesion,
-  credencialParaEnrolar = null,
-  onDescartarCredencialParaEnrolar = () => {},
-}) {
+export function HomePage({ socio, cerrarSesion }) {
   const [proximamente, setProximamente] = useState(null);
   const [vista, setVista] = useState('inicio');
   const [itemAPagarId, setItemAPagarId] = useState(null);
+  const [noticiaSeleccionadaId, setNoticiaSeleccionadaId] = useState(null);
 
   useBackToRoot(vista, 'inicio', () => setVista('inicio'));
 
@@ -78,7 +73,12 @@ export function HomePage({
             onIrATramites={() => setVista('tramites')}
           />
         )}
-        {vista === 'noticias' && <NoticiasPage />}
+        {vista === 'noticias' && (
+          <NoticiasPage
+            noticiaInicialId={noticiaSeleccionadaId}
+            onConsumirNoticiaInicial={() => setNoticiaSeleccionadaId(null)}
+          />
+        )}
         {vista === 'tienda' && <TiendaPage />}
         {vista === 'nueva-entrada' && (
           <NuevaEntradaPage
@@ -96,10 +96,6 @@ export function HomePage({
         {vista === 'inicio' && (
           <>
             <WelcomeCard socio={socio} />
-            <BiometriaOfferBanner
-              credencial={credencialParaEnrolar}
-              onDescartar={onDescartarCredencialParaEnrolar}
-            />
             <CertificadoVencidoBanner socio={socio} onClick={() => setVista('tramites')} />
             <QuickAccessGrid
               onProximamente={setProximamente}
@@ -110,6 +106,7 @@ export function HomePage({
               onEventos={() => setVista('nueva-entrada')}
               onNoticias={() => setVista('noticias')}
               onTienda={() => setVista('tienda')}
+              onVerNoticia={(id) => { setNoticiaSeleccionadaId(id); setVista('noticias'); }}
             />
           </>
         )}

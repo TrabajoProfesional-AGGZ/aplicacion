@@ -1,7 +1,16 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QuickAccessGrid } from './QuickAccessGrid';
+import { getUltimaNoticia } from '../../services/noticiasService';
+
+jest.mock('../../services/noticiasService', () => ({
+  getUltimaNoticia: jest.fn(() => Promise.resolve(null)),
+}));
 
 describe('QuickAccessGrid', () => {
+  beforeEach(() => {
+    getUltimaNoticia.mockClear().mockResolvedValue(null);
+  });
+
   test('muestra las 7 tarjetas de acceso rápido con sus títulos', () => {
     render(<QuickAccessGrid onProximamente={jest.fn()} />);
     expect(screen.getByText('Cuotas y pagos')).toBeInTheDocument();
@@ -74,5 +83,44 @@ describe('QuickAccessGrid', () => {
     fireEvent.click(screen.getByText('Tienda'));
     expect(onTienda).toHaveBeenCalled();
     expect(onProximamente).not.toHaveBeenCalled();
+  });
+
+  test('"Tienda" aparece antes que "Noticias" en la lista', () => {
+    render(<QuickAccessGrid onProximamente={jest.fn()} onPagos={jest.fn()} />);
+    const titulos = screen.getAllByRole('button').map((btn) => btn.textContent);
+    const indiceTienda = titulos.findIndex((t) => t.includes('Tienda'));
+    const indiceNoticias = titulos.findIndex((t) => t.includes('Noticias'));
+    expect(indiceTienda).toBeGreaterThan(-1);
+    expect(indiceNoticias).toBeGreaterThan(indiceTienda);
+  });
+
+  test('no muestra la extensión de "Última Noticia" si no hay ninguna vigente', async () => {
+    getUltimaNoticia.mockResolvedValue(null);
+    render(<QuickAccessGrid onProximamente={jest.fn()} onPagos={jest.fn()} />);
+    await waitFor(() => expect(getUltimaNoticia).toHaveBeenCalled());
+    expect(screen.queryByText('Última Noticia')).not.toBeInTheDocument();
+  });
+
+  test('muestra la extensión de "Última Noticia" (con foto y título) cuando getUltimaNoticia resuelve una', async () => {
+    getUltimaNoticia.mockResolvedValue({ id: 'n2', titulo: 'Noticia nueva', imagen: 'https://cdn.test/n2.jpg', cuerpo: '...' });
+
+    render(<QuickAccessGrid onProximamente={jest.fn()} onPagos={jest.fn()} />);
+
+    expect(await screen.findByText('Última Noticia')).toBeInTheDocument();
+    expect(screen.getByText('Noticia nueva')).toBeInTheDocument();
+  });
+
+  test('click en la extensión de "Última Noticia" llama a onVerNoticia con el id de la noticia', async () => {
+    getUltimaNoticia.mockResolvedValue({ id: 'n1', titulo: 'Noticia X', imagen: null, cuerpo: '...' });
+    const onVerNoticia = jest.fn();
+    const onNoticias = jest.fn();
+
+    render(<QuickAccessGrid onProximamente={jest.fn()} onPagos={jest.fn()} onNoticias={onNoticias} onVerNoticia={onVerNoticia} />);
+
+    await screen.findByText('Última Noticia');
+    fireEvent.click(screen.getByText('Última Noticia'));
+
+    expect(onVerNoticia).toHaveBeenCalledWith('n1');
+    expect(onNoticias).not.toHaveBeenCalled();
   });
 });

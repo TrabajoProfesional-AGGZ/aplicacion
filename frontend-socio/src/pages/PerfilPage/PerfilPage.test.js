@@ -303,13 +303,15 @@ describe('PerfilPage', () => {
 
   test('no muestra la opción de biometría si el dispositivo no la soporta', () => {
     render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    expect(screen.queryByText(/login con biometría/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument();
   });
 
-  test('ofrece activar la biometría cuando el dispositivo la soporta y no hay enrolamiento', () => {
+  test('ofrece activar la biometría (switch apagado) cuando el dispositivo la soporta y no hay enrolamiento', () => {
     mockBiometricState.soportado = true;
     render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    expect(screen.getByText('Activar login con biometría')).toBeInTheDocument();
+    const switchBiometria = screen.getByRole('switch', { name: 'Activar login con biometría' });
+    expect(switchBiometria).toBeInTheDocument();
+    expect(switchBiometria).toHaveAttribute('aria-checked', 'false');
   });
 
   test('activar biometría pide la contraseña actual, la valida contra Firebase y recién ahí enrola', async () => {
@@ -318,7 +320,7 @@ describe('PerfilPage', () => {
     mockBiometricState.ofrecerEnrolamiento.mockResolvedValueOnce();
 
     render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Activar login con biometría'));
+    fireEvent.click(screen.getByRole('switch', { name: 'Activar login con biometría' }));
 
     fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'ActualClave1' } });
     fireEvent.click(screen.getByRole('button', { name: /^activar$/i }));
@@ -335,7 +337,7 @@ describe('PerfilPage', () => {
     login.mockRejectedValueOnce(new Error('auth/wrong-password'));
 
     render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Activar login con biometría'));
+    fireEvent.click(screen.getByRole('switch', { name: 'Activar login con biometría' }));
 
     fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'mala-clave' } });
     fireEvent.click(screen.getByRole('button', { name: /^activar$/i }));
@@ -344,12 +346,15 @@ describe('PerfilPage', () => {
     expect(mockBiometricState.ofrecerEnrolamiento).not.toHaveBeenCalled();
   });
 
-  test('con biometría ya enrolada, ofrece desactivarla y llama a desenrolar al hacer click', () => {
+  test('con biometría ya enrolada, el switch aparece prendido y clickearlo llama a desenrolar', () => {
     mockBiometricState.soportado = true;
     mockBiometricState.enrolado = true;
 
     render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Desactivar login con biometría'));
+    const switchBiometria = screen.getByRole('switch', { name: 'Desactivar login con biometría' });
+    expect(switchBiometria).toHaveAttribute('aria-checked', 'true');
+
+    fireEvent.click(switchBiometria);
 
     expect(mockBiometricState.desenrolar).toHaveBeenCalledTimes(1);
   });
