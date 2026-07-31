@@ -40,6 +40,11 @@ jest.mock('../../services/disciplinasService', () => ({
 jest.mock('../../services/sociosService', () => ({
   getSocioByNroSocio: jest.fn(),
 }));
+jest.mock('../../services/noticiasService', () => ({
+  getNoticiasVigentes: jest.fn(() => Promise.resolve([])),
+  getNoticia: jest.fn(),
+  getUltimaNoticia: jest.fn(() => Promise.resolve(null)),
+}));
 jest.mock('../../hooks/useBiometricLogin', () => ({
   useBiometricLogin: () => ({
     soportado: false,

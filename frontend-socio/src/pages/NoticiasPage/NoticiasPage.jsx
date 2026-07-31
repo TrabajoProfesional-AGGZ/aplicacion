@@ -1,16 +1,35 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Newspaper } from 'lucide-react';
 import { getNoticiasVigentes, getNoticia } from '../../services/noticiasService';
+import { useBackToRoot } from '../../hooks/useBackToRoot';
 import './NoticiasPage.css';
 
-export function NoticiasPage() {
+export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial = () => {} }) {
   const [noticias, setNoticias] = useState([]);
   const [detalle, setDetalle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingDetalle, setLoadingDetalle] = useState(false);
   const [error, setError] = useState(null);
+  // El detalle abierto por el atajo "Última Noticia" no cuenta como una
+  // navegación real desde la lista (nunca se la llegó a ver) — no debe
+  // empujar su propia entrada de historial, para que un solo gesto de
+  // atrás vuelva directo a Home. Un click real en una card de la lista sí
+  // la empuja, para que atrás vuelva primero a la lista.
+  const entradaDesdeListaRef = useRef(!noticiaInicialId);
 
-  useEffect(() => { cargarNoticias(); }, []);
+  useBackToRoot(entradaDesdeListaRef.current ? detalle : null, null, () => setDetalle(null));
+
+  useEffect(() => {
+    cargarNoticias();
+    if (noticiaInicialId) {
+      onConsumirNoticiaInicial();
+      abrirDetalle(noticiaInicialId);
+    }
+    // Se captura noticiaInicialId solo al montar: HomePage crea una instancia
+    // nueva de esta página en cada navegación, así que no hace falta reaccionar
+    // a cambios posteriores del prop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function cargarNoticias() {
     try {
@@ -32,6 +51,11 @@ export function NoticiasPage() {
     } finally {
       setLoadingDetalle(false);
     }
+  }
+
+  function abrirDetalleDesdeLista(id) {
+    entradaDesdeListaRef.current = true;
+    abrirDetalle(id);
   }
 
   if (loading) return <p className="noticias-empty">Cargando noticias...</p>;
@@ -82,7 +106,7 @@ export function NoticiasPage() {
       ) : (
         <div className="noticias-lista">
           {noticias.map(n => (
-            <button key={n.id} className="noticias-card" onClick={() => abrirDetalle(n.id)}>
+            <button key={n.id} className="noticias-card" onClick={() => abrirDetalleDesdeLista(n.id)}>
               <div className="noticias-card-info">
                 <span className="noticias-card-titulo">{n.titulo}</span>
                 <span className="noticias-card-fecha">
