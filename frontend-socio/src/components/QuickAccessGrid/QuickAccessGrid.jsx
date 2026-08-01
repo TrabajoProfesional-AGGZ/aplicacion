@@ -1,5 +1,7 @@
+import { Fragment, useEffect, useState } from 'react';
 import { CreditCard, Calendar, ClipboardList, Newspaper, FileText, Ticket, ShoppingBag } from 'lucide-react';
 import { QuickAccessCard } from './QuickAccessCard';
+import { getUltimaNoticia } from '../../services/noticiasService';
 import './QuickAccessGrid.css';
 
 const ACCESOS_RAPIDOS = [
@@ -8,12 +10,24 @@ const ACCESOS_RAPIDOS = [
   { id: 'inscripciones', icon: ClipboardList, titulo: 'Inscribirme a actividad', desc: 'Sumate a una disciplina o actividad del club.' },
   { id: 'eventos', icon: Ticket, titulo: 'Comprar entradas', desc: 'Comprá tu entrada para los próximos eventos del club.' },
   { id: 'tramites', icon: FileText, titulo: 'Mis trámites', desc: 'Cargá y consultá tus trámites y formularios.' },
-  { id: 'noticias', icon: Newspaper, titulo: 'Noticias', desc: 'Enterate de las últimas novedades del club.' },
   { id: 'tienda', icon: ShoppingBag, titulo: 'Tienda', desc: 'Explorá los productos del club.' },
+  { id: 'noticias', icon: Newspaper, titulo: 'Noticias', desc: 'Enterate de las últimas novedades del club.' },
 ];
 
-export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReservas, onInscripciones, onEventos, onNoticias, onTienda }) {
+export function QuickAccessGrid({
+  onProximamente, onPagos, onTramites, onReservas, onInscripciones, onEventos, onNoticias, onTienda,
+  onVerNoticia = () => {},
+}) {
   const [destacado, ...resto] = ACCESOS_RAPIDOS;
+  const [ultimaNoticia, setUltimaNoticia] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getUltimaNoticia()
+      .then((detalle) => { if (!cancelled) setUltimaNoticia(detalle); })
+      .catch(() => { if (!cancelled) setUltimaNoticia(null); });
+    return () => { cancelled = true; };
+  }, []);
 
   function resolverOnClick(id, titulo) {
     if (id === 'pagos') return onPagos;
@@ -39,14 +53,30 @@ export function QuickAccessGrid({ onProximamente, onPagos, onTramites, onReserva
 
       <div className="quick-access-list">
         {resto.map(({ id, icon, titulo, desc }) => (
-          <QuickAccessCard
-            key={id}
-            icon={icon}
-            titulo={titulo}
-            desc={desc}
-            variant="row"
-            onClick={resolverOnClick(id, titulo)}
-          />
+          <Fragment key={id}>
+            <QuickAccessCard
+              icon={icon}
+              titulo={titulo}
+              desc={desc}
+              variant="row"
+              onClick={resolverOnClick(id, titulo)}
+            />
+            {id === 'noticias' && ultimaNoticia && (
+              <button
+                type="button"
+                className="qa-noticia-extension"
+                onClick={() => onVerNoticia(ultimaNoticia.id)}
+              >
+                {ultimaNoticia.imagen
+                  ? <img src={ultimaNoticia.imagen} alt="" className="qa-noticia-extension-img" />
+                  : <span className="qa-noticia-extension-icon"><Newspaper size={28} /></span>}
+                <span className="qa-noticia-extension-text">
+                  <span className="qa-noticia-extension-label">Última Noticia</span>
+                  <span className="qa-noticia-extension-titulo">{ultimaNoticia.titulo}</span>
+                </span>
+              </button>
+            )}
+          </Fragment>
         ))}
       </div>
     </div>

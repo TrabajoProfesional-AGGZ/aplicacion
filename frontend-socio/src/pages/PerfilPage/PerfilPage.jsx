@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import {
   Hash, Layers, IdCard, Cake, Mail, Phone, Lock, Eye, EyeOff, AlertCircle, LogOut,
-  Plus, Upload, Camera, Loader2, CheckCircle2, XCircle,
+  Plus, Upload, Camera, Loader2, CheckCircle2, XCircle, Fingerprint,
 } from 'lucide-react';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import { useCambiarContrasenia } from '../../hooks/useCambiarContrasenia';
@@ -458,13 +458,20 @@ export function PerfilPage({ socio, cerrarSesion }) {
       </button>
 
       {biometriaSoportada && (
-        <button
-          type="button"
-          className="perfil-cambiar-button"
-          onClick={() => (biometriaEnrolada ? desenrolarBiometria() : setBiometriaModalAbierto(true))}
-        >
-          {biometriaEnrolada ? 'Desactivar login con biometría' : 'Activar login con biometría'}
-        </button>
+        <div className="perfil-biometria-row">
+          <span className="perfil-biometria-icon"><Fingerprint size={18} /></span>
+          <span className="perfil-biometria-label">Inicio de sesión con biometría</span>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={biometriaEnrolada}
+            aria-label={biometriaEnrolada ? 'Desactivar login con biometría' : 'Activar login con biometría'}
+            className={`perfil-switch${biometriaEnrolada ? ' perfil-switch--on' : ''}`}
+            onClick={() => (biometriaEnrolada ? desenrolarBiometria() : setBiometriaModalAbierto(true))}
+          >
+            <span className="perfil-switch-thumb" />
+          </button>
+        </div>
       )}
 
       <button type="button" className="perfil-cerrar-sesion" onClick={cerrarSesion}>

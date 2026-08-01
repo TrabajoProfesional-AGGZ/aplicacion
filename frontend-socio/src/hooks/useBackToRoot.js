@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
-
-let backToRootIdCounter = 0;
+import { nextHistoryEntryId } from './historyEntryId';
 
 /**
  * Ties a "current screen" state value to browser history so the phone's
@@ -23,24 +22,28 @@ let backToRootIdCounter = 0;
  * exits this hook's own segment — e.g. a nested history consumer (a modal
  * via useModalHistory, or a multi-level wizard via useStepHistory) popping
  * one of its own entries, sitting above this hook's entry on the stack,
- * also dispatches a `popstate` that this hook's listener receives. The
- * handler below distinguishes the two by checking where the browser
- * actually landed: any of our tracked entries carries an `id` (this
- * hook's own, or one belonging to a nested consumer still stacked above
- * it) — landing on *any* such entry means the gesture hasn't actually
- * left this segment yet, so `onBack` must NOT fire. Only landing on a
- * plain state with no `id` (the true pre-existing state, from before this
- * hook ever pushed anything) means the gesture got past this hook's own
- * entry and `onBack` should fire.
+ * also dispatches a `popstate` that this hook's listener receives. It can
+ * also fire because a *different, outer* instance of this same hook is
+ * chained above this one (e.g. HomePage's own `useBackToRoot` around
+ * `vista`, with a page like NuevaInscripcionPage mounted inside it running
+ * a second `useBackToRoot` around its own internal `step`) — one gesture
+ * should unwind exactly one level of that chain, not all of them at once.
  *
- * Checking strictly "is this exactly my own entry" (instead of "does the
- * landed entry have an id at all") used to work for a single-level nested
- * consumer like a modal, where popping it always lands exactly back on
- * this hook's entry — but it broke for a multi-level consumer like
- * useStepHistory (one entry per wizard step): going back one step inside
- * the wizard lands on *another* of the wizard's own entries, not this
- * hook's, which the strict check misread as "exited past me" and fired
- * `onBack` on every single in-wizard back navigation.
+ * The handler below distinguishes "still inside my own segment" from
+ * "exited past me" by comparing ids, not just checking whether one is
+ * present: every tracked entry's `id` comes from the shared, monotonically
+ * increasing `nextHistoryEntryId()` (see historyEntryId.js), so an id
+ * greater than or equal to this hook's own pushed id was necessarily
+ * pushed by this hook itself or by something nested *above* it (still
+ * within this segment — ignore), while an id smaller than this hook's own,
+ * or no id at all (the true pre-existing state), was pushed *before* this
+ * hook's own entry — by an outer/ancestor consumer, or never tracked at
+ * all — meaning the gesture genuinely got past this hook's own entry, so
+ * `onBack` should fire.
+ *
+ * Two independent counters (one per hook) can't be compared for order,
+ * which is why both useBackToRoot and useModalHistory pull ids from the
+ * same shared sequence instead of keeping their own.
  */
 export function useBackToRoot(current, rootValue, onBack) {
   const onBackRef = useRef(onBack);
@@ -62,7 +65,7 @@ export function useBackToRoot(current, rootValue, onBack) {
     const isAway = current !== rootValue;
 
     if (isAway && !isAwayRef.current) {
-      const state = { backToRoot: true, id: Date.now() + '-' + (backToRootIdCounter++) };
+      const state = { backToRoot: true, id: nextHistoryEntryId() };
       pushedStateRef.current = state;
       window.history.pushState(state, '');
       isAwayRef.current = true;
@@ -79,12 +82,15 @@ export function useBackToRoot(current, rootValue, onBack) {
     const handlePopState = () => {
       if (currentRef.current === rootValue) return;
 
-      // Landing on any tracked entry (ours, or a nested consumer's, e.g. a
-      // modal or a wizard step still stacked above ours) means we haven't
-      // actually exited this segment yet — ignore. Only a landed state with
-      // no `id` at all (the true pre-existing state) means the gesture got
-      // past us for real.
-      if (window.history.state?.id) {
+      // Landing on our own entry, or on one pushed after it (a nested
+      // consumer, still stacked above ours), means we haven't actually
+      // exited this segment yet — ignore. Only landing on an entry pushed
+      // *before* ours (an outer consumer) or on a state with no id at all
+      // (the true pre-existing state) means the gesture got past us for
+      // real.
+      const landedId = window.history.state?.id;
+      const ownId = pushedStateRef.current?.id;
+      if (typeof landedId === 'number' && typeof ownId === 'number' && landedId >= ownId) {
         return;
       }
 
