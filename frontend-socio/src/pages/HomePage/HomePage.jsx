@@ -20,15 +20,59 @@ import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBan
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import '../../socio-theme.css';
 import './HomePage.css';
+import AccesoQR from '../../components/AccesoQR/AccesoQr';
+import { Carnet } from '../../components/Carnet/Carnet';
+import { AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
+import { fetchTo } from '../../utils/utils';
 
 export function HomePage({ socio, cerrarSesion }) {
   const [proximamente, setProximamente] = useState(null);
   const [vista, setVista] = useState('inicio');
   const [itemAPagarId, setItemAPagarId] = useState(null);
   const [noticiaSeleccionadaId, setNoticiaSeleccionadaId] = useState(null);
-
+  
   useBackToRoot(vista, 'inicio', () => setVista('inicio'));
+  
+  useEffect(() => {
+    const enrolarDispositivo = async () => {
+      const secretoGuardado = localStorage.getItem('socio_totp_secret');
+      
+      if (secretoGuardado || !navigator.onLine || socio.modoOffline) return;
 
+      try {
+        const res = await fetchTo('/api/v1/accesos/enrolar', 'POST', {
+          socio_id: socio.id 
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          // Guardamos el secreto en el dispositivo para futuros accesos offline
+          localStorage.setItem('socio_totp_secret', data.totp_secret);
+          localStorage.setItem('socio_id', socio.id);
+          console.log("Dispositivo enrolado correctamente para acceso offline.");
+        }
+      } catch (error) {
+        console.error("No se pudo enrolar el dispositivo:", error);
+      }
+    };
+
+    if (socio) {
+      enrolarDispositivo();
+    }
+  }, [socio]);
+
+  if (socio.modoOffline) {
+    console.warn("Estás sin conexión. Mostrando el pase de acceso offline.");
+    return (
+      <div className="offline-container">
+        <div className="alerta-offline">
+          Estás sin conexión. Mostrá este código para ingresar.
+        </div>
+        <AccesoQR />
+      </div>
+    );
+  }
   return (
     <div>
       <Header
@@ -110,14 +154,20 @@ export function HomePage({ socio, cerrarSesion }) {
             />
           </>
         )}
+        {vista === 'carnet' && (
+          <AnimatePresence>
+            <Carnet socio={socio} onClose={() => setVista('inicio')} />
+          </AnimatePresence>
+        )}
       </main>
-
+      
       <BottomNav
         onProximamente={setProximamente}
         onInicio={() => setVista('inicio')}
         onReservas={() => setVista('reservas')}
         onMisInscripciones={() => setVista('inscripciones')}
         onMisEntradas={() => setVista('mis-entradas')}
+        onCarnet={() => setVista('carnet')}
         vistaActual={vista}
       />
 

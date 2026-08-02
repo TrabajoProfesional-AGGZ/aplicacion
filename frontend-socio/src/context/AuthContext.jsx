@@ -17,6 +17,19 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        if (!navigator.onLine) {
+          console.warn("Estás sin conexión. Intentando cargar datos del socio desde almacenamiento local.");
+          const savedSecret = localStorage.getItem('socio_totp_secret');
+          const savedSocioId = localStorage.getItem('socio_id');
+          
+          if (savedSecret && savedSocioId) {
+            setSocio({ id: savedSocioId, modoOffline: true });
+            setAuthError(null);
+            setCargandoAuth(false);
+            return;
+          }
+        }
+
         try {
           const token = await firebaseUser.getIdToken();
           localStorage.setItem('socioToken', token); 

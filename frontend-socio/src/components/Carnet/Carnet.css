@@ -1,0 +1,137 @@
+.carnet-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1.5rem;
+  min-height: calc(100vh - var(--bottom-nav-height) - 70px);
+  background-color: var(--color-surface); /* O el fondo que uses en tu app */
+  animation: fadeIn 0.3s ease-out;
+}
+
+.carnet-header-mobile {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.carnet-header-mobile h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.carnet-header-mobile p {
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* La tarjeta estilo billetera virtual */
+.carnet-card {
+  width: 100%;
+  max-width: 360px;
+  background: linear-gradient(135deg, #1a1a1c 0%, #2d2d30 100%);
+  border-radius: 24px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 
+              0 1px 3px rgba(255, 255, 255, 0.1) inset;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brillo sutil superpuesto */
+.carnet-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+  transform: skewX(-20deg);
+  animation: shine 6s infinite;
+  pointer-events: none;
+}
+
+.carnet-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.carnet-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  font-size: 1.1rem;
+}
+
+.carnet-status {
+  background-color: rgba(76, 175, 80, 0.2);
+  color: #81c784;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* Fondo obligatoriamente blanco para la lectura del QR */
+.carnet-qr-container {
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15) inset;
+}
+
+.qr-skeleton {
+  color: #666;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.carnet-card-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.socio-data {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.align-right {
+  text-align: right;
+}
+
+.data-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #999;
+}
+
+.data-value {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  20% { left: 200%; }
+  100% { left: 200%; }
+}
