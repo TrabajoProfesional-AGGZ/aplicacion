@@ -7,7 +7,7 @@ export function Carnet({ socio }) {
     <div className="carnet-view">
       <div className="carnet-header-mobile">
         <h2>Mi Pase de Acceso</h2>
-        <p>Mostrá este código en los molinetes</p>
+        <p>Mostrá este código para ingresar</p>
       </div>
 
       <div className="carnet-card">
@@ -17,7 +17,7 @@ export function Carnet({ socio }) {
             <ShieldCheck size={28} className="brand-icon" />
             <span>SOCIOUNIDO</span>
           </div>
-          <span className="carnet-status">ACTIVO</span>
+          <span className="carnet-status">{socio?.estado?.nombre}</span>
         </div>
 
         {/* Contenedor del QR con zona blanca de seguridad (Quiet Zone) */}
