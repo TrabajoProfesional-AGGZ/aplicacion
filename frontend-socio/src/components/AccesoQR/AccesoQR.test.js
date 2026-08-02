@@ -1,10 +1,17 @@
 import { render, screen, act } from '@testing-library/react';
 import AccesoQR from './AccesoQr'; 
-import { generateSecret } from 'otplib';
+// import * as OTPAuth from 'otpauth';
 
-jest.mock('otplib', () => ({
-  generateSecret: jest.fn(() => 'TOKEN123')
-}));
+const mockGenerate = jest.fn(() => 'TOKEN123');
+
+jest.mock('otpauth', () => ({
+  TOTP: jest.fn().mockImplementation(() => ({
+    generate: mockGenerate
+  })),
+  Secret: {
+    fromBase32: jest.fn()
+  }
+}), { virtual: true });
 
 jest.mock('qrcode.react', () => ({
   QRCodeSVG: ({ value }) => <div data-testid="qr-mock">{value}</div>
@@ -37,18 +44,18 @@ describe('AccesoQR', () => {
     expect(screen.queryByText('Cargando pase seguro...')).not.toBeInTheDocument();
   });
 
-  test('actualiza el código QR usando generateSecret en cada intervalo', () => {
+  test('actualiza el código QR usando generate en cada intervalo', () => {
     localStorage.setItem('socio_id', '855c1d5e-8a3d');
     localStorage.setItem('socio_totp_secret', 'SECRETO_PRUEBA');
 
     render(<AccesoQR />);
     
-    generateSecret.mockClear();
+    mockGenerate.mockClear();
 
     act(() => {
       jest.advanceTimersByTime(1000);
     });
 
-    expect(generateSecret).toHaveBeenCalledTimes(1);
+    expect(mockGenerate).toHaveBeenCalledTimes(1);
   });
 });
