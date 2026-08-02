@@ -23,7 +23,7 @@ import './HomePage.css';
 import { Carnet } from '../../components/Carnet/Carnet';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
-import { fetchTo } from '../../utils/utils';
+import { enrolarYGuardarSecreto } from '../../services/accesosService';
 
 export function HomePage({ socio, cerrarSesion }) {
   const [proximamente, setProximamente] = useState(null);
@@ -45,23 +45,9 @@ export function HomePage({ socio, cerrarSesion }) {
       }
 
       try {
-        const res = await fetchTo('/api/v1/accesos/enrolar', 'POST', {
-          socio_id: socio.id 
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          const secreto = data.totp_secret;
-
-          if (typeof secreto === 'string' && /^[a-zA-Z0-9]+$/.test(secreto)) {
-            localStorage.setItem('socio_totp_secret', secreto);
-            localStorage.setItem('socio_id', String(socio.id));
-            localStorage.setItem('socio_nombre', String(socio.nombre));
-            localStorage.setItem('socio_nro_socio', String(socio.nro_socio));
-            console.log("Dispositivo enrolado correctamente para acceso offline.");
-          } else {
-            console.error("El secreto TOTP recibido no es válido:", secreto);
-          }
+        const secreto = await enrolarYGuardarSecreto(socio);
+        if (secreto) {
+          console.log("Dispositivo enrolado correctamente para acceso offline.");
         }
       } catch (error) {
         console.error("No se pudo enrolar el dispositivo:", error);

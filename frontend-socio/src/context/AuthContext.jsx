@@ -19,16 +19,18 @@ export function AuthProvider({ children }) {
       const savedSecret = localStorage.getItem('socio_totp_secret');
       const savedSocioId = localStorage.getItem('socio_id');
       const savedSocioNombre = localStorage.getItem('socio_nombre');
+      const savedSocioApellido = localStorage.getItem('socio_apellido');
       const savedSocioNro = localStorage.getItem('socio_nro_socio');
 
       if (savedSecret && savedSocioId) {
         console.log("PWA Offline Boot: Rescatando sesión local directamente.");
         setTimeout(() => {
-          setSocio({ 
-            id: savedSocioId, 
-            modoOffline: true, 
-            nombre: savedSocioNombre, 
-            nro_socio: savedSocioNro 
+          setSocio({
+            id: savedSocioId,
+            modoOffline: true,
+            nombre: savedSocioNombre,
+            apellido: savedSocioApellido,
+            nro_socio: savedSocioNro
           });
           setCargandoAuth(false);
         }, 0);
@@ -57,11 +59,12 @@ export function AuthProvider({ children }) {
           const savedSecret = localStorage.getItem('socio_totp_secret');
           const savedSocioId = localStorage.getItem('socio_id');
           const savedSocioNombre = localStorage.getItem('socio_nombre');
+          const savedSocioApellido = localStorage.getItem('socio_apellido');
           const savedSocioNro = localStorage.getItem('socio_nro_socio');
-          
+
           if (savedSecret && savedSocioId) {
             console.log("Rescatando sesión local para renderizar el QR.");
-            setSocio({ id: savedSocioId, modoOffline: true, nombre: savedSocioNombre, nro_socio: savedSocioNro });
+            setSocio({ id: savedSocioId, modoOffline: true, nombre: savedSocioNombre, apellido: savedSocioApellido, nro_socio: savedSocioNro });
             setAuthError(null);
           } else {
             setSocio(null);
