@@ -58,9 +58,14 @@ jest.mock('../../hooks/useBiometricLogin', () => ({
     iniciarSesionBiometrico: jest.fn(),
   }),
 }));
-jest.mock('otplib', () => ({
-  generateSecret: jest.fn(),
-}));
+jest.mock('otpauth', () => ({
+  TOTP: jest.fn().mockImplementation(() => ({
+    generate: jest.fn(() => 'TOKEN123')
+  })),
+  Secret: {
+    fromBase32: jest.fn()
+  }
+}), { virtual: true });
 jest.mock('../../utils/utils', () => ({
   fetchTo: jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ totp_secret: 'SECRETO123' }) })),
 }));
