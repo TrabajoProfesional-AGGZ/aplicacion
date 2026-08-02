@@ -17,7 +17,6 @@ export function Carnet({ socio }) {
             <ShieldCheck size={28} className="brand-icon" />
             <span>SOCIOUNIDO</span>
           </div>
-          <span className="carnet-status">{socio?.estado?.nombre}</span>
         </div>
 
         {/* Contenedor del QR con zona blanca de seguridad (Quiet Zone) */}

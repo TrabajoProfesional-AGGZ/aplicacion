@@ -20,7 +20,6 @@ import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBan
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import '../../socio-theme.css';
 import './HomePage.css';
-import AccesoQR from '../../components/AccesoQR/AccesoQr';
 import { Carnet } from '../../components/Carnet/Carnet';
 import { AnimatePresence } from 'framer-motion';
 import { useEffect } from 'react';
@@ -47,9 +46,10 @@ export function HomePage({ socio, cerrarSesion }) {
 
         if (res.ok) {
           const data = await res.json();
-          // Guardamos el secreto en el dispositivo para futuros accesos offline
           localStorage.setItem('socio_totp_secret', data.totp_secret);
           localStorage.setItem('socio_id', socio.id);
+          localStorage.setItem('socio_nombre', socio.nombre);
+          localStorage.setItem('socio_nro_socio', socio.nro_socio);
           console.log("Dispositivo enrolado correctamente para acceso offline.");
         }
       } catch (error) {
@@ -61,15 +61,16 @@ export function HomePage({ socio, cerrarSesion }) {
       enrolarDispositivo();
     }
   }, [socio]);
-
+  
   if (socio.modoOffline) {
     console.warn("Estás sin conexión. Mostrando el pase de acceso offline.");
     return (
-      <div className="offline-container">
-        <div className="alerta-offline">
-          Estás sin conexión. Mostrá este código para ingresar.
+      <div className="offline-fullscreen-container" style={{ minHeight: '100dvh', backgroundColor: 'var(--color-surface)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', textAlign: 'center', padding: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+          Conexión perdida. Mostrando credencial offline.
         </div>
-        <AccesoQR />
+        
+        <Carnet socio={socio} />
       </div>
     );
   }
