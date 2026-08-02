@@ -9,7 +9,7 @@ const ITEMS = [
   { id: 'entradas', icon: Ticket, label: 'Mis Entradas' },
 ];
 
-export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripciones, onMisEntradas, vistaActual }) {
+export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripciones, onMisEntradas, onCarnet, vistaActual }) {
   return (
     <nav className="bottom-nav">
       {ITEMS.map(({ id, icon: Icon, label }) => {
@@ -21,7 +21,8 @@ export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripci
         const activo = (esInicio && vistaActual === 'inicio')
           || (esReservas && vistaActual === 'reservas')
           || (esInscripciones && vistaActual === 'inscripciones')
-          || (esEntradas && vistaActual === 'mis-entradas');
+          || (esEntradas && vistaActual === 'mis-entradas')
+          || (esCarnet && vistaActual === 'carnet');
         const onClick = esInicio
           ? onInicio
           : esReservas
@@ -30,7 +31,9 @@ export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripci
               ? onMisInscripciones
               : esEntradas
                 ? onMisEntradas
-                : () => onProximamente(label);
+                : esCarnet
+                  ? onCarnet
+                    : () => onProximamente(label);
         return (
           <button
             key={id}

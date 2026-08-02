@@ -31,9 +31,21 @@ export function AuthProvider({ children }) {
             setAuthError('No pudimos cargar tu perfil de socio. Probá de nuevo en unos segundos.');
           }
         } catch (error) {
-          console.error("Error al recuperar el perfil del socio:", error);
-          setSocio(null);
-          setAuthError('No pudimos cargar tu perfil de socio. Probá de nuevo en unos segundos.');
+          console.warn("Fallo la conexión con el backend:", error);
+          
+          const savedSecret = localStorage.getItem('socio_totp_secret');
+          const savedSocioId = localStorage.getItem('socio_id');
+          const savedSocioNombre = localStorage.getItem('socio_nombre');
+          const savedSocioNro = localStorage.getItem('socio_nro_socio');
+          
+          if (savedSecret && savedSocioId) {
+            console.log("Rescatando sesión local para renderizar el QR.");
+            setSocio({ id: savedSocioId, modoOffline: true, nombre: savedSocioNombre, nro_socio: savedSocioNro });
+            setAuthError(null);
+          } else {
+            setSocio(null);
+            setAuthError('No pudimos cargar tu perfil de socio. Probá de nuevo en unos segundos.');
+          }
         }
       } else {
         localStorage.removeItem('socioToken');

@@ -20,15 +20,66 @@ import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBan
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import '../../socio-theme.css';
 import './HomePage.css';
+import { Carnet } from '../../components/Carnet/Carnet';
+import { AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
+import { fetchTo } from '../../utils/utils';
 
 export function HomePage({ socio, cerrarSesion }) {
   const [proximamente, setProximamente] = useState(null);
   const [vista, setVista] = useState('inicio');
   const [itemAPagarId, setItemAPagarId] = useState(null);
   const [noticiaSeleccionadaId, setNoticiaSeleccionadaId] = useState(null);
-
+  
   useBackToRoot(vista, 'inicio', () => setVista('inicio'));
+  
+  useEffect(() => {
+    const enrolarDispositivo = async () => {
+      const secretoGuardado = localStorage.getItem('socio_totp_secret');
+      
+      if (secretoGuardado || !navigator.onLine || socio.modoOffline) return;
 
+      try {
+        const res = await fetchTo('/api/v1/accesos/enrolar', 'POST', {
+          socio_id: socio.id 
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const secreto = data.totp_secret;
+
+          if (typeof secreto === 'string' && /^[a-zA-Z0-9]+$/.test(secreto)) {
+            localStorage.setItem('socio_totp_secret', secreto);
+            localStorage.setItem('socio_id', String(socio.id));
+            localStorage.setItem('socio_nombre', String(socio.nombre));
+            localStorage.setItem('socio_nro_socio', String(socio.nro_socio));
+            console.log("Dispositivo enrolado correctamente para acceso offline.");
+          } else {
+            console.error("El secreto TOTP recibido no es válido:", secreto);
+          }
+        }
+      } catch (error) {
+        console.error("No se pudo enrolar el dispositivo:", error);
+      }
+    };
+
+    if (socio) {
+      enrolarDispositivo();
+    }
+  }, [socio]);
+  
+  if (socio.modoOffline) {
+    console.warn("Estás sin conexión. Mostrando el pase de acceso offline.");
+    return (
+      <div className="offline-fullscreen-container" style={{ minHeight: '100dvh', backgroundColor: 'var(--color-surface)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ backgroundColor: '#ff9800', color: 'white', textAlign: 'center', padding: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+          Conexión perdida. Mostrando credencial offline.
+        </div>
+        
+        <Carnet socio={socio} />
+      </div>
+    );
+  }
   return (
     <div>
       <Header
@@ -110,14 +161,20 @@ export function HomePage({ socio, cerrarSesion }) {
             />
           </>
         )}
+        {vista === 'carnet' && (
+          <AnimatePresence>
+            <Carnet socio={socio} onClose={() => setVista('inicio')} />
+          </AnimatePresence>
+        )}
       </main>
-
+      
       <BottomNav
         onProximamente={setProximamente}
         onInicio={() => setVista('inicio')}
         onReservas={() => setVista('reservas')}
         onMisInscripciones={() => setVista('inscripciones')}
         onMisEntradas={() => setVista('mis-entradas')}
+        onCarnet={() => setVista('carnet')}
         vistaActual={vista}
       />
 

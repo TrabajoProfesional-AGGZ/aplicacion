@@ -1,7 +1,9 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { HomePage } from './HomePage';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles } from '../../services/reservasService';
+import { TextEncoder, TextDecoder } from 'util';
+Object.assign(global, { TextEncoder, TextDecoder });
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../utils/authService', () => ({
@@ -56,6 +58,13 @@ jest.mock('../../hooks/useBiometricLogin', () => ({
     iniciarSesionBiometrico: jest.fn(),
   }),
 }));
+jest.mock('otplib', () => ({
+  generateSecret: jest.fn(),
+}));
+jest.mock('../../utils/utils', () => ({
+  fetchTo: jest.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ totp_secret: 'SECRETO123' }) })),
+}));
+import { fetchTo } from '../../utils/utils';
 
 const socioFixture = {
   id: 'socio-1',
@@ -211,14 +220,6 @@ describe('HomePage', () => {
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
   });
 
-  test('click en "Cerrar" del overlay lo cierra', () => {
-    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mi Carnet'));
-    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
-    fireEvent.click(screen.getByText('Cerrar'));
-    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
-  });
-
   test('click en "Cuotas y pagos" navega a la página de finanzas (no abre el overlay)', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Cuotas y pagos'));
@@ -248,10 +249,11 @@ describe('HomePage', () => {
     expect(screen.getByText('Mis Inscripciones')).toBeInTheDocument();
   });
 
-  test('click en un botón del nav inferior (distinto de Inicio) abre el overlay', () => {
+  test('click en un botón del nav inferior (distinto de Inicio) abre el overlay', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Mi Carnet'));
-    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();    
+    expect(await screen.findByText('Mi Pase de Acceso')).toBeInTheDocument();
   });
 
   test('click en el botón de notificaciones navega a la página de alertas', async () => {
@@ -289,5 +291,49 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByLabelText('Mi perfil'));
     fireEvent.click(screen.getByText('Inicio'));
     expect(screen.getByText('Cuotas y pagos')).toBeInTheDocument();
+  });
+
+  test('muestra el banner de modo offline y la credencial si socio.modoOffline es true', () => {
+    const socioOffline = { id: 'socio-1', modoOffline: true, nombre: 'Ana' };
+    render(<HomePage socio={socioOffline} cerrarSesion={jest.fn()} />);
+    
+    expect(screen.getByText('Conexión perdida. Mostrando credencial offline.')).toBeInTheDocument();
+    expect(screen.getByText('Mi Pase de Acceso')).toBeInTheDocument();
+  });
+
+  test('enrola el dispositivo y guarda el secreto TOTP si el backend responde ok', async () => {
+    localStorage.clear();
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ totp_secret: 'SECRETOVALIDO123' })
+    });
+    
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    
+    await waitFor(() => {
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/enrolar', 'POST', { socio_id: 'socio-1' });
+    });
+    
+    expect(localStorage.getItem('socio_totp_secret')).toBe('SECRETOVALIDO123');
+    expect(localStorage.getItem('socio_nombre')).toBe('Ana');
+  });
+
+  test('rechaza guardar el secreto si no pasa la validación de seguridad', async () => {
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    localStorage.clear();
+    fetchTo.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ totp_secret: 'INVAL!DO-@@#' }) // Formato inválido para que salte el Else
+    });
+    
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    
+    await waitFor(() => {
+      expect(fetchTo).toHaveBeenCalled();
+    });
+    
+    expect(localStorage.getItem('socio_totp_secret')).toBeNull();
+    expect(consoleSpy).toHaveBeenCalledWith('El secreto TOTP recibido no es válido:', 'INVAL!DO-@@#');
+    consoleSpy.mockRestore();
   });
 });

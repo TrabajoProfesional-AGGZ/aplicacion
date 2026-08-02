@@ -33,11 +33,23 @@ describe('BottomNav', () => {
     expect(onProximamente).not.toHaveBeenCalled();
   });
 
-  test('click en "Mi Carnet" llama a onProximamente con su label', () => {
+  test('click en "Mi Carnet" llama a onCarnet en vez de onProximamente', () => {
     const onProximamente = jest.fn();
-    render(<BottomNav onProximamente={onProximamente} onInicio={jest.fn()} onReservas={jest.fn()} vistaActual="inicio" />);
+    const onCarnet = jest.fn(); // Asegurate de que este prop coincida con el que usás en BottomNav.jsx
+    
+    render(
+      <BottomNav 
+        onProximamente={onProximamente} 
+        onInicio={jest.fn()} 
+        onReservas={jest.fn()} 
+        onCarnet={onCarnet} 
+        vistaActual="inicio" 
+      />
+    );
+    
     fireEvent.click(screen.getByText('Mi Carnet'));
-    expect(onProximamente).toHaveBeenCalledWith('Mi Carnet');
+    expect(onCarnet).toHaveBeenCalled();
+    expect(onProximamente).not.toHaveBeenCalled();
   });
 
   test('click en "Inicio" llama a onInicio en vez de onProximamente', () => {
@@ -69,5 +81,44 @@ describe('BottomNav', () => {
     fireEvent.click(screen.getByText('Mis Inscripciones'));
     expect(onMisInscripciones).toHaveBeenCalled();
     expect(onProximamente).not.toHaveBeenCalled();
+  });
+
+  test('"Mi Carnet" está marcado como activo cuando vistaActual es "carnet"', () => {
+    render(
+      <BottomNav 
+        onProximamente={jest.fn()} 
+        onInicio={jest.fn()} 
+        onReservas={jest.fn()} 
+        vistaActual="carnet" 
+      />
+    );
+    expect(screen.getByText('Mi Carnet').closest('button')).toHaveAttribute('aria-current', 'page');
+  });
+
+  test('click en "Mis Entradas" llama a onMisEntradas', () => {
+    const onMisEntradas = jest.fn();
+    render(
+      <BottomNav 
+        onProximamente={jest.fn()} 
+        onInicio={jest.fn()} 
+        onReservas={jest.fn()} 
+        onMisEntradas={onMisEntradas} 
+        vistaActual="inicio" 
+      />
+    );
+    fireEvent.click(screen.getByText('Mis Entradas'));
+    expect(onMisEntradas).toHaveBeenCalled();
+  });
+
+  test('"Mis Entradas" está marcado como activo cuando vistaActual es "mis-entradas"', () => {
+    render(
+      <BottomNav 
+        onProximamente={jest.fn()} 
+        onInicio={jest.fn()} 
+        onReservas={jest.fn()} 
+        vistaActual="mis-entradas" 
+      />
+    );
+    expect(screen.getByText('Mis Entradas').closest('button')).toHaveAttribute('aria-current', 'page');
   });
 });

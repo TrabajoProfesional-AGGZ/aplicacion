@@ -98,3 +98,47 @@ describe('AuthProvider — cierre de sesión por inactividad', () => {
     expect(mockSignOut).not.toHaveBeenCalled();
   });
 });
+
+describe('AuthProvider — Contingencia Offline', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    localStorage.clear();
+  });
+
+  test('rescata la sesión local si falla el backend (modo offline)', async () => {
+    fetchTo.mockRejectedValueOnce(new Error('Network error'));
+    
+    localStorage.setItem('socio_totp_secret', 'SECRETO123');
+    localStorage.setItem('socio_id', 'id-123');
+    localStorage.setItem('socio_nombre', 'Lautaro');
+    localStorage.setItem('socio_nro_socio', '1234');
+
+    render(
+      <AuthProvider>
+        <Sonda />
+      </AuthProvider>
+    );
+
+    await act(async () => {
+      await callbackAuthState({ email: 'lautaro@example.com', getIdToken: async () => 'token' });
+    });
+
+    expect(await screen.findByText('socio: Lautaro')).toBeInTheDocument();
+  });
+
+  test('falla completamente si no hay conexión y tampoco hay datos locales', async () => {
+    fetchTo.mockRejectedValueOnce(new Error('Network error'));
+
+    render(
+      <AuthProvider>
+        <Sonda />
+      </AuthProvider>
+    );
+
+    await act(async () => {
+      await callbackAuthState({ email: 'lautaro@example.com', getIdToken: async () => 'token' });
+    });
+
+    expect(await screen.findByText('socio: ninguno')).toBeInTheDocument();
+  });
+});
