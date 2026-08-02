@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { generateSecret } from 'otplib';
-
+import * as OTPAuth from 'otpauth';
 
 const AccesoQR = () => {
   const [qrData, setQrData] = useState('');
@@ -12,13 +11,23 @@ const AccesoQR = () => {
 
     if (!socioId || !secreto) return;
 
+    const generadorTotp = new OTPAuth.TOTP({
+      issuer: 'SocioUnido',
+      label: 'AccesoSocio',
+      algorithm: 'SHA1',
+      digits: 6,
+      period: 120,
+      secret: OTPAuth.Secret.fromBase32(secreto) 
+    });
+
     const generarQR = () => {
-      const token = generateSecret(secreto);
+      const token = generadorTotp.generate();
       setQrData(`${socioId}|${token}`);
     };
 
     generarQR();
-    const intervalo = setInterval(generarQR, 1000);
+    const intervalo = setInterval(generarQR, 1000); 
+    
     return () => clearInterval(intervalo);
   }, []);
 
