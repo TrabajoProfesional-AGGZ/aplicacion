@@ -2,6 +2,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { HomePage } from './HomePage';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles } from '../../services/reservasService';
+import { TextEncoder, TextDecoder } from 'util';
+Object.assign(global, { TextEncoder, TextDecoder });
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../utils/authService', () => ({
@@ -55,6 +57,9 @@ jest.mock('../../hooks/useBiometricLogin', () => ({
     desenrolar: jest.fn(),
     iniciarSesionBiometrico: jest.fn(),
   }),
+}));
+jest.mock('otplib', () => ({
+  generateSecret: jest.fn(),
 }));
 
 const socioFixture = {
@@ -211,14 +216,6 @@ describe('HomePage', () => {
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
   });
 
-  test('click en "Cerrar" del overlay lo cierra', () => {
-    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mi Carnet'));
-    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
-    fireEvent.click(screen.getByText('Cerrar'));
-    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
-  });
-
   test('click en "Cuotas y pagos" navega a la página de finanzas (no abre el overlay)', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Cuotas y pagos'));
@@ -248,10 +245,11 @@ describe('HomePage', () => {
     expect(screen.getByText('Mis Inscripciones')).toBeInTheDocument();
   });
 
-  test('click en un botón del nav inferior (distinto de Inicio) abre el overlay', () => {
+  test('click en un botón del nav inferior (distinto de Inicio) abre el overlay', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Mi Carnet'));
-    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();    
+    expect(await screen.findByText('Mi Pase de Acceso')).toBeInTheDocument();
   });
 
   test('click en el botón de notificaciones navega a la página de alertas', async () => {

@@ -21,7 +21,8 @@ export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripci
         const activo = (esInicio && vistaActual === 'inicio')
           || (esReservas && vistaActual === 'reservas')
           || (esInscripciones && vistaActual === 'inscripciones')
-          || (esEntradas && vistaActual === 'mis-entradas');
+          || (esEntradas && vistaActual === 'mis-entradas')
+          || (esCarnet && vistaActual === 'carnet');
         const onClick = esInicio
           ? onInicio
           : esReservas

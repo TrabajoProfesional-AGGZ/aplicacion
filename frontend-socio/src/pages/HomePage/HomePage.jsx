@@ -46,11 +46,17 @@ export function HomePage({ socio, cerrarSesion }) {
 
         if (res.ok) {
           const data = await res.json();
-          localStorage.setItem('socio_totp_secret', data.totp_secret);
-          localStorage.setItem('socio_id', socio.id);
-          localStorage.setItem('socio_nombre', socio.nombre);
-          localStorage.setItem('socio_nro_socio', socio.nro_socio);
-          console.log("Dispositivo enrolado correctamente para acceso offline.");
+          const secreto = data.totp_secret;
+
+          if (typeof secreto === 'string' && /^[a-zA-Z0-9]+$/.test(secreto)) {
+            localStorage.setItem('socio_totp_secret', secreto);
+            localStorage.setItem('socio_id', String(socio.id));
+            localStorage.setItem('socio_nombre', String(socio.nombre));
+            localStorage.setItem('socio_nro_socio', String(socio.nro_socio));
+            console.log("Dispositivo enrolado correctamente para acceso offline.");
+          } else {
+            console.error("El secreto TOTP recibido no es válido:", secreto);
+          }
         }
       } catch (error) {
         console.error("No se pudo enrolar el dispositivo:", error);
