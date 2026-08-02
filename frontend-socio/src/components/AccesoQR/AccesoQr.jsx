@@ -16,7 +16,7 @@ const AccesoQR = () => {
       label: 'AccesoSocio',
       algorithm: 'SHA1',
       digits: 6,
-      period: 120,
+      period: 30,
       secret: OTPAuth.Secret.fromBase32(secreto) 
     });
 
