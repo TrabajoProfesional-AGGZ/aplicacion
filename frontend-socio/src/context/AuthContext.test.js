@@ -100,12 +100,36 @@ describe('AuthProvider — cierre de sesión por inactividad', () => {
 });
 
 describe('AuthProvider — Contingencia Offline', () => {
+  const originalOnLine = navigator.onLine;
+
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: true });
   });
 
-  test('rescata la sesión local si falla el backend (modo offline)', async () => {
+  afterAll(() => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: originalOnLine });
+  });
+
+  test('rescata la sesión local inmediatamente en arranque en frío (PWA Cold Boot) sin internet', async () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+    
+    localStorage.setItem('socio_totp_secret', 'SECRETO123');
+    localStorage.setItem('socio_id', 'id-123');
+    localStorage.setItem('socio_nombre', 'Lautaro');
+    localStorage.setItem('socio_nro_socio', '1234');
+
+    render(
+      <AuthProvider>
+        <Sonda />
+      </AuthProvider>
+    );
+
+    expect(await screen.findByText('socio: Lautaro')).toBeInTheDocument();
+  });
+
+  test('rescata la sesión local si falla el backend con la app abierta (pérdida de red en uso)', async () => {
     fetchTo.mockRejectedValueOnce(new Error('Network error'));
     
     localStorage.setItem('socio_totp_secret', 'SECRETO123');
