@@ -15,6 +15,27 @@ export function AuthProvider({ children }) {
   const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
+    if (!navigator.onLine) {
+      const savedSecret = localStorage.getItem('socio_totp_secret');
+      const savedSocioId = localStorage.getItem('socio_id');
+      const savedSocioNombre = localStorage.getItem('socio_nombre');
+      const savedSocioNro = localStorage.getItem('socio_nro_socio');
+
+      if (savedSecret && savedSocioId) {
+        console.log("PWA Offline Boot: Rescatando sesión local directamente.");
+        setTimeout(() => {
+          setSocio({ 
+            id: savedSocioId, 
+            modoOffline: true, 
+            nombre: savedSocioNombre, 
+            nro_socio: savedSocioNro 
+          });
+          setCargandoAuth(false);
+        }, 0);
+        return;
+      }
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
