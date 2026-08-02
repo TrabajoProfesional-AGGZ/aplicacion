@@ -36,8 +36,13 @@ export function HomePage({ socio, cerrarSesion }) {
   useEffect(() => {
     const enrolarDispositivo = async () => {
       const secretoGuardado = localStorage.getItem('socio_totp_secret');
-      
-      if (secretoGuardado || !navigator.onLine || socio.modoOffline) return;
+      const idGuardado = localStorage.getItem('socio_id');
+
+      if (secretoGuardado && idGuardado !== String(socio.id)) {
+        localStorage.removeItem('socio_totp_secret');
+      } else if (secretoGuardado || !navigator.onLine || socio.modoOffline) {
+        return;
+      }
 
       try {
         const res = await fetchTo('/api/v1/accesos/enrolar', 'POST', {

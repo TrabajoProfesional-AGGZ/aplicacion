@@ -69,7 +69,7 @@ export function AuthProvider({ children }) {
           }
         }
       } else {
-        localStorage.removeItem('socioToken');
+        localStorage.clear();
         setSocio(null);
         setAuthError(null);
       }
