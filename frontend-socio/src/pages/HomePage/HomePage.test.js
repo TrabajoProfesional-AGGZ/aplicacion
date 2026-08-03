@@ -338,7 +338,7 @@ describe('HomePage', () => {
     });
     
     expect(localStorage.getItem('socio_totp_secret')).toBeNull();
-    expect(consoleSpy).toHaveBeenCalledWith('El secreto TOTP recibido no es válido:', JSON.stringify('INVAL!DO-@@#'));
+    expect(consoleSpy).toHaveBeenCalledWith('El secreto TOTP recibido del servidor no tiene un formato válido.');
     consoleSpy.mockRestore();
   });
 });

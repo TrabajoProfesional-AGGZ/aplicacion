@@ -19,6 +19,7 @@ export async function enrolarYGuardarSecreto(socio) {
   const secreto = data.totp_secret;
 
   if (typeof secreto !== 'string' || !SECRETO_VALIDO_REGEX.test(secreto)) {
+    console.error('El secreto TOTP recibido del servidor no tiene un formato válido.');
     return null;
   }
 

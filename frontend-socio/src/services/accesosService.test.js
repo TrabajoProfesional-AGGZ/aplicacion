@@ -50,25 +50,25 @@ describe('accesosService', () => {
 
     expect(secreto).toBeNull();
     expect(localStorage.getItem('socio_totp_secret')).toBeNull();
-    expect(consoleSpy).toHaveBeenCalledWith('El secreto TOTP recibido no es válido:', JSON.stringify('INVAL!DO-@@#'));
+    expect(consoleSpy).toHaveBeenCalledWith('El secreto TOTP recibido del servidor no tiene un formato válido.');
     consoleSpy.mockRestore();
   });
 
-  test('no permite inyectar líneas de log falsas via un secreto con saltos de línea (log forging)', async () => {
+test('intercepta secretos con formato inválido y registra un error seguro (sin log forging)', async () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     const payloadMalicioso = 'x\n[ERROR] evento falso inyectado';
+    
     fetchTo.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ totp_secret: payloadMalicioso }),
     });
 
     await enrolarYGuardarSecreto(socio);
-
-    const [, valorLogueado] = consoleSpy.mock.calls[0];
-    // Serializado (comillas + \n escapado como texto), no el salto de línea real:
-    // así no se puede forjar una línea de log que aparente ser un evento distinto.
-    expect(valorLogueado).not.toContain('\n');
-    expect(valorLogueado).toBe(JSON.stringify(payloadMalicioso));
+    
+    expect(consoleSpy).toHaveBeenCalled();
+    
+    expect(consoleSpy).toHaveBeenCalledWith('El secreto TOTP recibido del servidor no tiene un formato válido.');
+    
     consoleSpy.mockRestore();
   });
 
