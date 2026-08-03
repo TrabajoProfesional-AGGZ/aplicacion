@@ -19,9 +19,6 @@ export async function enrolarYGuardarSecreto(socio) {
   const secreto = data.totp_secret;
 
   if (typeof secreto !== 'string' || !SECRETO_VALIDO_REGEX.test(secreto)) {
-    // secreto viene sin validar de la respuesta del servidor: se loguea serializado
-    // (JSON.stringify), nunca crudo, para que no pueda forjar/inyectar líneas de log.
-    console.error('El secreto TOTP recibido no es válido:', JSON.stringify(secreto));
     return null;
   }
 
