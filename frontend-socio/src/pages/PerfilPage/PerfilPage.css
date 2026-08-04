@@ -34,12 +34,23 @@
   letter-spacing: 0.02em;
 }
 
+.perfil-avatar-img-btn {
+  display: block;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+}
+
 .perfil-avatar-img {
   width: 56px;
   height: 56px;
   border-radius: var(--radius-full);
   object-fit: cover;
-  cursor: pointer;
 }
 
 .perfil-avatar-edit-btn {

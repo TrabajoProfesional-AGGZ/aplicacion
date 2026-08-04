@@ -16,6 +16,6 @@ export const messaging = getMessaging(app);
 
 // Sesión atada a la pestaña/PWA en vez de persistir entre reinicios (default de Firebase):
 // al cerrar la app, la sesión se pierde y hay que loguearse de nuevo la próxima vez.
-setPersistence(auth, browserSessionPersistence).catch((error) => {
+setPersistence(auth, browserSessionPersistence).catch((error) => { // NOSONAR: top-level await rompe firebase.test.js bajo babel-jest (CommonJS)
   console.error('No se pudo configurar la persistencia de sesión:', error);
 });

@@ -10,19 +10,13 @@ const socioFixture = {
 };
 
 describe('WelcomeCard', () => {
-  test('muestra el saludo de bienvenida con nombre y apellido', () => {
+  test.each([
+    ['el saludo de bienvenida con nombre y apellido', 'Bienvenido Ana Pérez'],
+    ['el número de socio junto con la categoría', '1000 - Titular'],
+    ['el estado del socio', 'Estado: Activo'],
+  ])('muestra %s', (_descripcion, textoEsperado) => {
     render(<WelcomeCard socio={socioFixture} />);
-    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
-  });
-
-  test('muestra el número de socio junto con la categoría', () => {
-    render(<WelcomeCard socio={socioFixture} />);
-    expect(screen.getByText('1000 - Titular')).toBeInTheDocument();
-  });
-
-  test('muestra el estado del socio', () => {
-    render(<WelcomeCard socio={socioFixture} />);
-    expect(screen.getByText('Estado: Activo')).toBeInTheDocument();
+    expect(screen.getByText(textoEsperado)).toBeInTheDocument();
   });
 
   test('muestra una fecha', () => {

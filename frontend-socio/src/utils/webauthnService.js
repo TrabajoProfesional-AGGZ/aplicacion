@@ -52,7 +52,7 @@ async function borrarClaveDeIndexedDb() {
 function bufferABase64(buffer) {
   const bytes = new Uint8Array(buffer);
   let binario = '';
-  for (let i = 0; i < bytes.length; i += 1) binario += String.fromCodePoint(bytes[i]);
+  for (const byte of bytes) binario += String.fromCodePoint(byte);
   return window.btoa(binario);
 }
 

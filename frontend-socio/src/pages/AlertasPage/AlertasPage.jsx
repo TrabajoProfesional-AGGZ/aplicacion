@@ -37,6 +37,11 @@ export function AlertasPage({ socio }) {
     return () => { cancelled = true; };
   }, [socio.id]);
 
+  const sufijoPlural = alertas.length === 1 ? '' : 'es';
+  const subtitulo = alertas.length > 0
+    ? `${alertas.length} novedad${sufijoPlural} del club para vos.`
+    : 'Acá vas a ver las novedades que el club envíe para vos.';
+
   return (
     <>
       {cargando && <LoadingScreen />}
@@ -51,11 +56,7 @@ export function AlertasPage({ socio }) {
             <span className="alertas-header-icon" aria-hidden="true"><Bell size={20} /></span>
             <div className="alertas-header-text">
               <h2 className="alertas-title">Mis alertas</h2>
-              <p className="alertas-subtitle">
-                {alertas.length > 0
-                  ? `${alertas.length} novedad${alertas.length === 1 ? '' : 'es'} del club para vos.`
-                  : 'Acá vas a ver las novedades que el club envíe para vos.'}
-              </p>
+              <p className="alertas-subtitle">{subtitulo}</p>
             </div>
           </header>
 

@@ -29,19 +29,17 @@ describe('InstalacionDetalleStep', () => {
     expect(screen.getByText('Deportiva · 10 personas')).toBeInTheDocument();
   });
 
-  test('usa 60 minutos por defecto cuando la instalación no tiene tolerancia definida', () => {
-    render(<InstalacionDetalleStep {...baseProps} />);
-    expect(screen.getByText('hasta 60 min antes')).toBeInTheDocument();
-  });
-
-  test('muestra la tolerancia de cancelación real de la instalación', () => {
-    render(<InstalacionDetalleStep {...baseProps} instalacion={{ ...INSTALACION, tiempo_minimo_cancelacion: 120 }} />);
-    expect(screen.getByText('hasta 120 min antes')).toBeInTheDocument();
-  });
-
-  test('muestra el valor del turno', () => {
-    render(<InstalacionDetalleStep {...baseProps} />);
-    expect(screen.getByText('$ 5.000,00')).toBeInTheDocument();
+  test.each([
+    ['usa 60 minutos por defecto cuando la instalación no tiene tolerancia definida', {}, 'hasta 60 min antes'],
+    [
+      'muestra la tolerancia de cancelación real de la instalación',
+      { instalacion: { ...INSTALACION, tiempo_minimo_cancelacion: 120 } },
+      'hasta 120 min antes',
+    ],
+    ['muestra el valor del turno', {}, '$ 5.000,00'],
+  ])('%s', (_descripcion, propsOverride, textoEsperado) => {
+    render(<InstalacionDetalleStep {...baseProps} {...propsOverride} />);
+    expect(screen.getByText(textoEsperado)).toBeInTheDocument();
   });
 
   test('cambiar la fecha llama a onFechaChange', () => {

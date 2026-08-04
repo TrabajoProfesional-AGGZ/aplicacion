@@ -79,8 +79,8 @@ describe('RecuperarContraseniaModal', () => {
 
   test('se cierra al hacer click fuera del formulario (en el fondo del modal)', () => {
     const onClose = jest.fn();
-    render(<RecuperarContraseniaModal onClose={onClose} />);
-    fireEvent.click(screen.getByRole('presentation'));
+    const { container } = render(<RecuperarContraseniaModal onClose={onClose} />);
+    fireEvent.click(container.querySelector('.csf-overlay'));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 

@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { auth } from '../firebase';
-import { messaging } from '../firebase';
+import { auth, messaging } from '../firebase';
 import { getToken } from 'firebase/messaging';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';

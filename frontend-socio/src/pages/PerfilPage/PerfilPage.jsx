@@ -401,22 +401,19 @@ export function PerfilPage({ socio, cerrarSesion }) {
           <div className="perfil-avatar-wrapper">
             {socio.foto_url
               ? (
-                <img
-                  src={socio.foto_url}
-                  alt=""
-                  className="perfil-avatar-img"
-                  referrerPolicy="no-referrer"
-                  role="button"
-                  tabIndex={0}
+                <button
+                  type="button"
+                  className="perfil-avatar-img-btn"
                   aria-label="Ver foto de perfil ampliada"
                   onClick={() => setFotoAmpliadaAbierta(true)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setFotoAmpliadaAbierta(true);
-                    }
-                  }}
-                />
+                >
+                  <img
+                    src={socio.foto_url}
+                    alt=""
+                    className="perfil-avatar-img"
+                    referrerPolicy="no-referrer"
+                  />
+                </button>
               )
               : <span className="perfil-avatar" aria-hidden="true">{iniciales(socio.nombre, socio.apellido)}</span>}
             <button

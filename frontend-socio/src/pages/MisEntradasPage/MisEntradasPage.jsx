@@ -73,7 +73,7 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {} }) {
             <h2 className="entradas-banner-title">Mis Entradas</h2>
           </section>
 
-          <div className="entradas-toggle" role="group" aria-label="Alternar entradas activas o históricas">
+          <fieldset className="entradas-toggle" aria-label="Alternar entradas activas o históricas">
             <button
               type="button"
               className={`entradas-toggle-btn${vista === 'activas' ? ' entradas-toggle-btn--activo' : ''}`}
@@ -88,7 +88,7 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {} }) {
             >
               Históricas
             </button>
-          </div>
+          </fieldset>
 
           {cargandoHistoricas && <p className="entradas-empty">Cargando historial...</p>}
 

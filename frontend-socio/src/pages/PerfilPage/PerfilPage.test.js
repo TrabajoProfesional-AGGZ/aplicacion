@@ -118,7 +118,7 @@ describe('PerfilPage', () => {
     expect(screen.getByText('ana.perez@example.com')).toBeInTheDocument();
     expect(screen.getByText('+54 9 11 5555-1234')).toBeInTheDocument();
     expect(screen.getByText('12 de mayo de 1990')).toBeInTheDocument();
-    expect(container.querySelectorAll('.perfil-card').length).toBe(1);
+    expect(container.querySelectorAll('.perfil-card')).toHaveLength(1);
   });
 
   test('no muestra una fila para los campos opcionales ausentes', () => {
@@ -285,8 +285,8 @@ describe('PerfilPage', () => {
 
     fireEvent.click(screen.getByLabelText('Ver foto de perfil ampliada'));
 
-    expect(screen.getAllByAltText('').length).toBe(2);
-    expect(screen.getAllByLabelText('Cambiar foto de perfil').length).toBe(2);
+    expect(screen.getAllByAltText('')).toHaveLength(2);
+    expect(screen.getAllByLabelText('Cambiar foto de perfil')).toHaveLength(2);
   });
 
   test('el botón "+" de la vista ampliada abre el formulario de subida', () => {
@@ -298,7 +298,7 @@ describe('PerfilPage', () => {
     fireEvent.click(botonesCambiar[botonesCambiar.length - 1]);
 
     expect(screen.getByText('Subir desde el dispositivo')).toBeInTheDocument();
-    expect(screen.getAllByLabelText('Cambiar foto de perfil').length).toBe(1);
+    expect(screen.getAllByLabelText('Cambiar foto de perfil')).toHaveLength(1);
   });
 
   test('no muestra la opción de biometría si el dispositivo no la soporta', () => {

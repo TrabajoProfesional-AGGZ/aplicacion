@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { NoticiasPage } from './NoticiasPage';
 import { getNoticiasVigentes, getNoticia } from '../../services/noticiasService';
 
@@ -49,7 +49,7 @@ describe('NoticiasPage', () => {
     await screen.findByText('Cuerpo de la noticia dos.');
     fireEvent.click(screen.getByText('Volver'));
 
-    await waitFor(() => expect(screen.getByText('Noticia uno')).toBeInTheDocument());
+    expect(await screen.findByText('Noticia uno')).toBeInTheDocument();
     expect(screen.getByText('Noticia dos')).toBeInTheDocument();
   });
 
@@ -90,7 +90,7 @@ describe('NoticiasPage', () => {
       window.history.replaceState({ otraEntrada: true }, '');
       act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
 
-      await waitFor(() => expect(screen.getByText('Noticia uno')).toBeInTheDocument());
+      expect(await screen.findByText('Noticia uno')).toBeInTheDocument();
       expect(screen.getByText('Noticia dos')).toBeInTheDocument();
     });
   });

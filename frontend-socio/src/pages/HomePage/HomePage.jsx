@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '../../components/Header/Header';
 import { WelcomeCard } from '../../components/WelcomeCard/WelcomeCard';
 import { QuickAccessGrid } from '../../components/QuickAccessGrid/QuickAccessGrid';
@@ -22,7 +22,6 @@ import '../../socio-theme.css';
 import './HomePage.css';
 import { Carnet } from '../../components/Carnet/Carnet';
 import { AnimatePresence } from 'framer-motion';
-import { useEffect } from 'react';
 import { enrolarYGuardarSecreto } from '../../services/accesosService';
 
 export function HomePage({ socio, cerrarSesion }) {

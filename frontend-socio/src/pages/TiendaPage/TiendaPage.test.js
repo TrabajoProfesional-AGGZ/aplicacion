@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { TiendaPage } from './TiendaPage';
 import { getProductosDisponibles, getProducto } from '../../services/tiendaService';
 
@@ -95,7 +95,7 @@ describe('TiendaPage', () => {
 
     fireEvent.click(await screen.findByText('Buzo campera'));
 
-    await waitFor(() => expect(screen.getByText('Buzo oficial del club.')).toBeInTheDocument());
+    expect(await screen.findByText('Buzo oficial del club.')).toBeInTheDocument();
     expect(screen.queryByText('Comprar')).not.toBeInTheDocument();
     expect(screen.getByText('Agotado')).toBeInTheDocument();
   });
@@ -120,6 +120,6 @@ describe('TiendaPage', () => {
 
     fireEvent.click(screen.getByText('Volver'));
 
-    await waitFor(() => expect(screen.getByText('Buzo campera')).toBeInTheDocument());
+    expect(await screen.findByText('Buzo campera')).toBeInTheDocument();
   });
 });

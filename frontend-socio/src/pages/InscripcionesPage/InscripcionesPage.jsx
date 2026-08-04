@@ -82,7 +82,7 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
             </div>
           </section>
 
-          <div className="inscripciones-filtros" role="group" aria-label="Filtrar inscripciones">
+          <fieldset className="inscripciones-filtros" aria-label="Filtrar inscripciones">
             {FILTROS.map((f) => (
               <button
                 key={f.id}
@@ -93,7 +93,7 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
                 {f.label}
               </button>
             ))}
-          </div>
+          </fieldset>
 
           {inscripcionesVisibles.length === 0 && (
             <p className="inscripciones-empty">No tenés inscripciones en esta categoría.</p>
