@@ -58,24 +58,24 @@ async function fillStep4() {
 async function navigateToStep2() {
   await fillStep1();
   userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-  await waitFor(() => expect(screen.getByText(/Paso 2 de 4/)).toBeInTheDocument());
-  await waitFor(() => expect(screen.getByPlaceholderText('María')).toBeInTheDocument());
+  expect(await screen.findByText(/Paso 2 de 4/)).toBeInTheDocument();
+  expect(await screen.findByPlaceholderText('María')).toBeInTheDocument();
 }
 
 async function navigateToStep3() {
   await navigateToStep2();
   await fillStep2();
   userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-  await waitFor(() => expect(screen.getByText(/Paso 3 de 4/)).toBeInTheDocument());
-  await waitFor(() => expect(screen.getByPlaceholderText('Ej: 1123456789')).toBeInTheDocument());
+  expect(await screen.findByText(/Paso 3 de 4/)).toBeInTheDocument();
+  expect(await screen.findByPlaceholderText('Ej: 1123456789')).toBeInTheDocument();
 }
 
 async function navigateToStep4() {
   await navigateToStep3();
   await fillStep3();
   userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-  await waitFor(() => expect(screen.getByText(/Paso 4 de 4/)).toBeInTheDocument());
-  await waitFor(() => expect(screen.getByPlaceholderText('maria@ejemplo.com')).toBeInTheDocument());
+  expect(await screen.findByText(/Paso 4 de 4/)).toBeInTheDocument();
+  expect(await screen.findByPlaceholderText('maria@ejemplo.com')).toBeInTheDocument();
 }
 
 describe('RegistroSocioForm', () => {
@@ -135,7 +135,7 @@ describe('RegistroSocioForm', () => {
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await navigateToStep2();
     userEvent.click(screen.getByRole('button', { name: /atrás/i }));
-    await waitFor(() => expect(screen.getByText(/Paso 1 de 4/)).toBeInTheDocument());
+    expect(await screen.findByText(/Paso 1 de 4/)).toBeInTheDocument();
   });
 
   test('completa el registro: crea el usuario en Firebase, actualiza el perfil y reclama la cuenta', async () => {
@@ -156,7 +156,7 @@ describe('RegistroSocioForm', () => {
       '/api/v1/socios/por-dni/12345678', 'PATCH', expect.objectContaining({ nombre: 'Juan', apellido: 'Lopez' })
     ));
     await waitFor(() => expect(reclamarCuentaSocio).toHaveBeenCalledWith('12345678'));
-    await waitFor(() => expect(screen.getByText('¡Cuenta configurada!')).toBeInTheDocument());
+    expect(await screen.findByText('¡Cuenta configurada!')).toBeInTheDocument();
     expect(deleteUser).not.toHaveBeenCalled();
   });
 
@@ -171,7 +171,7 @@ describe('RegistroSocioForm', () => {
     await fillStep4();
     userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
 
-    await waitFor(() => expect(screen.getByText('¡Cuenta configurada!')).toBeInTheDocument());
+    expect(await screen.findByText('¡Cuenta configurada!')).toBeInTheDocument();
     expect(onSuccess).not.toHaveBeenCalled();
 
     await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 3000 });

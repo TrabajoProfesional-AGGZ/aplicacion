@@ -144,7 +144,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
             </div>
           </section>
 
-          <div className="reservas-filtros" role="group" aria-label="Filtrar reservas por estado">
+          <fieldset className="reservas-filtros" aria-label="Filtrar reservas por estado">
             {FILTROS.map((f) => (
               <button
                 key={f.id}
@@ -155,7 +155,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
                 {f.label}
               </button>
             ))}
-          </div>
+          </fieldset>
 
           {(filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas && (
             <p className="reservas-empty">Cargando historial...</p>
@@ -205,7 +205,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
       )}
 
       {reservaAConfirmarCancelacion && (
-        <div className="reserva-confirmar-overlay" role="dialog" aria-label="Confirmar cancelación">
+        <dialog open className="reserva-confirmar-overlay" aria-label="Confirmar cancelación">
           <div className="reserva-confirmar-card">
             <p>¿Seguro que querés cancelar esta reserva?</p>
             {errorCancelacion && <p className="reservas-error">{errorCancelacion}</p>}
@@ -228,7 +228,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
               </button>
             </div>
           </div>
-        </div>
+        </dialog>
       )}
     </>
   );

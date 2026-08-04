@@ -40,9 +40,12 @@ export async function createReserva(data) {
     const body = await res.json().catch(() => null);
     const detail = body?.detail ?? {};
     const tipo = detail.tipo;
-    const errorKey = tipo === 'apto_medico'
-      ? 'apto-medico'
-      : tipo === 'suspendido' ? 'socio-suspendido' : 'socio-moroso';
+    let errorKey = 'socio-moroso';
+    if (tipo === 'apto_medico') {
+      errorKey = 'apto-medico';
+    } else if (tipo === 'suspendido') {
+      errorKey = 'socio-suspendido';
+    }
     const sociosPorTipo = {
       'apto-medico': detail.socios_sin_apto_medico,
       'socio-suspendido': detail.socios_suspendido,

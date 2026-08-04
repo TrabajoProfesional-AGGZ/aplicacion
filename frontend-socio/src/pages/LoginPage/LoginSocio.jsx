@@ -21,6 +21,31 @@ const formItemVariants = {
   exiting: { y: -20, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } },
 };
 
+const CODIGOS_CREDENCIALES_INVALIDAS = [
+  'auth/invalid-credential',
+  'auth/user-not-found',
+  'auth/wrong-password',
+];
+
+function resolverMensajeErrorLogin(err) {
+  if (CODIGOS_CREDENCIALES_INVALIDAS.includes(err.code)) {
+    return 'Credenciales incorrectas';
+  }
+  return err.message || 'Ocurrió un error al iniciar sesión.';
+}
+
+function calcularExitAnimation(shouldReduceMotion, exiting) {
+  if (shouldReduceMotion) return { opacity: 0 };
+  if (exiting) return { opacity: 1 };
+  return { x: '-40%', opacity: 0, filter: 'blur(10px)' };
+}
+
+function calcularFormAnimateState(exiting, animStarted, shouldReduceMotion) {
+  if (exiting) return 'exiting';
+  if (animStarted || shouldReduceMotion) return 'visible';
+  return 'hidden';
+}
+
 export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -89,16 +114,7 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
     try {
       await login(emailLimpio, passwordLimpia);
     } catch (err) {
-      const codigosCredencialesInvalidas = [
-        'auth/invalid-credential',
-        'auth/user-not-found',
-        'auth/wrong-password',
-      ];
-      if (codigosCredencialesInvalidas.includes(err.code)) {
-        setError('Credenciales incorrectas');
-      } else {
-        setError(err.message || 'Ocurrió un error al iniciar sesión.');
-      }
+      setError(resolverMensajeErrorLogin(err));
       setCargando(false);
     }
   };
@@ -112,23 +128,8 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
     }
   };
 
-  let exitAnimation;
-  if (shouldReduceMotion) {
-    exitAnimation = { opacity: 0 };
-  } else if (exiting) {
-    exitAnimation = { opacity: 1 };
-  } else {
-    exitAnimation = { x: '-40%', opacity: 0, filter: 'blur(10px)' };
-  }
-
-  let formAnimateState;
-  if (exiting) {
-    formAnimateState = 'exiting';
-  } else if (animStarted || shouldReduceMotion) {
-    formAnimateState = 'visible';
-  } else {
-    formAnimateState = 'hidden';
-  }
+  const exitAnimation = calcularExitAnimation(shouldReduceMotion, exiting);
+  const formAnimateState = calcularFormAnimateState(exiting, animStarted, shouldReduceMotion);
 
   return (
     <motion.div

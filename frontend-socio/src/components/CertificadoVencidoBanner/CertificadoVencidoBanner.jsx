@@ -14,11 +14,12 @@ export function CertificadoVencidoBanner({ socio, onClick }) {
     return () => { cancelled = true; };
   }, [socio.id]);
 
-  const severidad = pendientes?.vencidos?.length > 0
-    ? 'danger'
-    : pendientes?.por_vencer?.length > 0
-      ? 'warning'
-      : null;
+  let severidad = null;
+  if (pendientes?.vencidos?.length > 0) {
+    severidad = 'danger';
+  } else if (pendientes?.por_vencer?.length > 0) {
+    severidad = 'warning';
+  }
 
   if (!severidad) return null;
 

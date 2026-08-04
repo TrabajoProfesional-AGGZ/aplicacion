@@ -2,38 +2,28 @@ import { Home, Calendar, QrCode, ClipboardList, Ticket } from 'lucide-react';
 import './BottomNav.css';
 
 const ITEMS = [
-  { id: 'inicio', icon: Home, label: 'Inicio' },
-  { id: 'reservas', icon: Calendar, label: 'Mis Reservas' },
-  { id: 'carnet', icon: QrCode, label: 'Mi Carnet' },
-  { id: 'inscripciones', icon: ClipboardList, label: 'Mis Inscripciones' },
-  { id: 'entradas', icon: Ticket, label: 'Mis Entradas' },
+  { id: 'inicio', icon: Home, label: 'Inicio', vista: 'inicio' },
+  { id: 'reservas', icon: Calendar, label: 'Mis Reservas', vista: 'reservas' },
+  { id: 'carnet', icon: QrCode, label: 'Mi Carnet', vista: 'carnet' },
+  { id: 'inscripciones', icon: ClipboardList, label: 'Mis Inscripciones', vista: 'inscripciones' },
+  { id: 'entradas', icon: Ticket, label: 'Mis Entradas', vista: 'mis-entradas' },
 ];
 
 export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripciones, onMisEntradas, onCarnet, vistaActual }) {
+  const handlersPorId = {
+    inicio: onInicio,
+    reservas: onReservas,
+    inscripciones: onMisInscripciones,
+    entradas: onMisEntradas,
+    carnet: onCarnet,
+  };
+
   return (
     <nav className="bottom-nav">
-      {ITEMS.map(({ id, icon: Icon, label }) => {
-        const esInicio = id === 'inicio';
-        const esReservas = id === 'reservas';
+      {ITEMS.map(({ id, icon: Icon, label, vista }) => {
         const esCarnet = id === 'carnet';
-        const esInscripciones = id === 'inscripciones';
-        const esEntradas = id === 'entradas';
-        const activo = (esInicio && vistaActual === 'inicio')
-          || (esReservas && vistaActual === 'reservas')
-          || (esInscripciones && vistaActual === 'inscripciones')
-          || (esEntradas && vistaActual === 'mis-entradas')
-          || (esCarnet && vistaActual === 'carnet');
-        const onClick = esInicio
-          ? onInicio
-          : esReservas
-            ? onReservas
-            : esInscripciones
-              ? onMisInscripciones
-              : esEntradas
-                ? onMisEntradas
-                : esCarnet
-                  ? onCarnet
-                    : () => onProximamente(label);
+        const activo = vistaActual === vista;
+        const onClick = handlersPorId[id] ?? (() => onProximamente(label));
         return (
           <button
             key={id}

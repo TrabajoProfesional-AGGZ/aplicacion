@@ -7,7 +7,7 @@ export const validarFechaNacimiento = (value) => {
   if (fechaSeleccionada > hoy) {
     return "La fecha no puede ser en el futuro";
   }
-  return true;
+  return undefined;
 };
 
 export const getDocNumberRules = () => ({

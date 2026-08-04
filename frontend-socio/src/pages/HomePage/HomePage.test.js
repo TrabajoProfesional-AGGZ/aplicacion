@@ -96,11 +96,18 @@ describe('HomePage', () => {
     expect(screen.getByText('Mis trámites')).toBeInTheDocument();
   });
 
-  test('click en "Mis trámites" navega a la página de trámites (no abre el overlay)', async () => {
+  test.each([
+    ['click en "Mis trámites" navega a la página de trámites (no abre el overlay)', 'Mis trámites', 'Mis trámites'],
+    ['click en "Inscribirme a actividad" navega a la grilla de disciplinas (no abre el overlay)', 'Inscribirme a actividad', 'Inscribite a una actividad'],
+    ['"Mis Inscripciones" del nav inferior navega a la página de inscripciones', 'Mis Inscripciones', 'Mis inscripciones'],
+    ['click en "Reservar instalación" navega al flujo de nueva reserva (no abre el overlay ni la lista de reservas)', 'Reservar instalación', 'Realizá tu reserva'],
+    ['"Mis Reservas" del nav inferior navega a la lista de reservas, no al flujo de nueva reserva', 'Mis Reservas', 'Mis Reservas'],
+    ['click en "Cuotas y pagos" navega a la página de finanzas (no abre el overlay)', 'Cuotas y pagos', 'Cuotas'],
+  ])('%s', async (_descripcion, label, heading) => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis trámites'));
+    fireEvent.click(screen.getByText(label));
     expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Mis trámites' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: heading })).toBeInTheDocument();
   });
 
   test('"Inicio" del nav inferior vuelve a mostrar el inicio desde trámites', async () => {
@@ -117,20 +124,6 @@ describe('HomePage', () => {
     expect(screen.getByText('Cargando noticias...')).toBeInTheDocument();
   });
 
-  test('click en "Inscribirme a actividad" navega a la grilla de disciplinas (no abre el overlay)', async () => {
-    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Inscribirme a actividad'));
-    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Inscribite a una actividad' })).toBeInTheDocument();
-  });
-
-  test('"Mis Inscripciones" del nav inferior navega a la página de inscripciones', async () => {
-    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Inscripciones'));
-    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Mis inscripciones' })).toBeInTheDocument();
-  });
-
   test('"Nueva Inscripcion" del banner de Mis Inscripciones navega a la grilla de disciplinas', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Mis Inscripciones'));
@@ -138,13 +131,6 @@ describe('HomePage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /nueva inscripcion/i }));
     expect(await screen.findByRole('heading', { name: 'Inscribite a una actividad' })).toBeInTheDocument();
-  });
-
-  test('click en "Reservar instalación" navega al flujo de nueva reserva (no abre el overlay ni la lista de reservas)', async () => {
-    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Reservar instalación'));
-    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
   });
 
   test('el botón "Volver" dentro del flujo de nueva reserva vuelve directo a la lista de instalaciones, no sale a Home', async () => {
@@ -209,13 +195,6 @@ describe('HomePage', () => {
     expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
   });
 
-  test('"Mis Reservas" del nav inferior navega a la lista de reservas, no al flujo de nueva reserva', async () => {
-    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Reservas'));
-    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Mis Reservas' })).toBeInTheDocument();
-  });
-
   test('"Nueva reserva" del banner de Mis Reservas navega al flujo de nueva reserva', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Mis Reservas'));
@@ -223,13 +202,6 @@ describe('HomePage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /nueva reserva/i }));
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
-  });
-
-  test('click en "Cuotas y pagos" navega a la página de finanzas (no abre el overlay)', async () => {
-    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Cuotas y pagos'));
-    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
-    expect(await screen.findByRole('heading', { name: 'Cuotas' })).toBeInTheDocument();
   });
 
   test('la página de finanzas se mantiene dentro del layout con Header y BottomNav', async () => {

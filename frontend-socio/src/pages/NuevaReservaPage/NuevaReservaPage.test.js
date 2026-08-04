@@ -204,7 +204,7 @@ describe('NuevaReservaPage', () => {
 
     await screen.findByText('08:00');
     fireEvent.click(screen.getAllByText('Volver')[0]);
-    await screen.findByText('Realizá tu reserva');
+    expect(await screen.findByText('Realizá tu reserva')).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Cancha de fútbol'));
     await screen.findByText('08:00');
@@ -212,7 +212,7 @@ describe('NuevaReservaPage', () => {
 
     await screen.findByText('Agregar socios');
     fireEvent.click(screen.getAllByText('Volver')[0]);
-    await screen.findByText('Realizá tu reserva');
+    expect(await screen.findByText('Realizá tu reserva')).toBeInTheDocument();
   });
 
   test('el gesto de atrás del celular no cierra el flujo: vuelve a la lista de instalaciones', async () => {
