@@ -6,7 +6,7 @@ export function ProximamenteOverlay({ titulo, onClose }) {
       <div className="proximamente-card">
         <p className="proximamente-titulo">{titulo}</p>
         <p className="proximamente-texto">Próximamente...</p>
-        <button className="proximamente-cerrar" onClick={onClose}>Cerrar</button>
+        <button type="button" className="proximamente-cerrar" onClick={onClose}>Cerrar</button>
       </div>
     </ModalOverlay>
   );

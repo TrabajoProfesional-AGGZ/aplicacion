@@ -37,7 +37,7 @@ export function PagoCuotaFlow({ item, tipoItem, socio, onVolver }) {
       console.error('Error al procesar el pago:', err);
       setErrorPago('procesamiento');
     }
-    return Promise.reject();
+    return Promise.reject(new Error('No se pudo procesar el pago.'));
   };
 
   return (

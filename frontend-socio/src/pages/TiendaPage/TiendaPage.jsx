@@ -76,7 +76,7 @@ export function TiendaPage() {
     const sinStock = Number(detalle.stock) <= 0;
     return (
       <div className="tienda-page">
-        <button className="tienda-volver" onClick={volverALista}>
+        <button type="button" className="tienda-volver" onClick={volverALista}>
           <ArrowLeft size={20} /> Volver
         </button>
 
@@ -175,6 +175,7 @@ export function TiendaPage() {
             return (
               <button
                 key={p.id}
+                type="button"
                 className={`tienda-card${agotado ? ' tienda-card--agotado' : ''}`}
                 onClick={() => abrirDetalle(p.id)}
               >

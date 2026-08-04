@@ -52,14 +52,14 @@ async function borrarClaveDeIndexedDb() {
 function bufferABase64(buffer) {
   const bytes = new Uint8Array(buffer);
   let binario = '';
-  for (let i = 0; i < bytes.length; i += 1) binario += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i += 1) binario += String.fromCodePoint(bytes[i]);
   return window.btoa(binario);
 }
 
 function base64ABuffer(base64) {
   const binario = window.atob(base64);
   const bytes = new Uint8Array(binario.length);
-  for (let i = 0; i < binario.length; i += 1) bytes[i] = binario.charCodeAt(i);
+  for (let i = 0; i < binario.length; i += 1) bytes[i] = binario.codePointAt(i);
   return bytes;
 }
 

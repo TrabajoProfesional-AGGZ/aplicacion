@@ -1,4 +1,5 @@
 // src/components/createForm/MultiStepFormShell.jsx
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import logoVerde from '../../assets/logo-verde.png';
@@ -18,6 +19,17 @@ export function MultiStepFormShell({
   onCancel, goBack, goNext, direction, onFormSubmit, children
 }) {
   const progress = (step / steps.length) * 100;
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    const formEl = formRef.current;
+    if (!formEl) return undefined;
+    function handleKeyDown(e) {
+      if (e.key === 'Enter' && step < steps.length) e.preventDefault();
+    }
+    formEl.addEventListener('keydown', handleKeyDown);
+    return () => formEl.removeEventListener('keydown', handleKeyDown);
+  }, [step, steps.length]);
 
   return (
     <ModalOverlay onClose={onCancel}>
@@ -120,7 +132,7 @@ export function MultiStepFormShell({
             </div>
 
             <div className="csf-card">
-              <form onSubmit={onFormSubmit} onKeyDown={(e) => { if (e.key === 'Enter' && step < steps.length) e.preventDefault(); }}>
+              <form ref={formRef} onSubmit={onFormSubmit}>
                 {direction !== undefined ? (
                   <AnimatePresence mode="wait" custom={direction}>
                     {children}
