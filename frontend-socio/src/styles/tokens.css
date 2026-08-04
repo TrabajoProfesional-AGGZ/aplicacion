@@ -3,16 +3,18 @@
   color-scheme: light;
 
   /* Colors */
-  --color-text-primary: #003c82;
-  --color-text-secondary: #5c7285;
-  --color-bg: #f3f6f9;
+  /* Paleta de club (rama demo): Mamelodi Sundowns — #FFDC00 / #039F5D / #FFD25A.
+     Ver nota "Colores por club (rama demo)" más abajo en este CLAUDE.md. */
+  --color-text-primary: #039f5d;
+  --color-text-secondary: #4a4a4a;
+  --color-bg: #f5f5f5;
   --color-surface: #ffffff;
   --color-border: #e8e8e8;
-  --color-border-medium: #d7dee4;
-  --color-border-strong: #003c82;
+  --color-border-medium: #d0d0d0;
+  --color-border-strong: #039f5d;
   --color-border-light: #efefef;
-  --color-accent: #12a0d7;
-  --color-accent-hover: #0f8ab8;
+  --color-accent: #ffdc00;
+  --color-accent-hover: #ffd25a;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
   --color-row-hover: #f8f8f8;

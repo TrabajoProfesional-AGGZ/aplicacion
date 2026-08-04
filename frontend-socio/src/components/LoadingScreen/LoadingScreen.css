@@ -6,7 +6,7 @@
 }
 
 .loading-logo {
-  width: 64px;
+  width: 100px;
   animation:
     loading-pulse 1.4s ease-in-out infinite,
     loading-spin  3s   linear        infinite;
