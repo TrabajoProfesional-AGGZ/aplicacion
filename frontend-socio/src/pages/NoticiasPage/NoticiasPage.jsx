@@ -64,7 +64,7 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
   if (detalle) {
     return (
       <div className="noticias-page">
-        <button className="noticias-volver" onClick={() => { setDetalle(null); setError(null); }}>
+        <button type="button" className="noticias-volver" onClick={() => { setDetalle(null); setError(null); }}>
           <ArrowLeft size={20} /> Volver
         </button>
         <article className="noticias-detalle-card">
@@ -106,7 +106,7 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
       ) : (
         <div className="noticias-lista">
           {noticias.map(n => (
-            <button key={n.id} className="noticias-card" onClick={() => abrirDetalleDesdeLista(n.id)}>
+            <button key={n.id} type="button" className="noticias-card" onClick={() => abrirDetalleDesdeLista(n.id)}>
               <div className="noticias-card-info">
                 <span className="noticias-card-titulo">{n.titulo}</span>
                 <span className="noticias-card-fecha">
