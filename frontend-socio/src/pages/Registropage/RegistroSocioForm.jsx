@@ -93,7 +93,7 @@ const {
         apellido: data.apellido,
         fecha_nacimiento: data.fechaNacimiento,
         nro_documento: data.nroDocumento,
-        genero: data.genero.value,
+        genero: data.genero,
         email: data.email,
         telefono: data.telefono,
         direccion: data.direccion
