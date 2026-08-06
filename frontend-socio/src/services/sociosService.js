@@ -9,7 +9,7 @@ export async function validarSocio(nroSocio, dni) {
 }
 
 export async function reclamarCuentaSocio(dni) {
-  const res = await fetchTo(`/api/v1/socios/por-dni/${dni}/reclamar`, 'POST');
+  const res = await fetchTo(`/api/v1/socios/por-dni/${encodeURIComponent(dni)}/reclamar`, 'POST');
   if (res.status === 409) throw new Error('cuenta-ya-registrada');
   if (res.status === 404) throw new Error('socio-no-encontrado');
   if (!res.ok) throw new Error('Error al reclamar la cuenta del socio');
