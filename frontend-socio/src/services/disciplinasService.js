@@ -9,14 +9,14 @@ export async function getDisciplinasActivas() {
 }
 
 export async function getDisciplinaById(idDisciplina) {
-  const res = await fetchTo(`/api/v1/disciplinas/${idDisciplina}`, 'GET');
+  const res = await fetchTo(`/api/v1/disciplinas/${encodeURIComponent(idDisciplina)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al obtener la disciplina');
   return res.json();
 }
 
 export async function getDisciplinasPorSocio(idSocio) {
-  const res = await fetchTo(`/api/v1/disciplinas/por-socio/${idSocio}`, 'GET');
+  const res = await fetchTo(`/api/v1/disciplinas/por-socio/${encodeURIComponent(idSocio)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al obtener tus inscripciones');
   const data = await res.json();
@@ -51,11 +51,17 @@ async function manejarRespuestaInscripcion(res) {
 }
 
 export async function inscribirseADisciplina(idDisciplina, idSocio) {
-  const res = await fetchTo(`/api/v1/disciplinas/${idDisciplina}/socios/${idSocio}`, 'POST');
+  const res = await fetchTo(
+    `/api/v1/disciplinas/${encodeURIComponent(idDisciplina)}/socios/${encodeURIComponent(idSocio)}`,
+    'POST'
+  );
   return manejarRespuestaInscripcion(res);
 }
 
 export async function sumarseAListaEspera(idDisciplina, idSocio) {
-  const res = await fetchTo(`/api/v1/disciplinas/${idDisciplina}/socios/${idSocio}/lista-espera`, 'POST');
+  const res = await fetchTo(
+    `/api/v1/disciplinas/${encodeURIComponent(idDisciplina)}/socios/${encodeURIComponent(idSocio)}/lista-espera`,
+    'POST'
+  );
   return manejarRespuestaInscripcion(res);
 }

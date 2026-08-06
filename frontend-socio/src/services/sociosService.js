@@ -9,7 +9,7 @@ export async function validarSocio(nroSocio, dni) {
 }
 
 export async function reclamarCuentaSocio(dni) {
-  const res = await fetchTo(`/api/v1/socios/por-dni/${dni}/reclamar`, 'POST');
+  const res = await fetchTo(`/api/v1/socios/por-dni/${encodeURIComponent(dni)}/reclamar`, 'POST');
   if (res.status === 409) throw new Error('cuenta-ya-registrada');
   if (res.status === 404) throw new Error('socio-no-encontrado');
   if (!res.ok) throw new Error('Error al reclamar la cuenta del socio');
@@ -17,7 +17,7 @@ export async function reclamarCuentaSocio(dni) {
 }
 
 export async function subirFotoSocio(idSocio, imagenBase64) {
-  const res = await fetchTo(`/api/v1/socios/${idSocio}/foto`, 'POST', { imagen_base64: imagenBase64 });
+  const res = await fetchTo(`/api/v1/socios/${encodeURIComponent(idSocio)}/foto`, 'POST', { imagen_base64: imagenBase64 });
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al subir la foto');
   return res.json();

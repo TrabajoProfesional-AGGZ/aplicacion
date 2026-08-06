@@ -47,7 +47,9 @@ export class ErrorBoundary extends Component {
               fontSize: '0.8rem',
             }}
           >
-            {this.state.error.message}
+            {import.meta.env.DEV
+              ? this.state.error.message
+              : 'Ocurrió un error inesperado al procesar su solicitud. Por favor, reintente más tarde.'}
           </pre>
           <button
             type="button"

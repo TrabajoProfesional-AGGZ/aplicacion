@@ -99,7 +99,7 @@ const {
         direccion: data.direccion
       };
 
-      const updateResponse = await fetchTo(`/api/v1/socios/por-dni/${data.nroDocumento}`,'PATCH', payload)
+      const updateResponse = await fetchTo(`/api/v1/socios/por-dni/${encodeURIComponent(data.nroDocumento)}`,'PATCH', payload)
 
       if (!updateResponse.ok) {
         throw new Error('error-actualizacion');
