@@ -4,9 +4,6 @@ import { getToken } from 'firebase/messaging';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
 import { AuthContext } from './authContextObject';
-import { useInactivityLogout } from '../hooks/useInactivityLogout';
-
-const TIEMPO_INACTIVIDAD_MS = 10 * 60 * 1000;
 
 export function AuthProvider({ children }) {
   const [socio, setSocio] = useState(null);
@@ -113,8 +110,6 @@ export function AuthProvider({ children }) {
     await signOut(auth);
     setSocio(null);
   }, []);
-
-  useInactivityLogout(Boolean(socio), TIEMPO_INACTIVIDAD_MS, cerrarSesion);
 
   const value = useMemo(
     () => ({ socio, setSocio, cargandoAuth, authError, cerrarSesion }),
