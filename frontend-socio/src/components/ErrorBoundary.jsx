@@ -48,8 +48,6 @@ export class ErrorBoundary extends Component {
             }}
           >
             {this.state.error.message}
-            {'\n'}
-            {this.state.error.stack}
           </pre>
           <button
             type="button"
