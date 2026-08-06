@@ -1,3 +1,4 @@
+import { PartyPopper } from 'lucide-react';
 import './WelcomeCard.css';
 
 const ESTADO_COLOR = {
@@ -7,6 +8,16 @@ const ESTADO_COLOR = {
   Suspendido: 'var(--status-suspended-border)',
 };
 
+function esCumpleaniosHoy(fechaNacimiento) {
+  if (!fechaNacimiento) return false;
+  const nacimiento = new Date(fechaNacimiento);
+  const hoy = new Date();
+  return (
+    nacimiento.getUTCMonth() === hoy.getMonth() &&
+    nacimiento.getUTCDate() === hoy.getDate()
+  );
+}
+
 export function WelcomeCard({ socio }) {
   const fechaFormateada = new Intl.DateTimeFormat('es-AR', {
     weekday: 'long',
@@ -14,6 +25,8 @@ export function WelcomeCard({ socio }) {
     month: 'long',
     year: 'numeric',
   }).format(new Date());
+
+  const esCumpleanios = esCumpleaniosHoy(socio.fecha_nacimiento);
 
   return (
     <section className="welcome-card">
@@ -25,6 +38,12 @@ export function WelcomeCard({ socio }) {
         </p>
       </div>
       <h1 className="welcome-card-saludo">Bienvenido {socio.nombre} {socio.apellido}</h1>
+      {esCumpleanios && (
+        <p className="welcome-card-cumpleanios" role="status">
+          <PartyPopper size={14} aria-hidden="true" />
+          ¡Feliz cumpleaños, {socio.nombre}! Desde el club te deseamos un gran día
+        </p>
+      )}
       <p className="welcome-card-membresia">{socio.nro_socio} - {socio.categoria?.nombre}</p>
     </section>
   );
