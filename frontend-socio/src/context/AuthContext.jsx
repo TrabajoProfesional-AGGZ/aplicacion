@@ -82,7 +82,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    console.log('intento de notif ', socio)
     // Si no hay un socio cargado en el contexto, no hacemos nada
     if (!socio) return;
 
@@ -90,13 +89,11 @@ export function AuthProvider({ children }) {
       try {
         // Pedimos permiso al sistema operativo/navegador
         const permission = await Notification.requestPermission();
-        console.log(permission)
-        
+
         if (permission === 'granted') {
-          const currentToken = await getToken(messaging, { 
+          const currentToken = await getToken(messaging, {
             vapidKey: import.meta.env.VITE_APP_VAPID_KEY
           });
-          console.log(currentToken)
           if (currentToken) {
             await fetchTo('/api/v1/notificaciones/token', 'POST', {token: currentToken, plataforma: 'web', email: auth.currentUser?.email});
             console.log('Token de notificaciones registrado exitosamente.');
