@@ -1,11 +1,21 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { TiendaPage } from './TiendaPage';
-import { getProductosDisponibles, getProducto } from '../../services/tiendaService';
+import { getProductosDisponibles, getProducto, comprarProducto, getComprasPorSocio } from '../../services/tiendaService';
 
 jest.mock('../../services/tiendaService', () => ({
   getProductosDisponibles: jest.fn(),
   getProducto: jest.fn(),
+  comprarProducto: jest.fn(),
+  getComprasPorSocio: jest.fn(),
 }));
+
+jest.mock('../../components/pagoCuota/PagoCuotaFlow', () => ({
+  PagoCuotaFlow: ({ item, tipoItem }) => (
+    <div data-testid="payment-brick">pago-flow-stub {tipoItem} {item.concepto} {item.monto}</div>
+  ),
+}));
+
+const SOCIO = { id: 'socio-1', nombre: 'Ana', apellido: 'Gómez', email: 'ana@test.com' };
 
 const productos = [
   { id: '1', nombre: 'Remera oficial', precio: 15000, stock: 5, imagen_url: null },
@@ -30,14 +40,34 @@ const detalleSinStock = {
   descripcion: 'Buzo oficial del club.',
 };
 
+const COMPRA_INICIADA = {
+  id: 'compra-1',
+  cantidad: 1,
+  monto: '15000.00',
+  estado: 'Iniciada',
+  producto: { id: '1', nombre: 'Remera oficial', imagen_url: null, precio: 15000 },
+};
+
+const COMPRA_PAGADA = {
+  id: 'compra-2',
+  cantidad: 2,
+  monto: '30000.00',
+  estado: 'Pagada',
+  creado_en: '2026-01-01T00:00:00Z',
+  pagado_en_caja: false,
+  producto: { id: '2', nombre: 'Buzo campera', imagen_url: null, precio: 15000 },
+};
+
 describe('TiendaPage', () => {
   beforeEach(() => {
     getProductosDisponibles.mockReset().mockResolvedValue(productos);
     getProducto.mockReset();
+    comprarProducto.mockReset();
+    getComprasPorSocio.mockReset().mockResolvedValue([]);
   });
 
   test('en la lista, un producto sin stock muestra "Agotado" en vez de la cantidad disponible', async () => {
-    render(<TiendaPage />);
+    render(<TiendaPage socio={SOCIO} />);
 
     expect(await screen.findByText('Remera oficial')).toBeInTheDocument();
     expect(screen.getByText('5 disponibles')).toBeInTheDocument();
@@ -47,7 +77,7 @@ describe('TiendaPage', () => {
 
   test('al entrar al detalle de un producto con stock, aparece el botón "Comprar"', async () => {
     getProducto.mockResolvedValue(detalleConStock);
-    render(<TiendaPage />);
+    render(<TiendaPage socio={SOCIO} />);
 
     fireEvent.click(await screen.findByText('Remera oficial'));
 
@@ -56,7 +86,7 @@ describe('TiendaPage', () => {
 
   test('al tocar "Comprar" aparece el selector de cantidad y el botón pasa a "Confirmar compra", actualizando el total', async () => {
     getProducto.mockResolvedValue(detalleConStock);
-    render(<TiendaPage />);
+    render(<TiendaPage socio={SOCIO} />);
 
     fireEvent.click(await screen.findByText('Remera oficial'));
     fireEvent.click(await screen.findByText('Comprar'));
@@ -76,7 +106,7 @@ describe('TiendaPage', () => {
 
   test('la cantidad no puede bajar de 1 ni superar el stock disponible', async () => {
     getProducto.mockResolvedValue(detalleConStock);
-    render(<TiendaPage />);
+    render(<TiendaPage socio={SOCIO} />);
 
     fireEvent.click(await screen.findByText('Remera oficial'));
     fireEvent.click(await screen.findByText('Comprar'));
@@ -91,7 +121,7 @@ describe('TiendaPage', () => {
 
   test('un producto sin stock no muestra el botón de comprar y sí muestra el badge "Agotado"', async () => {
     getProducto.mockResolvedValue(detalleSinStock);
-    render(<TiendaPage />);
+    render(<TiendaPage socio={SOCIO} />);
 
     fireEvent.click(await screen.findByText('Buzo campera'));
 
@@ -100,20 +130,47 @@ describe('TiendaPage', () => {
     expect(screen.getByText('Agotado')).toBeInTheDocument();
   });
 
-  test('al tocar "Confirmar compra" aparece el placeholder de "Próximamente"', async () => {
+  test('al tocar "Confirmar compra" con éxito, pasa al flujo de pago con las props correctas', async () => {
     getProducto.mockResolvedValue(detalleConStock);
-    render(<TiendaPage />);
+    comprarProducto.mockResolvedValue(COMPRA_INICIADA);
+    render(<TiendaPage socio={SOCIO} />);
 
     fireEvent.click(await screen.findByText('Remera oficial'));
     fireEvent.click(await screen.findByText('Comprar'));
     fireEvent.click(screen.getByText('Confirmar compra'));
 
-    expect(await screen.findByText('Próximamente...')).toBeInTheDocument();
+    expect(await screen.findByTestId('payment-brick')).toHaveTextContent('pago-flow-stub compra Remera oficial 15000.00');
+    expect(comprarProducto).toHaveBeenCalledWith('1', 'socio-1', 1);
+  });
+
+  test('un error de compra se muestra inline sin avanzar al pago', async () => {
+    getProducto.mockResolvedValue(detalleConStock);
+    comprarProducto.mockRejectedValue(new Error('sin-stock'));
+    render(<TiendaPage socio={SOCIO} />);
+
+    fireEvent.click(await screen.findByText('Remera oficial'));
+    fireEvent.click(await screen.findByText('Comprar'));
+    fireEvent.click(screen.getByText('Confirmar compra'));
+
+    expect(await screen.findByText('No queda stock suficiente de este producto.')).toBeInTheDocument();
+    expect(screen.queryByTestId('payment-brick')).not.toBeInTheDocument();
+  });
+
+  test('un error moroso se muestra inline con el mensaje correspondiente', async () => {
+    getProducto.mockResolvedValue(detalleConStock);
+    comprarProducto.mockRejectedValue(new Error('moroso'));
+    render(<TiendaPage socio={SOCIO} />);
+
+    fireEvent.click(await screen.findByText('Remera oficial'));
+    fireEvent.click(await screen.findByText('Comprar'));
+    fireEvent.click(screen.getByText('Confirmar compra'));
+
+    expect(await screen.findByText('Tenés pagos pendientes. Regularizá tu situación para poder comprar.')).toBeInTheDocument();
   });
 
   test('"Volver" desde el detalle muestra la lista de nuevo', async () => {
     getProducto.mockResolvedValue(detalleConStock);
-    render(<TiendaPage />);
+    render(<TiendaPage socio={SOCIO} />);
 
     fireEvent.click(await screen.findByText('Remera oficial'));
     await screen.findByText('Comprar');
@@ -121,5 +178,27 @@ describe('TiendaPage', () => {
     fireEvent.click(screen.getByText('Volver'));
 
     expect(await screen.findByText('Buzo campera')).toBeInTheDocument();
+  });
+
+  test('"Mis compras" lista las compras pagadas del socio', async () => {
+    getComprasPorSocio.mockResolvedValue([COMPRA_PAGADA]);
+    render(<TiendaPage socio={SOCIO} />);
+
+    await screen.findByText('Remera oficial');
+    fireEvent.click(screen.getByText('Mis compras'));
+
+    expect(await screen.findByText('Buzo campera')).toBeInTheDocument();
+    expect(screen.getByText('Cantidad: 2')).toBeInTheDocument();
+    expect(getComprasPorSocio).toHaveBeenCalledWith('socio-1');
+  });
+
+  test('"Mis compras" muestra un mensaje cuando el socio no tiene compras', async () => {
+    getComprasPorSocio.mockResolvedValue([]);
+    render(<TiendaPage socio={SOCIO} />);
+
+    await screen.findByText('Remera oficial');
+    fireEvent.click(screen.getByText('Mis compras'));
+
+    expect(await screen.findByText('Todavía no tenés compras.')).toBeInTheDocument();
   });
 });

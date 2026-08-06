@@ -1,16 +1,30 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ShoppingBag, Package, Minus, Plus } from 'lucide-react';
-import { getProductosDisponibles, getProducto } from '../../services/tiendaService';
+import { ArrowLeft, ShoppingBag, Package, Minus, Plus, Receipt } from 'lucide-react';
+import { getProductosDisponibles, getProducto, comprarProducto, getComprasPorSocio } from '../../services/tiendaService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
-import { ProximamenteOverlay } from '../../components/ProximamenteOverlay/ProximamenteOverlay';
+import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import './TiendaPage.css';
+
+const MENSAJES_ERROR_COMPRA = {
+  'producto-no-encontrado': 'No se pudo procesar la compra. Volvé a intentarlo.',
+  'sin-stock': 'No queda stock suficiente de este producto.',
+  'producto-inactivo': 'Este producto ya no está disponible.',
+  moroso: 'Tenés pagos pendientes. Regularizá tu situación para poder comprar.',
+  suspendido: 'Tu cuenta está suspendida. Contactate con el club para más información.',
+  'no-autorizado': 'No pudimos procesar tu compra.',
+  'servicio-no-disponible': 'El servicio no está disponible. Intentá más tarde.',
+};
+
+function mensajeError(codigo) {
+  return MENSAJES_ERROR_COMPRA[codigo] || 'No se pudo comprar el producto. Intentá de nuevo.';
+}
 
 function formatearPrecio(monto) {
   return `$${Number(monto).toLocaleString('es-AR')}`;
 }
 
-export function TiendaPage() {
+export function TiendaPage({ socio }) {
   const [productos, setProductos] = useState([]);
   const [detalle, setDetalle] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -18,16 +32,27 @@ export function TiendaPage() {
   const [error, setError] = useState(null);
   const [comprando, setComprando] = useState(false);
   const [cantidad, setCantidad] = useState(1);
-  const [mostrarProximamente, setMostrarProximamente] = useState(false);
+
+  const [vistaInterna, setVistaInterna] = useState('lista');
+  const [enviandoCompra, setEnviandoCompra] = useState(false);
+  const [errorCompra, setErrorCompra] = useState('');
+  const [compraEnCurso, setCompraEnCurso] = useState(null);
+
+  const [misCompras, setMisCompras] = useState(null);
+  const [cargandoMisCompras, setCargandoMisCompras] = useState(false);
+  const [errorMisCompras, setErrorMisCompras] = useState(false);
 
   function volverALista() {
     setDetalle(null);
     setError(null);
     setComprando(false);
     setCantidad(1);
+    setErrorCompra('');
+    setCompraEnCurso(null);
+    setVistaInterna('lista');
   }
 
-  useBackToRoot(detalle, null, volverALista);
+  useBackToRoot(vistaInterna, 'lista', volverALista);
 
   async function cargarProductos() {
     try {
@@ -48,7 +73,9 @@ export function TiendaPage() {
       setError(null);
       setComprando(false);
       setCantidad(1);
+      setErrorCompra('');
       setDetalle(await getProducto(id));
+      setVistaInterna('detalle');
     } catch {
       setError('No se pudo cargar el producto.');
     } finally {
@@ -64,15 +91,95 @@ export function TiendaPage() {
     setCantidad((c) => Math.max(c - 1, 1));
   }
 
-  function confirmarCompra() {
-    // Placeholder: aún no existe lógica de compra/descuento de stock en el backend (ver ms-club/CLAUDE.md).
-    setMostrarProximamente(true);
+  async function confirmarCompra() {
+    setEnviandoCompra(true);
+    setErrorCompra('');
+    try {
+      // Crea la fila "Iniciada" (descuenta stock ya) y recién ahí muestra el Brick de pago.
+      const compraIniciada = await comprarProducto(detalle.id, socio.id, cantidad);
+      setCompraEnCurso(compraIniciada);
+      setVistaInterna('pago');
+    } catch (e) {
+      setErrorCompra(e.message);
+    } finally {
+      setEnviandoCompra(false);
+    }
+  }
+
+  function abrirMisCompras() {
+    setVistaInterna('mis-compras');
+    if (misCompras !== null) return;
+    setCargandoMisCompras(true);
+    setErrorMisCompras(false);
+    getComprasPorSocio(socio.id)
+      .then(setMisCompras)
+      .catch(() => setErrorMisCompras(true))
+      .finally(() => setCargandoMisCompras(false));
   }
 
   if (loading) return <LoadingScreen />;
 
+  // ─── Pago ───
+  if (vistaInterna === 'pago' && compraEnCurso) {
+    return (
+      <PagoCuotaFlow
+        item={{
+          id: compraEnCurso.id,
+          monto: compraEnCurso.monto,
+          concepto: compraEnCurso.producto.nombre,
+        }}
+        tipoItem="compra"
+        socio={socio}
+        onVolver={() => { volverALista(); setVistaInterna('mis-compras'); }}
+      />
+    );
+  }
+
+  // ─── Mis compras ───
+  if (vistaInterna === 'mis-compras') {
+    return (
+      <div className="tienda-page">
+        <button type="button" className="tienda-volver" onClick={volverALista}>
+          <ArrowLeft size={20} /> Volver
+        </button>
+
+        <h2 className="tienda-detalle-nombre" style={{ padding: 0, marginBottom: 'var(--space-4)' }}>Mis compras</h2>
+
+        {cargandoMisCompras && <p className="tienda-empty">Cargando...</p>}
+
+        {!cargandoMisCompras && errorMisCompras && (
+          <p className="tienda-error">No se pudieron cargar tus compras.</p>
+        )}
+
+        {!cargandoMisCompras && !errorMisCompras && (misCompras ?? []).length === 0 && (
+          <p className="tienda-empty">Todavía no tenés compras.</p>
+        )}
+
+        {!cargandoMisCompras && !errorMisCompras && (misCompras ?? []).length > 0 && (
+          <div className="compra-lista">
+            {misCompras.map((compra) => (
+              <div className="compra-card" key={compra.id}>
+                {compra.producto.imagen_url ? (
+                  <img src={compra.producto.imagen_url} alt={compra.producto.nombre} className="compra-card-img" />
+                ) : (
+                  <div className="compra-card-img-placeholder"><Package size={24} /></div>
+                )}
+                <div className="compra-card-info">
+                  <span className="compra-card-nombre">{compra.producto.nombre}</span>
+                  <span className="compra-card-cantidad">Cantidad: {compra.cantidad}</span>
+                  <span className="compra-card-precio">{formatearPrecio(compra.monto)}</span>
+                  <span className="compra-card-id">Compra #{compra.id.slice(0, 8)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   // ─── Detalle ───
-  if (detalle) {
+  if (vistaInterna === 'detalle' && detalle) {
     const sinStock = Number(detalle.stock) <= 0;
     return (
       <div className="tienda-page">
@@ -98,6 +205,10 @@ export function TiendaPage() {
             <span className="tienda-detalle-stock">{detalle.stock} disponibles</span>
           )}
           {detalle.descripcion && <p className="tienda-detalle-desc">{detalle.descripcion}</p>}
+
+          {errorCompra && (
+            <p className="tienda-error" role="alert">{mensajeError(errorCompra)}</p>
+          )}
 
           {!sinStock && (
             <div className="tienda-comprar-bar">
@@ -133,16 +244,13 @@ export function TiendaPage() {
                 type="button"
                 className="tienda-comprar-btn"
                 onClick={comprando ? confirmarCompra : () => setComprando(true)}
+                disabled={enviandoCompra}
               >
-                {comprando ? 'Confirmar compra' : 'Comprar'}
+                {enviandoCompra ? 'Procesando...' : comprando ? 'Confirmar compra' : 'Comprar'}
               </button>
             </div>
           )}
         </div>
-
-        {mostrarProximamente && (
-          <ProximamenteOverlay titulo="Confirmar compra" onClose={() => setMostrarProximamente(false)} />
-        )}
       </div>
     );
   }
@@ -163,6 +271,10 @@ export function TiendaPage() {
           </div>
         </div>
       </div>
+
+      <button type="button" className="tienda-mis-compras-btn" onClick={abrirMisCompras}>
+        <Receipt size={16} /> Mis compras
+      </button>
 
       {error && <p className="tienda-error">{error}</p>}
 
