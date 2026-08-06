@@ -36,11 +36,13 @@ const AccesoQR = () => {
   }
 
   return (
-    <QRCodeSVG 
-      value={qrData} 
-      size={220} 
+    <QRCodeSVG
+      value={qrData}
+      size={220}
       level="H"
       style={{ display: 'block' }}
+      role="img"
+      aria-label="Código QR de acceso al club"
     />
   );
 };
