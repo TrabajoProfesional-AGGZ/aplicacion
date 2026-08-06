@@ -42,13 +42,14 @@ describe('utils', () => {
       );
     });
 
-    test('sin usuario logueado, el token queda undefined', async () => {
+    test('sin usuario logueado, no incluye header Authorization', async () => {
       await fetchTo('/api/v1/socios', 'GET');
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:8080/api/v1/socios',
-        expect.objectContaining({ headers: expect.objectContaining({ Authorization: 'Bearer undefined' }) })
-      );
+      expect(global.fetch).toHaveBeenCalledWith('http://localhost:8080/api/v1/socios', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        body: null,
+      });
     });
 
     test.each([

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { getToken } from 'firebase/messaging';
-import { messaging } from '../services/firebase';
+import { messaging } from '../firebase';
 import { fetchTo } from '../utils/utils'
 
 export const usePushNotifications = (usuarioAutenticado) => {
@@ -15,7 +15,7 @@ export const usePushNotifications = (usuarioAutenticado) => {
         if (permission === 'granted') {
           // Generamos el token usando tu clave VAPID
           const currentToken = await getToken(messaging, { 
-            vapidKey: import.meta.env.VITE_APP_KEY_PUSH
+            vapidKey: import.meta.env.VITE_APP_VAPID_KEY
           });
 
           if (currentToken) {

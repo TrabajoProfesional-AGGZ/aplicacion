@@ -11,12 +11,16 @@ function buildUrl(path) {
 
 export async function fetchTo(path, method, body = null) {
   const token = await auth.currentUser?.getIdToken();
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
   return fetch(buildUrl(path), {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
+    headers,
     body: body ? JSON.stringify(body) : null,
   });
 }
