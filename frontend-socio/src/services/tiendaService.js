@@ -7,7 +7,7 @@ export async function getProductosDisponibles() {
 }
 
 export async function getProducto(id) {
-  const res = await fetchTo(`/api/v1/productos/${id}`, 'GET');
+  const res = await fetchTo(`/api/v1/productos/${encodeURIComponent(id)}`, 'GET');
   if (!res.ok) throw new Error('Error al obtener el producto');
   return res.json();
 }

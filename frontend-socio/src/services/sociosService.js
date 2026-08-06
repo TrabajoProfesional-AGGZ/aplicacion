@@ -17,7 +17,7 @@ export async function reclamarCuentaSocio(dni) {
 }
 
 export async function subirFotoSocio(idSocio, imagenBase64) {
-  const res = await fetchTo(`/api/v1/socios/${idSocio}/foto`, 'POST', { imagen_base64: imagenBase64 });
+  const res = await fetchTo(`/api/v1/socios/${encodeURIComponent(idSocio)}/foto`, 'POST', { imagen_base64: imagenBase64 });
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al subir la foto');
   return res.json();
