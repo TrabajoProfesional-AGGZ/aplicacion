@@ -8,21 +8,21 @@ export async function getTiposTramite() {
 }
 
 export async function getTramitesPorSocio(idSocio) {
-  const res = await fetchTo(`/api/v1/tramites/por-socio/${idSocio}`, 'GET');
+  const res = await fetchTo(`/api/v1/tramites/por-socio/${encodeURIComponent(idSocio)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al obtener los trámites');
   return res.json();
 }
 
 export async function getTramitesPendientes(idSocio) {
-  const res = await fetchTo(`/api/v1/tramites/pendientes/${idSocio}`, 'GET');
+  const res = await fetchTo(`/api/v1/tramites/pendientes/${encodeURIComponent(idSocio)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al obtener los trámites pendientes');
   return res.json();
 }
 
 export async function crearTramite(idSocio, { id_tipo_tramite, archivo_base64, fecha_vencimiento }) {
-  const res = await fetchTo(`/api/v1/tramites/${idSocio}`, 'POST', {
+  const res = await fetchTo(`/api/v1/tramites/${encodeURIComponent(idSocio)}`, 'POST', {
     id_tipo_tramite,
     archivo_base64,
     fecha_vencimiento: fecha_vencimiento || null,
