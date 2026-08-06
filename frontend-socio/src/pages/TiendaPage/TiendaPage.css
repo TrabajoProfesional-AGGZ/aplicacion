@@ -50,6 +50,38 @@
   .tienda-banner-title { font-size: 1.65rem; }
 }
 
+/* ── Mis compras (botón + lista) ── */
+.tienda-mis-compras-btn {
+  display: inline-flex; align-items: center; gap: var(--space-2);
+  background-color: var(--color-surface); border: 1px solid var(--color-border-medium);
+  color: var(--color-text-primary); font-family: inherit; font-size: 0.85rem; font-weight: 600;
+  padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); cursor: pointer;
+  margin-bottom: var(--space-4); box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.tienda-mis-compras-btn:active { transform: scale(0.97); }
+@media (hover: hover) {
+  .tienda-mis-compras-btn:hover { box-shadow: var(--shadow-md); }
+}
+
+.compra-lista { display: flex; flex-direction: column; gap: var(--space-3); }
+.compra-card {
+  display: flex; align-items: center; gap: var(--space-3);
+  background-color: var(--color-surface); border-radius: var(--radius-md);
+  overflow: hidden; box-shadow: var(--shadow-sm); padding: var(--space-3);
+}
+.compra-card-img, .compra-card-img-placeholder {
+  width: 64px; height: 64px; flex-shrink: 0; border-radius: var(--radius-sm);
+  object-fit: contain; background: var(--color-bg-subtle);
+}
+.compra-card-img-placeholder {
+  display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary);
+}
+.compra-card-info { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.compra-card-nombre { font-weight: 700; color: var(--color-text-primary); font-size: 0.95rem; }
+.compra-card-cantidad, .compra-card-id { font-size: 0.78rem; color: var(--color-text-secondary); }
+.compra-card-precio { font-weight: 700; color: var(--color-text-primary); font-size: 0.95rem; }
+
 /* ── Grid de productos ── */
 .tienda-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-3); }
 

@@ -120,7 +120,7 @@ export function HomePage({ socio, cerrarSesion }) {
             onConsumirNoticiaInicial={() => setNoticiaSeleccionadaId(null)}
           />
         )}
-        {vista === 'tienda' && <TiendaPage />}
+        {vista === 'tienda' && <TiendaPage socio={socio} />}
         {vista === 'nueva-entrada' && (
           <NuevaEntradaPage
             socio={socio}
