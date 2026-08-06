@@ -17,6 +17,7 @@ export function ModalOverlay({ onClose, wrapperClass, children }) {
   return (
     <div
       className="csf-overlay"
+      role="presentation"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
