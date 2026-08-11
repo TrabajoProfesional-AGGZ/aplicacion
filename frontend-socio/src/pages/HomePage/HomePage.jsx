@@ -132,6 +132,7 @@ export function HomePage({ socio, cerrarSesion }) {
           <MisEntradasPage
             socio={socio}
             onPagarEntrada={(entrada) => { setItemAPagarId(entrada.id); setVista('pagos'); }}
+            onVerCarnet={() => setVista('carnet')}
           />
         )}
         {vista === 'inicio' && (
