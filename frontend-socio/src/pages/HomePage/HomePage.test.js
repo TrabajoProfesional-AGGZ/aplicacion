@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { HomePage } from './HomePage';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles } from '../../services/reservasService';
+import { getEntradasActivas, getEntradasPendientes } from '../../services/eventosService';
 import { TextEncoder, TextDecoder } from 'util';
 Object.assign(global, { TextEncoder, TextDecoder });
 
@@ -47,6 +48,13 @@ jest.mock('../../services/noticiasService', () => ({
   getNoticia: jest.fn(),
   getUltimaNoticia: jest.fn(() => Promise.resolve(null)),
 }));
+jest.mock('../../services/eventosService', () => ({
+  getEventos: jest.fn(() => Promise.resolve([])),
+  getEntradasActivas: jest.fn(() => Promise.resolve([])),
+  getEntradasHistoricas: jest.fn(() => Promise.resolve([])),
+  getEntradasPendientes: jest.fn(() => Promise.resolve([])),
+  comprarEntrada: jest.fn(),
+}));
 jest.mock('otpauth', () => ({
   TOTP: jest.fn().mockImplementation(() => ({
     generate: jest.fn(() => 'TOKEN123')
@@ -67,6 +75,18 @@ const socioFixture = {
   nro_socio: '1000',
   categoria: { nombre: 'Titular' },
   estado: { nombre: 'Activo' },
+};
+
+const entradaPendienteFixture = {
+  id: 'entrada-1',
+  estado: 'Pendiente',
+  evento: { nombre: 'Fiesta de fin de año', dia: '2024-12-20', hora_inicio: '20:00:00', hora_fin: '23:00:00' },
+};
+
+const entradaPagadaFixture = {
+  id: 'entrada-2',
+  estado: 'Pagada',
+  evento: { nombre: 'Torneo de tenis', dia: '2024-11-10', hora_inicio: '09:00:00', hora_fin: '18:00:00' },
 };
 
 describe('HomePage', () => {
@@ -301,5 +321,29 @@ describe('HomePage', () => {
     expect(localStorage.getItem('socio_totp_secret')).toBeNull();
     expect(consoleSpy).toHaveBeenCalledWith('El secreto TOTP recibido del servidor no tiene un formato válido.');
     consoleSpy.mockRestore();
+  });
+
+  test('"Mis Entradas" del nav inferior navega a la página de entradas, dentro del layout', async () => {
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Mis Entradas'));
+    expect(await screen.findByRole('heading', { name: 'Mis Entradas' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Mi perfil')).toBeInTheDocument();
+    expect(screen.getByText('Inicio').closest('button')).toBeInTheDocument();
+  });
+
+  test('"Ir a pagar" en una entrada pendiente navega a la página de pagos (onPagarEntrada)', async () => {
+    getEntradasPendientes.mockResolvedValueOnce([entradaPendienteFixture]);
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Mis Entradas'));
+    fireEvent.click(await screen.findByText('Ir a pagar'));
+    expect(await screen.findByRole('heading', { name: 'Cuotas' })).toBeInTheDocument();
+  });
+
+  test('el botón de QR de una entrada pagada navega al carnet (onVerCarnet)', async () => {
+    getEntradasActivas.mockResolvedValueOnce([entradaPagadaFixture]);
+    render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    fireEvent.click(screen.getByText('Mis Entradas'));
+    fireEvent.click(await screen.findByLabelText('Ver código QR de la entrada'));
+    expect(await screen.findByText('Mi Pase de Acceso')).toBeInTheDocument();
   });
 });

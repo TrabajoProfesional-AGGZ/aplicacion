@@ -216,4 +216,36 @@ describe('ReservasPage', () => {
     expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
     expect(cancelReserva).not.toHaveBeenCalled();
   });
+
+  test('clickear fuera de la confirmación de cancelación la cierra sin cancelar (usa ModalOverlay, no un <dialog> a medida)', async () => {
+    getReservasPorSocio.mockResolvedValue([RESERVA_PENDIENTE]);
+    getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
+    render(<ReservasPage socio={socioFixture} />);
+    await screen.findByText('Cancha de fútbol');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+    const mensaje = screen.getByText('¿Seguro que querés cancelar esta reserva?');
+
+    fireEvent.click(mensaje.closest('.csf-overlay'));
+
+    expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    expect(cancelReserva).not.toHaveBeenCalled();
+  });
+
+  test('el gesto de atrás (popstate) cierra la confirmación de cancelación sin cancelar', async () => {
+    getReservasPorSocio.mockResolvedValue([RESERVA_PENDIENTE]);
+    getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
+    render(<ReservasPage socio={socioFixture} />);
+    await screen.findByText('Cancha de fútbol');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(screen.getByText('¿Seguro que querés cancelar esta reserva?')).toBeInTheDocument();
+
+    window.dispatchEvent(new PopStateEvent('popstate'));
+
+    await waitFor(() => {
+      expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    });
+    expect(cancelReserva).not.toHaveBeenCalled();
+  });
 });
