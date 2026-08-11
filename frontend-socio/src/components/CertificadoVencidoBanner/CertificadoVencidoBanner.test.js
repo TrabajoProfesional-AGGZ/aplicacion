@@ -53,4 +53,10 @@ describe('CertificadoVencidoBanner', () => {
     await waitFor(() => expect(getTramitesPendientes).toHaveBeenCalled());
     expect(container.firstChild).toBeNull();
   });
+
+  test('no crashea ni llama al servicio si socio todavía no está inicializado', () => {
+    const { container } = render(<CertificadoVencidoBanner socio={null} onClick={jest.fn()} />);
+    expect(getTramitesPendientes).not.toHaveBeenCalled();
+    expect(container.firstChild).toBeNull();
+  });
 });

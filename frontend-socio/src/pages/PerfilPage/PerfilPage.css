@@ -282,68 +282,6 @@
   transform: scale(0.99);
 }
 
-.perfil-biometria-row {
-  width: 100%;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-}
-
-.perfil-biometria-icon {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--color-bg-subtle);
-  color: var(--color-text-primary);
-}
-
-.perfil-biometria-label {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-.perfil-switch {
-  flex-shrink: 0;
-  position: relative;
-  width: 44px;
-  height: 26px;
-  padding: 3px;
-  border: none;
-  border-radius: var(--radius-full);
-  background-color: var(--color-border-medium);
-  cursor: pointer;
-  transition: background-color var(--transition-normal);
-}
-
-.perfil-switch--on {
-  background-color: var(--color-text-primary);
-}
-
-.perfil-switch-thumb {
-  display: block;
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-full);
-  background-color: var(--color-surface);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-normal);
-}
-
-.perfil-switch--on .perfil-switch-thumb {
-  transform: translateX(18px);
-}
-
 .perfil-password-wrapper {
   position: relative;
 }

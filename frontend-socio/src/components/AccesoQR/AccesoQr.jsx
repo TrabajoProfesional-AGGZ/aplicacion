@@ -11,24 +11,31 @@ const AccesoQR = () => {
 
     if (!socioId || !secreto) return;
 
-    const generadorTotp = new OTPAuth.TOTP({
-      issuer: 'SocioUnido',
-      label: 'AccesoSocio',
-      algorithm: 'SHA1',
-      digits: 6,
-      period: 30,
-      secret: OTPAuth.Secret.fromBase32(secreto) 
-    });
+    try {
+      const generadorTotp = new OTPAuth.TOTP({
+        issuer: 'SocioUnido',
+        label: 'AccesoSocio',
+        algorithm: 'SHA1',
+        digits: 6,
+        period: 30,
+        secret: OTPAuth.Secret.fromBase32(secreto)
+      });
 
-    const generarQR = () => {
-      const token = generadorTotp.generate();
-      setQrData(`${socioId}|${token}`);
-    };
+      const generarQR = () => {
+        try {
+          const token = generadorTotp.generate();
+          setQrData(`${socioId}|${token}`);
+        } catch (err) {
+          console.error('Error al generar TOTP token:', err);
+        }
+      };
 
-    generarQR();
-    const intervalo = setInterval(generarQR, 1000); 
-    
-    return () => clearInterval(intervalo);
+      generarQR();
+      const intervalo = setInterval(generarQR, 1000);
+      return () => clearInterval(intervalo);
+    } catch (err) {
+      console.error('Secreto TOTP inválido o corrupto:', err);
+    }
   }, []);
 
   if (!qrData) {

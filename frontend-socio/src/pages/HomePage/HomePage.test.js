@@ -47,17 +47,6 @@ jest.mock('../../services/noticiasService', () => ({
   getNoticia: jest.fn(),
   getUltimaNoticia: jest.fn(() => Promise.resolve(null)),
 }));
-jest.mock('../../hooks/useBiometricLogin', () => ({
-  useBiometricLogin: () => ({
-    soportado: false,
-    enrolado: false,
-    cargando: false,
-    error: null,
-    ofrecerEnrolamiento: jest.fn(),
-    desenrolar: jest.fn(),
-    iniciarSesionBiometrico: jest.fn(),
-  }),
-}));
 jest.mock('otpauth', () => ({
   TOTP: jest.fn().mockImplementation(() => ({
     generate: jest.fn(() => 'TOKEN123')

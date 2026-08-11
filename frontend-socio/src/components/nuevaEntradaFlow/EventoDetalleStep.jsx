@@ -46,7 +46,7 @@ export function EventoDetalleStep({
             <div className="evento-banner-stat">
               <span className="evento-banner-stat-label">Horario</span>
               <span className="evento-banner-stat-valor">
-                {evento.hora_inicio.slice(0, 5)} - {evento.hora_fin.slice(0, 5)}
+                {evento.hora_inicio?.slice(0, 5) ?? '--:--'} - {evento.hora_fin?.slice(0, 5) ?? '--:--'}
               </span>
             </div>
             <div className="evento-banner-divider" aria-hidden="true" />
