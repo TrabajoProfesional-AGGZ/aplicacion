@@ -10,12 +10,10 @@ const ESTADO_COLOR = {
 
 function esCumpleaniosHoy(fechaNacimiento) {
   if (!fechaNacimiento) return false;
-  const nacimiento = new Date(fechaNacimiento);
+  const [, month, day] = fechaNacimiento.split('T')[0].split('-').map(Number);
+  if (!month || !day) return false;
   const hoy = new Date();
-  return (
-    nacimiento.getUTCMonth() === hoy.getMonth() &&
-    nacimiento.getUTCDate() === hoy.getDate()
-  );
+  return hoy.getMonth() + 1 === month && hoy.getDate() === day;
 }
 
 export function WelcomeCard({ socio }) {
