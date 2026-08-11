@@ -57,7 +57,7 @@ async function fillStep4() {
 // header (que sí se actualiza de inmediato).
 async function navigateToStep2() {
   await fillStep1();
-  userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+  await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
   expect(await screen.findByText(/Paso 2 de 4/)).toBeInTheDocument();
   expect(await screen.findByPlaceholderText('María')).toBeInTheDocument();
 }
@@ -65,7 +65,7 @@ async function navigateToStep2() {
 async function navigateToStep3() {
   await navigateToStep2();
   await fillStep2();
-  userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+  await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
   expect(await screen.findByText(/Paso 3 de 4/)).toBeInTheDocument();
   expect(await screen.findByPlaceholderText('Ej: 1123456789')).toBeInTheDocument();
 }
@@ -73,7 +73,7 @@ async function navigateToStep3() {
 async function navigateToStep4() {
   await navigateToStep3();
   await fillStep3();
-  userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+  await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
   expect(await screen.findByText(/Paso 4 de 4/)).toBeInTheDocument();
   expect(await screen.findByPlaceholderText('maria@ejemplo.com')).toBeInTheDocument();
 }
@@ -94,7 +94,7 @@ describe('RegistroSocioForm', () => {
 
   test('muestra errores de validación si se intenta avanzar con campos vacíos', async () => {
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await waitFor(() => {
       expect(screen.getAllByText('Requerido').length).toBeGreaterThan(0);
     });
@@ -111,7 +111,7 @@ describe('RegistroSocioForm', () => {
     validarSocio.mockRejectedValueOnce(new Error('socio-no-encontrado'));
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await fillStep1();
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/no pudimos validar tu identidad/i)).toBeInTheDocument();
@@ -123,7 +123,7 @@ describe('RegistroSocioForm', () => {
     validarSocio.mockRejectedValueOnce(new Error('cuenta-ya-registrada'));
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await fillStep1();
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/ya tiene una cuenta registrada/i)).toBeInTheDocument();
@@ -134,7 +134,7 @@ describe('RegistroSocioForm', () => {
   test('retrocede al paso 1 desde el paso 2', async () => {
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await navigateToStep2();
-    userEvent.click(screen.getByRole('button', { name: /atrás/i }));
+    await userEvent.click(screen.getByRole('button', { name: /atrás/i }));
     expect(await screen.findByText(/Paso 1 de 4/)).toBeInTheDocument();
   });
 
@@ -147,7 +147,7 @@ describe('RegistroSocioForm', () => {
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await navigateToStep4();
     await fillStep4();
-    userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
+    await userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
 
     await waitFor(() => expect(createUserWithEmailAndPassword).toHaveBeenCalledWith(
       expect.anything(), 'juan@club.com', 'Clave12345'
@@ -169,7 +169,7 @@ describe('RegistroSocioForm', () => {
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await navigateToStep4();
     await fillStep4();
-    userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
+    await userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
 
     expect(await screen.findByText('¡Cuenta configurada!')).toBeInTheDocument();
     expect(onSuccess).not.toHaveBeenCalled();
@@ -186,7 +186,7 @@ describe('RegistroSocioForm', () => {
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await navigateToStep4();
     await fillStep4();
-    userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
+    await userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
 
     await waitFor(() => expect(deleteUser).toHaveBeenCalledWith({ uid: 'firebase-uid' }));
     expect(reclamarCuentaSocio).not.toHaveBeenCalled();
