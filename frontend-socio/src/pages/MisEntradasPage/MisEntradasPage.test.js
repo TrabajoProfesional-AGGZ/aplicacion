@@ -63,16 +63,16 @@ describe('MisEntradasPage', () => {
     expect(screen.getByText('Pagada')).toBeInTheDocument();
   });
 
-  test('click en "Ver código QR" abre el placeholder de próximamente', async () => {
+  test('click en "Ver código QR" llama a onVerCarnet', async () => {
     getEntradasActivas.mockResolvedValue([ENTRADA_ACTIVA]);
     getEntradasPendientes.mockResolvedValue([]);
-    render(<MisEntradasPage socio={SOCIO} />);
+    const onVerCarnet = jest.fn();
+    render(<MisEntradasPage socio={SOCIO} onVerCarnet={onVerCarnet} />);
     await screen.findByText('Fiesta de fin de año');
 
     fireEvent.click(screen.getByLabelText('Ver código QR de la entrada'));
 
-    expect(screen.getByText('Código QR')).toBeInTheDocument();
-    expect(screen.getByText('Próximamente...')).toBeInTheDocument();
+    expect(onVerCarnet).toHaveBeenCalledTimes(1);
   });
 
   test('alternar a "Históricas" pide y muestra el historial', async () => {

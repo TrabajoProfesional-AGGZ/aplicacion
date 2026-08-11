@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { QrCode, Calendar } from 'lucide-react';
 import { getEntradasActivas, getEntradasHistoricas, getEntradasPendientes } from '../../services/eventosService';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
-import { ProximamenteOverlay } from '../../components/ProximamenteOverlay/ProximamenteOverlay';
 import './MisEntradasPage.css';
 
 const ESTADO_TAG = {
@@ -21,13 +20,12 @@ function formatearFecha(fechaIso) {
   }).format(new Date(fechaIso));
 }
 
-export function MisEntradasPage({ socio, onPagarEntrada = () => {} }) {
+export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet = () => {} }) {
   const [vista, setVista] = useState('activas');
   const [entradas, setEntradas] = useState([]);
   const [historicas, setHistoricas] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
-  const [entradaQr, setEntradaQr] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -123,7 +121,7 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {} }) {
                   <button
                     type="button"
                     className="entrada-qr-btn"
-                    onClick={() => setEntradaQr(entrada)}
+                    onClick={onVerCarnet}
                     aria-label="Ver código QR de la entrada"
                   >
                     <QrCode size={22} />
@@ -133,10 +131,6 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {} }) {
             );
           })}
         </section>
-      )}
-
-      {entradaQr && (
-        <ProximamenteOverlay titulo="Código QR" onClose={() => setEntradaQr(null)} />
       )}
     </>
   );
