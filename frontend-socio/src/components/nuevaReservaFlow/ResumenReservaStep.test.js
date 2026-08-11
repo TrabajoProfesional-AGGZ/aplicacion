@@ -63,7 +63,16 @@ describe('ResumenReservaStep', () => {
   test('cuando la reserva se envió con éxito muestra la pantalla de confirmación', () => {
     render(<ResumenReservaStep {...baseProps} submitted />);
     expect(screen.getByText('¡Reserva registrada!')).toBeInTheDocument();
+    expect(screen.getByText('Tu reserva quedó pendiente hasta confirmar el pago.')).toBeInTheDocument();
     expect(screen.queryByText('Cancha de fútbol')).not.toBeInTheDocument();
+  });
+
+  test('cuando la instalación es gratuita y la reserva quedó confirmada, muestra un mensaje distinto', () => {
+    render(<ResumenReservaStep {...baseProps} submitted reservaConfirmada />);
+    expect(screen.getByText('¡Reserva confirmada!')).toBeInTheDocument();
+    expect(
+      screen.getByText('Esta instalación es gratuita, así que tu reserva ya quedó confirmada. No hace falta ningún pago.')
+    ).toBeInTheDocument();
   });
 
   test('cuando el error incluye socios que no cumplen los requisitos, los lista con nombre y número', () => {

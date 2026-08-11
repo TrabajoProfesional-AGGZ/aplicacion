@@ -8,6 +8,7 @@ import {
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { EventosListStep } from '../../components/nuevaEntradaFlow/EventosListStep';
 import { EventoDetalleStep } from '../../components/nuevaEntradaFlow/EventoDetalleStep';
+import { EntradaExitoStep } from '../../components/nuevaEntradaFlow/EntradaExitoStep';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 
 const MENSAJES_ERROR_COMPRA = {
@@ -76,12 +77,21 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
     try {
       const entrada = await comprarEntrada(eventoSeleccionado.id, socio.id);
       setEntradaPendiente(entrada);
-      setStep('pago');
+      if (entrada.estado === 'Pagada') {
+        setStep('exito');
+        setTimeout(() => onExito(), 1800);
+      } else {
+        setStep('pago');
+      }
     } catch (e) {
       setErrorCompra(e.message);
     } finally {
       setEnviando(false);
     }
+  }
+
+  if (step === 'exito' && entradaPendiente) {
+    return <EntradaExitoStep nombreEvento={entradaPendiente.evento.nombre} />;
   }
 
   if (step === 'pago' && entradaPendiente) {

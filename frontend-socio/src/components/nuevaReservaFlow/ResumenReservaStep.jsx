@@ -25,6 +25,7 @@ export function ResumenReservaStep({
   onVolver,
   enviando,
   submitted,
+  reservaConfirmada = false,
   submitError,
   sociosIncumplen = [],
 }) {
@@ -32,8 +33,14 @@ export function ResumenReservaStep({
     return (
       <section className="resumen-reserva resumen-reserva--exito">
         <CheckCircle2 size={40} color="var(--status-success-border)" />
-        <h2 className="resumen-exito-titulo">¡Reserva registrada!</h2>
-        <p className="resumen-exito-texto">Tu reserva quedó pendiente hasta confirmar el pago.</p>
+        <h2 className="resumen-exito-titulo">
+          {reservaConfirmada ? '¡Reserva confirmada!' : '¡Reserva registrada!'}
+        </h2>
+        <p className="resumen-exito-texto">
+          {reservaConfirmada
+            ? 'Esta instalación es gratuita, así que tu reserva ya quedó confirmada. No hace falta ningún pago.'
+            : 'Tu reserva quedó pendiente hasta confirmar el pago.'}
+        </p>
       </section>
     );
   }

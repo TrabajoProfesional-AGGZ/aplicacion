@@ -46,6 +46,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
 
   const [enviando, setEnviando] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [reservaConfirmada, setReservaConfirmada] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [sociosIncumplen, setSociosIncumplen] = useState([]);
 
@@ -106,6 +107,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
     setSociosAgregados([]);
     setSubmitError('');
     setSociosIncumplen([]);
+    setReservaConfirmada(false);
     setStep('lista');
   }
 
@@ -114,12 +116,13 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
     setSubmitError('');
     setSociosIncumplen([]);
     try {
-      await createReserva({
+      const reserva = await createReserva({
         ids_socios: [socio.id, ...sociosAgregados.map((s) => s.id)],
         id_instalacion: instalacionSeleccionada.id,
         fecha_reserva: fecha,
         hora_inicio: turnoSeleccionado,
       });
+      setReservaConfirmada(reserva.estado === 'Confirmada');
       setSubmitted(true);
       setTimeout(() => onExito(), 1800);
     } catch (e) {
@@ -182,6 +185,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
       onVolver={volverAInstalaciones}
       enviando={enviando}
       submitted={submitted}
+      reservaConfirmada={reservaConfirmada}
       submitError={submitError}
       sociosIncumplen={sociosIncumplen}
     />

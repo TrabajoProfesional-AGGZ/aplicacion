@@ -1,0 +1,20 @@
+.entrada-exito {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-12) var(--space-4);
+  gap: var(--space-3);
+}
+
+.entrada-exito-titulo {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.entrada-exito-texto {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
