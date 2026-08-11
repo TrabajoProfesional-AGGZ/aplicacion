@@ -7,12 +7,13 @@ export function CertificadoVencidoBanner({ socio, onClick }) {
   const [pendientes, setPendientes] = useState(null);
 
   useEffect(() => {
+    if (!socio?.id) return;
     let cancelled = false;
     getTramitesPendientes(socio.id)
       .then((data) => { if (!cancelled) setPendientes(data); })
       .catch(() => { if (!cancelled) setPendientes(null); });
     return () => { cancelled = true; };
-  }, [socio.id]);
+  }, [socio?.id]);
 
   let severidad = null;
   if (pendientes?.vencidos?.length > 0) {
