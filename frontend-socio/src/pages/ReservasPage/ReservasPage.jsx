@@ -3,6 +3,7 @@ import { Calendar, MapPin, Plus } from 'lucide-react';
 import { getReservasPorSocio, getReservasHistoricasPorSocio, cancelReserva } from '../../services/reservasService';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import './ReservasPage.css';
 
 const FILTROS = [
@@ -205,7 +206,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
       )}
 
       {reservaAConfirmarCancelacion && (
-        <dialog open className="reserva-confirmar-overlay" aria-label="Confirmar cancelación">
+        <ModalOverlay onClose={() => setReservaAConfirmarCancelacion(null)}>
           <div className="reserva-confirmar-card">
             <p>¿Seguro que querés cancelar esta reserva?</p>
             {errorCancelacion && <p className="reservas-error">{errorCancelacion}</p>}
@@ -228,7 +229,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
               </button>
             </div>
           </div>
-        </dialog>
+        </ModalOverlay>
       )}
     </>
   );

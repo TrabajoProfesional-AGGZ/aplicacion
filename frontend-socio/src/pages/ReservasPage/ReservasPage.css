@@ -264,22 +264,6 @@
   color: var(--status-danger-border);
 }
 
-.reserva-confirmar-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.45);
-  z-index: var(--z-modal);
-  padding: var(--space-4);
-  margin: 0;
-  border: none;
-  color: inherit;
-  max-width: none;
-  max-height: none;
-}
-
 .reserva-confirmar-card {
   background-color: var(--color-surface);
   border-radius: var(--radius-md);
