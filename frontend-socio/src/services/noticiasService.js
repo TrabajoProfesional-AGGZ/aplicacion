@@ -7,7 +7,7 @@ export async function getNoticiasVigentes() {
 }
 
 export async function getNoticia(id) {
-  const res = await fetchTo(`/api/v1/noticias/${id}`, 'GET');
+  const res = await fetchTo(`/api/v1/noticias/${encodeURIComponent(id)}`, 'GET');
   if (!res.ok) throw new Error('Error al obtener la noticia');
   return res.json();
 }

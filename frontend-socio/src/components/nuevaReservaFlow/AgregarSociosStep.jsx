@@ -81,6 +81,8 @@ export function AgregarSociosStep({ socioTitular, sociosAgregados, onAgregar, on
         <div className="agregar-socios-input-wrapper">
           <Hash size={15} className="agregar-socios-input-icono" />
           <input
+            id="nro-socio-search"
+            aria-label="Número de socio a buscar"
             type="text"
             className="agregar-socios-input"
             placeholder="Número de socio"
