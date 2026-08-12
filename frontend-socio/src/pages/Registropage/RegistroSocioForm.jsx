@@ -211,9 +211,9 @@ const {
                   error={!!errors.genero}
                 >
                   <option value="">Seleccionar...</option>
-                  <option value="Femenino">Femenino</option>
-                  <option value="Masculino">Masculino</option>
-                  <option value="Otro">Otro</option>
+                  <option value="F">Femenino</option>
+                  <option value="M">Masculino</option>
+                  <option value="X">Otro</option>
                 </StyledSelect>
               </Field>
             </div>
