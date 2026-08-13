@@ -8,4 +8,5 @@ export const AuthContext = createContext({
   cargandoAuth: true,
   authError: null,
   cerrarSesion: async () => {},
+  refrescarSocio: async () => {},
 });

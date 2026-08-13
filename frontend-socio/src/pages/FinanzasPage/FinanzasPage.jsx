@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getEstadoFinanciero } from '../../services/finanzasService';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { useAuth } from '../../hooks/useAuth';
 import './FinanzasPage.css';
 
 const RESUMEN_CONFIG = {
@@ -35,6 +36,7 @@ function inferirTipoItem(concepto) {
 }
 
 export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar = () => {} }) {
+  const { refrescarSocio } = useAuth();
   const [resumen, setResumen] = useState(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -61,11 +63,15 @@ export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar 
           const item = data.cuotas.find((c) => c.id === idBuscado);
           if (item) setCuotaAPagar(item);
         }
+        // GET /finanzas puede haber transicionado el estado del socio (ej. a "Moroso") en el
+        // backend — refresca el perfil en contexto para que WelcomeCard/PerfilPage no queden
+        // mostrando el estado viejo cargado al loguearse.
+        refrescarSocio();
       })
       .catch((err) => { if (!cancelled) setError(err.message); })
       .finally(() => { if (!cancelled) setCargando(false); });
     return () => { cancelled = true; };
-  }, [socio.id, recarga]);
+  }, [socio.id, recarga, refrescarSocio]);
 
   const volverALista = () => { setCuotaAPagar(null); setRecarga((n) => n + 1); };
 
