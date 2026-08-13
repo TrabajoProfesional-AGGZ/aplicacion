@@ -185,6 +185,17 @@ describe('NuevaReservaPage', () => {
     )).toBeInTheDocument();
   });
 
+  test('muestra el mensaje de error mapeado si hay un conflicto temporal al confirmar', async () => {
+    createReserva.mockRejectedValue(new Error('conflicto-temporal'));
+    await irHastaResumen();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
+
+    expect(await screen.findByText(
+      'La instalación está siendo actualizada por otra reserva. Probá de nuevo en unos segundos.'
+    )).toBeInTheDocument();
+  });
+
   test('en "Agregar socios", deshabilita agregar más al llegar al cupo disponible del turno', async () => {
     getTurnosDisponibles.mockResolvedValue([{ hora_inicio: '08:00:00', cupos_disponibles: 2 }]);
     getSocioByNroSocio.mockResolvedValue(OTRO_SOCIO);

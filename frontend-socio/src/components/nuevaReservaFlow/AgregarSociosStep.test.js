@@ -118,12 +118,25 @@ describe('AgregarSociosStep', () => {
     expect(screen.getByText('Ya alcanzaste el cupo disponible para este turno (2 personas).')).toBeInTheDocument();
   });
 
-  test('muestra error al intentar agregar un socio habiendo alcanzado el cupo', async () => {
+  test('un click en "Agregar" ya deshabilitado no dispara la búsqueda del socio', async () => {
     renderStep({ sociosAgregados: [OTRO_SOCIO], cuposDisponibles: 2 });
 
     await agregar('3000');
 
-    expect(await screen.findByText('Ya alcanzaste el cupo disponible para este turno (2 personas).')).toBeInTheDocument();
+    expect(getSocioByNroSocio).not.toHaveBeenCalled();
+  });
+
+  test('presionar Enter habiendo alcanzado el cupo también corta antes de buscar el socio', () => {
+    // El botón "Agregar" está disabled al llegar al tope, así que un click no
+    // llega a agregarSocio(); Enter en el input sí (su onKeyDown no chequea
+    // disabled), por lo que es el único camino de UI que ejercita el corte
+    // temprano por topeAlcanzado dentro de agregarSocio().
+    renderStep({ sociosAgregados: [OTRO_SOCIO], cuposDisponibles: 2 });
+
+    fireEvent.change(screen.getByPlaceholderText('Número de socio'), { target: { value: '3000' } });
+    fireEvent.keyDown(screen.getByPlaceholderText('Número de socio'), { key: 'Enter' });
+
+    expect(screen.getByText('Ya alcanzaste el cupo disponible para este turno (2 personas).')).toBeInTheDocument();
     expect(getSocioByNroSocio).not.toHaveBeenCalled();
   });
 
