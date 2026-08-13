@@ -17,6 +17,7 @@ import { MisEntradasPage } from '../MisEntradasPage/MisEntradasPage';
 import { NoticiasPage } from '../NoticiasPage/NoticiasPage';
 import { TiendaPage } from '../TiendaPage/TiendaPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
+import { BotinButton } from '../../components/BotinButton/BotinButton';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import '../../socio-theme.css';
 import './HomePage.css';
@@ -172,6 +173,8 @@ export function HomePage({ socio, cerrarSesion }) {
       {proximamente && (
         <ProximamenteOverlay titulo={proximamente} onClose={() => setProximamente(null)} />
       )}
+
+      <BotinButton />
     </div>
   );
 }
