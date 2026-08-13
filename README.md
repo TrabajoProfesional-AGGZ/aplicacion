@@ -1,4 +1,4 @@
-# Aplicación SocioUnido
+# Aplicación SocioUnido (Socios)
 
 Aplicación móvil de "SocioUnido" para los socios.
 
