@@ -108,6 +108,21 @@ describe('reservasService', () => {
       }
     });
 
+    test('lanza sin-cupo en 409 sin cupos_disponibles en el body, con cuposDisponibles null', async () => {
+      fetchTo.mockResolvedValue({
+        ok: false,
+        status: 409,
+        json: () => Promise.resolve({ detail: { tipo: 'sin_cupo' } }),
+      });
+      try {
+        await createReserva({});
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('sin-cupo');
+        expect(e.cuposDisponibles).toBeNull();
+      }
+    });
+
     test('lanza conflicto-temporal en 409 con tipo conflicto_temporal', async () => {
       fetchTo.mockResolvedValue({
         ok: false,
