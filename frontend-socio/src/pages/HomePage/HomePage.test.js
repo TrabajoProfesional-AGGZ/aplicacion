@@ -166,7 +166,7 @@ describe('HomePage', () => {
       tiempo_minimo_cancelacion: null,
       activa: true,
     }]);
-    getTurnosDisponibles.mockResolvedValue(['08:00:00']);
+    getTurnosDisponibles.mockResolvedValue([{ hora_inicio: '08:00:00', cupos_disponibles: 5 }]);
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Reservar instalación'));
     await screen.findByText('Cancha de fútbol');
