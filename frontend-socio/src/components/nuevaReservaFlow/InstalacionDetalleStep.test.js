@@ -96,10 +96,20 @@ describe('InstalacionDetalleStep', () => {
 
   test('lista los turnos disponibles y permite seleccionar uno', () => {
     const onSeleccionarTurno = jest.fn();
-    render(<InstalacionDetalleStep {...baseProps} turnos={['08:00:00', '09:00:00']} onSeleccionarTurno={onSeleccionarTurno} />);
+    const turnos = [
+      { hora_inicio: '08:00:00', cupos_disponibles: 10 },
+      { hora_inicio: '09:00:00', cupos_disponibles: 3 },
+    ];
+    render(<InstalacionDetalleStep {...baseProps} turnos={turnos} onSeleccionarTurno={onSeleccionarTurno} />);
     expect(screen.getByText('08:00')).toBeInTheDocument();
     fireEvent.click(screen.getByText('09:00'));
-    expect(onSeleccionarTurno).toHaveBeenCalledWith('09:00:00');
+    expect(onSeleccionarTurno).toHaveBeenCalledWith(turnos[1]);
+  });
+
+  test('muestra los cupos disponibles de cada turno', () => {
+    const turnos = [{ hora_inicio: '08:00:00', cupos_disponibles: 3 }];
+    render(<InstalacionDetalleStep {...baseProps} turnos={turnos} />);
+    expect(screen.getByText('3/10 lugares')).toBeInTheDocument();
   });
 
   test('el botón de volver llama a onVolver', () => {

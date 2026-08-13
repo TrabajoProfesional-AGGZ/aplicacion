@@ -102,4 +102,35 @@ describe('AgregarSociosStep', () => {
     fireEvent.click(screen.getByText('Volver'));
     expect(onVolver).toHaveBeenCalled();
   });
+
+  test('sin cuposDisponibles no limita la cantidad de socios agregables', () => {
+    renderStep({ sociosAgregados: [OTRO_SOCIO], cuposDisponibles: null });
+    fireEvent.change(screen.getByPlaceholderText('Número de socio'), { target: { value: '3000' } });
+    expect(screen.getByRole('button', { name: 'Agregar' })).toBeEnabled();
+  });
+
+  test('deshabilita "Agregar" y muestra aviso al llegar al cupo disponible del turno (titular + agregados)', () => {
+    // cuposDisponibles=2 -> titular + 1 socio más agregado ya alcanza el tope.
+    renderStep({ sociosAgregados: [OTRO_SOCIO], cuposDisponibles: 2 });
+    fireEvent.change(screen.getByPlaceholderText('Número de socio'), { target: { value: '3000' } });
+
+    expect(screen.getByRole('button', { name: 'Agregar' })).toBeDisabled();
+    expect(screen.getByText('Ya alcanzaste el cupo disponible para este turno (2 personas).')).toBeInTheDocument();
+  });
+
+  test('muestra error al intentar agregar un socio habiendo alcanzado el cupo', async () => {
+    renderStep({ sociosAgregados: [OTRO_SOCIO], cuposDisponibles: 2 });
+
+    await agregar('3000');
+
+    expect(await screen.findByText('Ya alcanzaste el cupo disponible para este turno (2 personas).')).toBeInTheDocument();
+    expect(getSocioByNroSocio).not.toHaveBeenCalled();
+  });
+
+  test('con cupo disponible restante todavía permite agregar', () => {
+    renderStep({ sociosAgregados: [OTRO_SOCIO], cuposDisponibles: 5 });
+    fireEvent.change(screen.getByPlaceholderText('Número de socio'), { target: { value: '3000' } });
+    expect(screen.getByRole('button', { name: 'Agregar' })).toBeEnabled();
+    expect(screen.queryByText(/Ya alcanzaste el cupo disponible/)).not.toBeInTheDocument();
+  });
 });

@@ -208,6 +208,12 @@
   font-size: 0.82rem;
 }
 
+.detalle-turno-cupos {
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .detalle-turno-chevron {
   margin-left: auto;
   color: var(--color-text-secondary);

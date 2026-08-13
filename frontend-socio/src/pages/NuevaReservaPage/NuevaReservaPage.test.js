@@ -64,7 +64,10 @@ describe('NuevaReservaPage', () => {
     // (08:00, 09:00) nunca queden filtrados por el chequeo de "turno ya pasado".
     mockearAhora('2024-06-15T06:30:00');
     getInstalaciones.mockResolvedValue([INSTALACION]);
-    getTurnosDisponibles.mockResolvedValue(['08:00:00', '09:00:00']);
+    getTurnosDisponibles.mockResolvedValue([
+      { hora_inicio: '08:00:00', cupos_disponibles: 10 },
+      { hora_inicio: '09:00:00', cupos_disponibles: 10 },
+    ]);
   });
 
   afterEach(() => {
@@ -169,6 +172,39 @@ describe('NuevaReservaPage', () => {
     expect(screen.getByText('Confirmá tu reserva')).toBeInTheDocument();
   });
 
+  test('muestra el mensaje de error mapeado si no quedan cupos suficientes', async () => {
+    const error = new Error('sin-cupo');
+    error.cuposDisponibles = 1;
+    createReserva.mockRejectedValue(error);
+    await irHastaResumen();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
+
+    expect(await screen.findByText(
+      'Ya no quedan cupos suficientes para ese turno con la cantidad de socios elegida.'
+    )).toBeInTheDocument();
+  });
+
+  test('en "Agregar socios", deshabilita agregar más al llegar al cupo disponible del turno', async () => {
+    getTurnosDisponibles.mockResolvedValue([{ hora_inicio: '08:00:00', cupos_disponibles: 2 }]);
+    getSocioByNroSocio.mockResolvedValue(OTRO_SOCIO);
+    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+
+    await screen.findByText('Cancha de fútbol');
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+    await screen.findByText('08:00');
+    fireEvent.click(screen.getByText('08:00'));
+
+    await screen.findByText('Agregar socios');
+    // Cupo del turno es 2 (titular + 1 socio más): tras agregar uno, el botón se deshabilita.
+    fireEvent.change(screen.getByPlaceholderText('Número de socio'), { target: { value: '2000' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Agregar' }));
+    await screen.findByText('Luis Gómez');
+
+    expect(screen.getByRole('button', { name: 'Agregar' })).toBeDisabled();
+    expect(screen.getByText('Ya alcanzaste el cupo disponible para este turno (2 personas).')).toBeInTheDocument();
+  });
+
   test('si la reserva falla porque hay socios morosos, muestra el listado de socios que no cumplen', async () => {
     const error = new Error('socio-moroso');
     error.sociosIncumplen = ['1000'];
@@ -185,7 +221,12 @@ describe('NuevaReservaPage', () => {
 
   test('si la fecha elegida es hoy, no muestra turnos cuya hora de inicio ya pasó', async () => {
     mockearAhora('2024-06-15T14:00:00');
-    getTurnosDisponibles.mockResolvedValue(['09:00:00', '13:30:00', '14:00:00', '15:00:00']);
+    getTurnosDisponibles.mockResolvedValue([
+      { hora_inicio: '09:00:00', cupos_disponibles: 10 },
+      { hora_inicio: '13:30:00', cupos_disponibles: 10 },
+      { hora_inicio: '14:00:00', cupos_disponibles: 10 },
+      { hora_inicio: '15:00:00', cupos_disponibles: 10 },
+    ]);
 
     render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
     await screen.findByText('Cancha de fútbol');
@@ -199,7 +240,10 @@ describe('NuevaReservaPage', () => {
 
   test('si la fecha elegida es una fecha futura, muestra todos los turnos aunque ya haya pasado ese horario hoy', async () => {
     mockearAhora('2024-06-15T14:00:00');
-    getTurnosDisponibles.mockResolvedValue(['09:00:00', '10:00:00']);
+    getTurnosDisponibles.mockResolvedValue([
+      { hora_inicio: '09:00:00', cupos_disponibles: 10 },
+      { hora_inicio: '10:00:00', cupos_disponibles: 10 },
+    ]);
 
     render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
     await screen.findByText('Cancha de fútbol');

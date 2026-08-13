@@ -9,6 +9,8 @@ import { ResumenReservaStep } from '../../components/nuevaReservaFlow/ResumenRes
 
 const MENSAJES_ERROR_SUBMIT = {
   superposicion: 'Ese turno ya no está disponible. Elegí otro horario.',
+  'sin-cupo': 'Ya no quedan cupos suficientes para ese turno con la cantidad de socios elegida.',
+  'conflicto-temporal': 'La instalación está siendo actualizada por otra reserva. Probá de nuevo en unos segundos.',
   'apto-medico': 'Los siguientes socios no tienen el apto médico al día y deben actualizarlo para poder realizar reservas de tipo deportivas:',
   'socio-moroso': 'Los siguientes socios no estan al día con sus pagos y deben regularizar su estado para poder realizar reservas:',
   'socio-suspendido': 'Ningun socio suspendido puede realizar una reserva.',
@@ -23,7 +25,7 @@ function filtrarTurnosPasados(turnos, fecha) {
   const ahora = new Date();
   const horaActual = ahora.getHours() * 60 + ahora.getMinutes();
   return turnos.filter((turno) => {
-    const [h, m] = turno.split(':').map(Number);
+    const [h, m] = turno.hora_inicio.split(':').map(Number);
     return h * 60 + m >= horaActual;
   });
 }
@@ -41,6 +43,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
   const [cargandoTurnos, setCargandoTurnos] = useState(false);
   const [errorTurnos, setErrorTurnos] = useState('');
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
+  const [cuposDisponiblesTurno, setCuposDisponiblesTurno] = useState(null);
 
   const [sociosAgregados, setSociosAgregados] = useState([]);
 
@@ -96,7 +99,8 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
   }
 
   function irASocios(turno) {
-    setTurnoSeleccionado(turno);
+    setTurnoSeleccionado(turno.hora_inicio);
+    setCuposDisponiblesTurno(turno.cupos_disponibles);
     setStep('socios');
   }
 
@@ -104,6 +108,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
     setInstalacionSeleccionada(null);
     setTurnos([]);
     setTurnoSeleccionado(null);
+    setCuposDisponiblesTurno(null);
     setSociosAgregados([]);
     setSubmitError('');
     setSociosIncumplen([]);
@@ -165,6 +170,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
       <AgregarSociosStep
         socioTitular={socio}
         sociosAgregados={sociosAgregados}
+        cuposDisponibles={cuposDisponiblesTurno}
         onAgregar={(s) => setSociosAgregados((prev) => [...prev, s])}
         onQuitar={(id) => setSociosAgregados((prev) => prev.filter((s) => s.id !== id))}
         onContinuar={() => setStep('resumen')}

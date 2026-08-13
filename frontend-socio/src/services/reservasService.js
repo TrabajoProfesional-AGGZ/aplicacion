@@ -35,7 +35,17 @@ export async function getTurnosDisponibles(idInstalacion, fecha) {
 export async function createReserva(data) {
   const res = await fetchTo('/api/v1/reservas', 'POST', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (res.status === 409) throw new Error('superposicion');
+  if (res.status === 409) {
+    const body = await res.json?.().catch(() => null);
+    const tipo = body?.detail?.tipo;
+    if (tipo === 'sin_cupo') {
+      const error = new Error('sin-cupo');
+      error.cuposDisponibles = body?.detail?.cupos_disponibles ?? null;
+      throw error;
+    }
+    if (tipo === 'conflicto_temporal') throw new Error('conflicto-temporal');
+    throw new Error('superposicion');
+  }
   if (res.status === 403) {
     const body = await res.json().catch(() => null);
     const detail = body?.detail ?? {};
