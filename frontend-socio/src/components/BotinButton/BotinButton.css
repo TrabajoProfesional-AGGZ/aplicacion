@@ -1,0 +1,43 @@
+.botin-fab {
+  position: fixed;
+  right: var(--space-4);
+  bottom: calc(var(--bottom-nav-height) + var(--space-4) + env(safe-area-inset-bottom));
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  border: none;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  z-index: var(--z-sticky);
+  transition: transform var(--transition-fast);
+}
+
+.botin-fab:hover {
+  transform: scale(1.05);
+}
+
+.botin-fab:active {
+  transform: scale(0.96);
+}
+
+.botin-fab img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.botin-wrapper {
+  max-width: 340px;
+}
+
+.botin-card {
+  text-align: center;
+}
+
+.botin-card .csf-header {
+  margin-bottom: 0;
+}
