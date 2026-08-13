@@ -3,6 +3,7 @@ import { auth, messaging } from '../firebase';
 import { getToken } from 'firebase/messaging';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
+import { getSocioPorEmail } from '../services/sociosService';
 import { AuthContext } from './authContextObject';
 
 export function AuthProvider({ children }) {
@@ -111,9 +112,22 @@ export function AuthProvider({ children }) {
     setSocio(null);
   }, []);
 
+  // Vuelve a pedir el perfil del socio al backend. `socio.estado` (usado por WelcomeCard/PerfilPage
+  // para el badge de estado financiero) solo se persiste como efecto secundario de GET /finanzas o
+  // de marcar una cuota pagada — sin este refetch, el badge queda con el valor de cuando se logueó.
+  const refrescarSocio = useCallback(async () => {
+    if (!auth.currentUser) return;
+    try {
+      const data = await getSocioPorEmail(auth.currentUser.email);
+      setSocio((prev) => (prev?.modoOffline ? prev : data));
+    } catch (error) {
+      console.warn('No se pudo refrescar el perfil del socio:', error);
+    }
+  }, []);
+
   const value = useMemo(
-    () => ({ socio, setSocio, cargandoAuth, authError, cerrarSesion }),
-    [socio, cargandoAuth, authError, cerrarSesion]
+    () => ({ socio, setSocio, cargandoAuth, authError, cerrarSesion, refrescarSocio }),
+    [socio, cargandoAuth, authError, cerrarSesion, refrescarSocio]
   );
 
   return (

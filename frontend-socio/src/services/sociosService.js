@@ -23,6 +23,12 @@ export async function subirFotoSocio(idSocio, imagenBase64) {
   return res.json();
 }
 
+export async function getSocioPorEmail(email) {
+  const res = await fetchTo(`/api/v1/socios/por-email/${encodeURIComponent(email)}`, 'GET');
+  if (!res.ok) throw new Error('Error al obtener el perfil del socio');
+  return res.json();
+}
+
 export async function getSocioByNroSocio(nroSocio) {
   const res = await fetchTo(`/api/v1/socios/por-nro-socio/${encodeURIComponent(nroSocio)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
