@@ -111,15 +111,18 @@ export function InstalacionDetalleStep({
           {turnos.map((turno) => (
             <button
               type="button"
-              key={turno}
+              key={turno.hora_inicio}
               className="detalle-turno-row"
               onClick={() => onSeleccionarTurno(turno)}
             >
               <span className="detalle-turno-hora">
                 <Clock size={15} />
-                {turno.slice(0, 5)}
+                {turno.hora_inicio.slice(0, 5)}
               </span>
               <span className="detalle-turno-duracion">· {instalacion.duracion_turno} min</span>
+              <span className="detalle-turno-cupos">
+                {turno.cupos_disponibles}/{instalacion.capacidad_maxima} lugares
+              </span>
               <ChevronRight size={16} className="detalle-turno-chevron" />
             </button>
           ))}

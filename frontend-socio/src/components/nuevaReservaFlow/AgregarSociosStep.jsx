@@ -3,11 +3,16 @@ import { ArrowLeft, Hash, CheckCircle2, AlertCircle, Trash2, UserRound } from 'l
 import { getSocioByNroSocio } from '../../services/sociosService';
 import './AgregarSociosStep.css';
 
-export function AgregarSociosStep({ socioTitular, sociosAgregados, onAgregar, onQuitar, onContinuar, onVolver }) {
+export function AgregarSociosStep({ socioTitular, sociosAgregados, cuposDisponibles, onAgregar, onQuitar, onContinuar, onVolver }) {
   const [nroSocioInput, setNroSocioInput] = useState('');
   const [buscando, setBuscando] = useState(false);
   const [error, setError] = useState('');
   const [socioPreview, setSocioPreview] = useState(null);
+
+  // El titular siempre va incluido en la reserva, así que el tope de socios
+  // "extra" que se pueden sumar es el cupo del turno menos el titular.
+  const maxSociosAgregados = cuposDisponibles != null ? Math.max(cuposDisponibles - 1, 0) : null;
+  const topeAlcanzado = maxSociosAgregados != null && sociosAgregados.length >= maxSociosAgregados;
 
   async function previewSocio(value) {
     if (!value?.trim()) return;
@@ -23,6 +28,10 @@ export function AgregarSociosStep({ socioTitular, sociosAgregados, onAgregar, on
     const nro = nroSocioInput.trim();
     if (!nro) return;
 
+    if (topeAlcanzado) {
+      setError(`Ya alcanzaste el cupo disponible para este turno (${maxSociosAgregados + 1} personas).`);
+      return;
+    }
     if (nro === socioTitular.nro_socio) {
       setError('Ya sos parte de esta reserva como titular.');
       return;
@@ -96,11 +105,18 @@ export function AgregarSociosStep({ socioTitular, sociosAgregados, onAgregar, on
           type="button"
           className="agregar-socios-btn"
           onClick={agregarSocio}
-          disabled={buscando || !nroSocioInput.trim()}
+          disabled={buscando || !nroSocioInput.trim() || topeAlcanzado}
         >
           Agregar
         </button>
       </div>
+
+      {topeAlcanzado && !error && (
+        <p className="agregar-socios-error">
+          <AlertCircle size={13} />
+          {`Ya alcanzaste el cupo disponible para este turno (${maxSociosAgregados + 1} personas).`}
+        </p>
+      )}
 
       {socioPreview && socioPreview.nro_socio === nroSocioInput.trim() && (
         <span className="agregar-socios-preview">
