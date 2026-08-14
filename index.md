@@ -5,7 +5,7 @@ nav_order: 1
 description: "Documentación de la Aplicación PWA y Plataforma Web de SocioUnido"
 ---
 
-# Aplicación PWA (Plataforma Web y Móvil)
+# Aplicación móvil PWA (Para socios)
 
 Aplicación frontend de "SocioUnido", desarrollada como Progressive Web App (PWA) para brindar una experiencia nativa multiplataforma a los socios del club.
 
@@ -13,9 +13,9 @@ Aplicación frontend de "SocioUnido", desarrollada como Progressive Web App (PWA
 
 Esta aplicación es la cara visible del ecosistema y está diseñada para manejar las siguientes responsabilidades clave:
 
-* **Autogestión del socio:** Permite a los usuarios acceder a su carnet digital, revisar su estado financiero, actualizar su perfil y subir la documentación médica o legal necesaria para las actividades[cite: 8].
-* **Operatividad y reservas:** Facilita la inscripción a disciplinas, la compra de entradas para eventos y la reserva de instalaciones en tiempo real, conectándose con los microservicios core[cite: 8].
-* **Comunicación y notificaciones:** Mantiene a los socios informados sobre las últimas noticias del club y recibe notificaciones push instantáneas (alertas, vencimientos, avisos)[cite: 8].
+* **Autogestión del socio:** Permite a los usuarios acceder a su carnet digital, revisar su estado financiero, actualizar su perfil y subir la documentación médica o legal necesaria para las actividades.
+* **Operatividad y reservas:** Facilita la inscripción a disciplinas, la compra de entradas para eventos y la reserva de instalaciones en tiempo real, conectándose con los microservicios core.
+* **Comunicación y notificaciones:** Mantiene a los socios informados sobre las últimas noticias del club y recibe notificaciones push instantáneas (alertas, vencimientos, avisos).
 * **Experiencia Multiplataforma (Marca blanca):** Al ser una PWA, se instala directamente desde el navegador en iOS, Android y escritorio. Su diseño está preparado para adaptarse estéticamente a los colores y escudos de cualquier institución deportiva.
 
 ## ¿Qué vas a encontrar en esta página?
