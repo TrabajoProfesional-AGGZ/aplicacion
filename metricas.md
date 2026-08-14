@@ -31,7 +31,7 @@ A continuación se detalla la participación de cada miembro del equipo basándo
 | :--- | :---: | :---: | :---: |
 | **Zielonka, Axel (`axel-zielonka`)** | 91 | 29.051 | 8.516 |
 | **Ghosn, Lautaro Gabriel (`LGhosn`)** | 24 | 13.202 | 986 |
-| **Ascencio, Felipe Santino (`FelipeAscencio`)** | 13 | 496 | 136 |
+| **Ascencio, Felipe Santino (`FelipeAscencio`)** | 17 | 630 | 186 |
 | **Guerrero, Martín (`marttinguerrero`)** | 8 | 680 | 135 |
 
 *(Nota: Cualquier diferencia entre el total de commits del repositorio y la suma de los aportes individuales corresponde a operaciones de mantenimiento automatizado realizadas por herramientas como `dependabot`).*
