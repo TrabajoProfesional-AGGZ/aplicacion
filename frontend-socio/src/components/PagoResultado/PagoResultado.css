@@ -1,0 +1,127 @@
+.pago-resultado-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6) 0;
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.pago-resultado-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--radius-xl);
+  padding: var(--space-10) var(--space-6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 32px -16px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.pago-resultado-card--approved {
+  background: 
+    radial-gradient(130% 150% at 50% 0%, rgba(13, 110, 13, 0.4) 0%, transparent 55%),
+    linear-gradient(155deg, #16341c 0%, #101c12 45%, #0a0a0a 100%);
+}
+
+.pago-resultado-card--rejected {
+  background: 
+    radial-gradient(130% 150% at 50% 0%, rgba(160, 20, 20, 0.45) 0%, transparent 55%),
+    linear-gradient(155deg, #3a1512 0%, #200e0d 45%, #0a0a0a 100%);
+}
+
+.pago-resultado-card--pending {
+  background: 
+    radial-gradient(130% 150% at 50% 0%, rgba(154, 98, 0, 0.4) 0%, transparent 55%),
+    linear-gradient(155deg, #362a12 0%, #1c160b 45%, #0a0a0a 100%);
+}
+
+.pago-resultado-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.pago-resultado-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.pago-resultado-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-2);
+}
+
+.pago-resultado-card--approved .pago-resultado-icon {
+  background-color: var(--status-success-bg);
+  color: var(--status-success-border);
+}
+
+.pago-resultado-card--rejected .pago-resultado-icon {
+  background-color: var(--status-danger-bg);
+  color: var(--status-danger-border);
+}
+
+.pago-resultado-card--pending .pago-resultado-icon {
+  background-color: var(--status-warning-bg);
+  color: var(--status-warning-border);
+}
+
+.pago-resultado-title {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-surface);
+  letter-spacing: -0.02em;
+}
+
+.pago-resultado-desc {
+  margin: 0;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
+.pago-resultado-btn {
+  position: relative;
+  z-index: 1;
+  margin-top: var(--space-6);
+  background-color: var(--color-surface);
+  color: var(--color-text-strong);
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.pago-resultado-btn:hover {
+  opacity: 0.9;
+}
+
+.pago-resultado-btn:active {
+  transform: scale(0.96);
+}
