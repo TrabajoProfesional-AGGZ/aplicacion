@@ -32,7 +32,8 @@ export function HomePage({ socio, cerrarSesion }) {
   const [noticiaSeleccionadaId, setNoticiaSeleccionadaId] = useState(null);
   const searchParams = new URLSearchParams(window.location.search);
   const statusMP = searchParams.get('status');
-  const [vista, setVista] = useState(statusMP ? 'pago-resultado' : 'inicio');
+  const externalReferenceMP = searchParams.get('external_reference');
+  const [vista, setVista] = useState(statusMP && externalReferenceMP ? 'pago-resultado' : 'inicio');
   const [estadoPagoMP, setEstadoPagoMP] = useState(statusMP);
 
   useBackToRoot(vista, 'inicio', () => setVista('inicio'));
