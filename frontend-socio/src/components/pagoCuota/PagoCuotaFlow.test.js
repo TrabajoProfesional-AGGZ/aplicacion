@@ -1,76 +1,61 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { PagoCuotaFlow } from './PagoCuotaFlow';
-import { procesarPago } from '../../services/pagosService';
+import { crearPreferenciaPago } from '../../services/pagosService';
 
+// 1. Mock el servicio para que no haga llamadas reales
+jest.mock('../../services/pagosService', () => ({
+  crearPreferenciaPago: jest.fn(),
+}));
+
+// 2. Mock el SDK de Mercado Pago
 jest.mock('@mercadopago/sdk-react', () => ({
   initMercadoPago: jest.fn(),
-  Payment: ({ onSubmit }) => (
-    <button onClick={() => onSubmit({ formData: { token: 'tok' } }).catch(() => {})}>Simular pago</button>
-  ),
-  StatusScreen: ({ initialization }) => <div>status-screen {initialization.paymentId}</div>,
+  Wallet: () => <div data-testid="wallet-brick">Botón de Checkout Pro</div>
 }));
-jest.mock('../../services/pagosService', () => ({ procesarPago: jest.fn() }));
 
-const cuotaFixture = { id: 'cuota-1', concepto: 'Cuota Social - 07/2026', monto: '1500.00' };
-const socioFixture = { id: 'socio-1', email: 'socio@test.com' };
+const mockItem = { id: 'item-1', monto: 15000, concepto: 'Cuota Social - 07/2026' };
+const mockSocio = { id: 'socio-1', nombre: 'Ana', apellido: 'Pérez' };
 
 describe('PagoCuotaFlow', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('muestra el concepto y el monto de la cuota', () => {
-    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
+  test('muestra el concepto y carga el botón de Mercado Pago cuando obtiene la preferencia', async () => {
+    crearPreferenciaPago.mockResolvedValue({ id_preferencia: 'pref-123' });
+    
+    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={jest.fn()} />);
 
-    expect(screen.getByText('Cuota Social - 07/2026')).toBeInTheDocument();
-    expect(screen.getByText('$ 1.500,00')).toBeInTheDocument();
+    expect(screen.getByText(/Cuota Social - 07\/2026/i)).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(crearPreferenciaPago).toHaveBeenCalledWith(mockItem, 'cuota');
+    });
+
+    expect(await screen.findByTestId('wallet-brick')).toBeInTheDocument();
   });
 
-  test('pago aprobado avanza a la pantalla de resultado con el id_pago', async () => {
-    procesarPago.mockResolvedValue({ id_pago: 42, estado: 'approved' });
+  test('muestra un mensaje de error si falla la creación de la preferencia', async () => {
+    crearPreferenciaPago.mockRejectedValue(new Error('error-al-crear-preferencia'));
+    
+    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={jest.fn()} />);
 
-    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
-    fireEvent.click(screen.getByText('Simular pago'));
+    await waitFor(() => {
+      expect(crearPreferenciaPago).toHaveBeenCalled();
+    });
 
-    expect(await screen.findByText('status-screen 42')).toBeInTheDocument();
+    expect(screen.queryByTestId('wallet-brick')).not.toBeInTheDocument();
   });
 
-  test('pago in_process avanza a la pantalla de resultado', async () => {
-    procesarPago.mockResolvedValue({ id_pago: 43, estado: 'in_process' });
+  test('el botón volver llama a la función onVolver', async () => {
+    crearPreferenciaPago.mockReturnValue(new Promise(() => {}));
+    
+    const onVolverMock = jest.fn();
+    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={onVolverMock} />);
 
-    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
-    fireEvent.click(screen.getByText('Simular pago'));
+    const btnVolver = screen.getByRole('button', { name: /volver/i });
+    fireEvent.click(btnVolver);
 
-    expect(await screen.findByText('status-screen 43')).toBeInTheDocument();
-  });
-
-  test('pago rechazado muestra una alerta y se queda en el paso de pago', async () => {
-    procesarPago.mockResolvedValue({ id_pago: 44, estado: 'rejected' });
-
-    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
-    fireEvent.click(screen.getByText('Simular pago'));
-
-    expect(await screen.findByRole('alert')).toBeInTheDocument();
-    expect(screen.getByText('Simular pago')).toBeInTheDocument();
-    expect(screen.queryByText(/status-screen/)).not.toBeInTheDocument();
-  });
-
-  test('fallo de red muestra una alerta de procesamiento sin StatusScreen', async () => {
-    procesarPago.mockRejectedValue(new Error('pago-fallido'));
-
-    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={jest.fn()} />);
-    fireEvent.click(screen.getByText('Simular pago'));
-
-    expect(await screen.findByRole('alert')).toBeInTheDocument();
-    expect(screen.queryByText(/status-screen/)).not.toBeInTheDocument();
-  });
-
-  test('el botón volver llama a onVolver', () => {
-    const onVolver = jest.fn();
-    render(<PagoCuotaFlow item={cuotaFixture} tipoItem="cuota" socio={socioFixture} onVolver={onVolver} />);
-
-    fireEvent.click(screen.getByLabelText('Volver'));
-
-    expect(onVolver).toHaveBeenCalled();
+    expect(onVolverMock).toHaveBeenCalledTimes(1);
   });
 });

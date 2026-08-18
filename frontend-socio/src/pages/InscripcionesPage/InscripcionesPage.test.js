@@ -1,9 +1,10 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { InscripcionesPage } from './InscripcionesPage';
-import { getDisciplinasPorSocio } from '../../services/disciplinasService';
+import { getDisciplinasPorSocio, darDeBajaInscripcion } from '../../services/disciplinasService';
 
 jest.mock('../../services/disciplinasService', () => ({
   getDisciplinasPorSocio: jest.fn(),
+  darDeBajaInscripcion: jest.fn(),
 }));
 
 const socioFixture = { id: 'socio-1' };
@@ -118,5 +119,70 @@ describe('InscripcionesPage', () => {
     await screen.findByText('Básquet');
 
     expect(screen.getByText('En espera', { selector: '.inscripcion-tag--en-espera' })).toBeInTheDocument();
+  });
+
+  test('al clickear una card se abre el detalle con el botón "Dar de Baja"', async () => {
+    getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA]);
+    render(<InscripcionesPage socio={socioFixture} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    expect(screen.getByRole('button', { name: 'Dar de Baja' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument();
+  });
+
+  test('una inscripción en lista de espera no muestra el botón "Dar de Baja" en el detalle', async () => {
+    getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_EN_ESPERA]);
+    render(<InscripcionesPage socio={socioFixture} />);
+    fireEvent.click(await screen.findByText('Básquet'));
+
+    expect(screen.queryByRole('button', { name: 'Dar de Baja' })).not.toBeInTheDocument();
+  });
+
+  test('"Volver" desde el detalle vuelve a la lista', async () => {
+    getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA]);
+    render(<InscripcionesPage socio={socioFixture} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+
+    expect(await screen.findByRole('heading', { name: 'Mis inscripciones' })).toBeInTheDocument();
+  });
+
+  test('"Dar de Baja" pide confirmación advirtiendo que no hay reintegro', async () => {
+    getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA]);
+    render(<InscripcionesPage socio={socioFixture} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dar de Baja' }));
+
+    expect(screen.getByText(/no se realizará el reintegro de la cuota paga de este mes/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sí, dar de baja/i })).toBeInTheDocument();
+  });
+
+  test('confirmar la baja llama al service y saca la inscripción de la lista', async () => {
+    getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA]);
+    darDeBajaInscripcion.mockResolvedValue({ estado_suscripcion: 'inactiva' });
+    render(<InscripcionesPage socio={socioFixture} />);
+    fireEvent.click(await screen.findByText('Natación'));
+    fireEvent.click(screen.getByRole('button', { name: 'Dar de Baja' }));
+
+    fireEvent.click(screen.getByRole('button', { name: /sí, dar de baja/i }));
+
+    await waitFor(() => expect(darDeBajaInscripcion).toHaveBeenCalledWith('disc-1', 'socio-1'));
+    expect(await screen.findByRole('heading', { name: 'Mis inscripciones' })).toBeInTheDocument();
+    expect(screen.queryByText('Natación')).not.toBeInTheDocument();
+  });
+
+  test('si la baja falla, muestra un error y no cierra el detalle', async () => {
+    getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA]);
+    darDeBajaInscripcion.mockRejectedValue(new Error('servicio-no-disponible'));
+    render(<InscripcionesPage socio={socioFixture} />);
+    fireEvent.click(await screen.findByText('Natación'));
+    fireEvent.click(screen.getByRole('button', { name: 'Dar de Baja' }));
+
+    fireEvent.click(screen.getByRole('button', { name: /sí, dar de baja/i }));
+
+    expect(await screen.findByText('No se pudo dar de baja la inscripción. Intentá de nuevo.')).toBeInTheDocument();
+    expect(screen.getByText('Natación')).toBeInTheDocument();
   });
 });

@@ -65,3 +65,14 @@ export async function sumarseAListaEspera(idDisciplina, idSocio) {
   );
   return manejarRespuestaInscripcion(res);
 }
+
+export async function darDeBajaInscripcion(idDisciplina, idSocio) {
+  const res = await fetchTo(
+    `/api/v1/disciplinas/${encodeURIComponent(idDisciplina)}/socios/${encodeURIComponent(idSocio)}`,
+    'DELETE'
+  );
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (res.status === 404) throw new Error('no-encontrado');
+  if (!res.ok) throw new Error('Error al dar de baja la inscripción');
+  return res.json();
+}

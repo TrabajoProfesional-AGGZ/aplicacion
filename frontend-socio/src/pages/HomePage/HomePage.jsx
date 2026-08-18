@@ -24,15 +24,20 @@ import './HomePage.css';
 import { Carnet } from '../../components/Carnet/Carnet';
 import { AnimatePresence } from 'framer-motion';
 import { enrolarYGuardarSecreto } from '../../services/accesosService';
+import { PagoResultado } from '../../components/PagoResultado/PagoResultado'; 
 
 export function HomePage({ socio, cerrarSesion }) {
   const [proximamente, setProximamente] = useState(null);
-  const [vista, setVista] = useState('inicio');
   const [itemAPagarId, setItemAPagarId] = useState(null);
   const [noticiaSeleccionadaId, setNoticiaSeleccionadaId] = useState(null);
-  
+  const searchParams = new URLSearchParams(window.location.search);
+  const statusMP = searchParams.get('status');
+  const externalReferenceMP = searchParams.get('external_reference');
+  const [vista, setVista] = useState(statusMP && externalReferenceMP ? 'pago-resultado' : 'inicio');
+  const [estadoPagoMP, setEstadoPagoMP] = useState(statusMP);
+
   useBackToRoot(vista, 'inicio', () => setVista('inicio'));
-  
+
   useEffect(() => {
     const enrolarDispositivo = async () => {
       const secretoGuardado = localStorage.getItem('socio_totp_secret');
@@ -58,7 +63,13 @@ export function HomePage({ socio, cerrarSesion }) {
       enrolarDispositivo();
     }
   }, [socio]);
-  
+
+  const manejarVolverDePago = () => {
+    window.history.replaceState({}, document.title, window.location.pathname);
+    setEstadoPagoMP(null);
+    setVista('inicio');
+  };
+
   if (socio.modoOffline) {
     console.warn("Estás sin conexión. Mostrando el pase de acceso offline.");
     return (
@@ -80,6 +91,12 @@ export function HomePage({ socio, cerrarSesion }) {
       />
 
       <main className="home-page">
+        {vista === 'pago-resultado' && (
+          <PagoResultado 
+            status={estadoPagoMP} 
+            onVolver={manejarVolverDePago} 
+          />
+        )}
         {vista === 'perfil' && <PerfilPage socio={socio} cerrarSesion={cerrarSesion} />}
         {vista === 'pagos' && (
           <FinanzasPage

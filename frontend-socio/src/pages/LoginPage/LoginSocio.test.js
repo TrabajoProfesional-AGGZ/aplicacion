@@ -76,7 +76,7 @@ describe('LoginSocio', () => {
     }
   });
 
-  test('muestra un error distinto cuando falla por otro motivo (no de credenciales)', async () => {
+  test('muestra "Servicio no disponible" cuando falla por otro motivo (no de credenciales)', async () => {
     authService.login.mockRejectedValueOnce({ code: 'auth/network-request-failed', message: 'Error de red' });
     render(<LoginSocio irARegistro={() => {}} />);
 
@@ -85,7 +85,7 @@ describe('LoginSocio', () => {
     fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('Error de red')).toBeInTheDocument();
+      expect(screen.getByText('Servicio no disponible')).toBeInTheDocument();
     });
     expect(screen.queryByText('Credenciales incorrectas')).not.toBeInTheDocument();
   });
@@ -111,12 +111,12 @@ describe('LoginSocio', () => {
     // AuthContext detectó que no pudo traer el perfil del socio (ej. GET .../por-email devolvió 500)
     mockAuthState = {
       ...mockAuthState,
-      authError: 'No pudimos cargar tu perfil de socio. Probá de nuevo en unos segundos.',
+      authError: 'Servicio no disponible',
     };
     rerender(<LoginSocio irARegistro={() => {}} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/no pudimos cargar tu perfil de socio/i)).toBeInTheDocument();
+      expect(screen.getByText('Servicio no disponible')).toBeInTheDocument();
     });
     expect(mockAuthState.cerrarSesion).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: /^ingresar$/i })).not.toBeDisabled();

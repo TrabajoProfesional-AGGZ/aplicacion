@@ -50,15 +50,19 @@
 .welcome-card-estado {
   margin: 0;
   flex-shrink: 0;
-  font-size: 0.68rem;
-  font-weight: 600;
+  font-size: 0.7rem;
+  font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  --estado-rgb: 255 255 255;
+  color: rgb(var(--estado-rgb) / 1);
+  background-color: rgb(var(--estado-rgb) / 0.16);
+  border: 1px solid rgb(var(--estado-rgb) / 0.55);
   border-radius: var(--radius-full);
   padding: 0.3em 0.75em;
   white-space: nowrap;
+  text-shadow: 0 0 10px rgb(var(--estado-rgb) / 0.7);
+  box-shadow: 0 0 12px 1px rgb(var(--estado-rgb) / 0.35);
 }
 
 .welcome-card-saludo {

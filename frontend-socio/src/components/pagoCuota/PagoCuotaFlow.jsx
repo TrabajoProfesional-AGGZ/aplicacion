@@ -1,80 +1,80 @@
-import { useState } from 'react';
-import { Payment, StatusScreen } from '@mercadopago/sdk-react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { Wallet } from '@mercadopago/sdk-react';
 import { inicializarMercadoPago } from '../../utils/mercadopago';
-import { procesarPago } from '../../services/pagosService';
+import { crearPreferenciaPago } from '../../services/pagosService';
 import './PagoCuotaFlow.css';
 
-inicializarMercadoPago();
-
-const MENSAJES_ERROR = {
-  rechazado: 'El pago fue rechazado. Podés intentar con otro medio de pago.',
-  procesamiento: 'Hubo un problema al procesar el pago. Probá de nuevo.',
-  brick: 'No pudimos cargar el formulario de pago. Probá de nuevo.',
-};
-
-function formatearMonto(monto) {
+function formatearPrecio(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
 export function PagoCuotaFlow({ item, tipoItem, socio, onVolver }) {
-  const [paso, setPaso] = useState('pago');
-  const [idPago, setIdPago] = useState(null);
-  const [errorPago, setErrorPago] = useState(null);
+  const [preferenceId, setPreferenceId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const onSubmitPago = async ({ formData }) => {
-    setErrorPago(null);
-    try {
-      const data = await procesarPago(formData, item.id, tipoItem);
-      if (data.estado === 'approved' || data.estado === 'in_process') {
-        setIdPago(String(data.id_pago));
-        setPaso('resultado');
-        return;
-      }
-      console.error('Pago rechazado por MercadoPago:', data.estado, data.estado_detalle);
-      setErrorPago('rechazado');
-    } catch (err) {
-      console.error('Error al procesar el pago:', err);
-      setErrorPago('procesamiento');
-    }
-    throw new Error('No se pudo procesar el pago.');
-  };
+  useEffect(() => {
+    inicializarMercadoPago();
+
+    let cancelled = false;
+    setLoading(true);
+    setError('');
+
+    crearPreferenciaPago(item, tipoItem)
+      .then((data) => {
+        if (!cancelled) {
+          setPreferenceId(data.id_preferencia);
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setError('No pudimos conectar con Mercado Pago. Intentá de nuevo más tarde.');
+        console.error("Error al crear preferencia:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [item, tipoItem]);
 
   return (
-    <div className="pago-flow">
-      {paso === 'pago' && (
-        <>
-          <button type="button" className="pago-volver-btn" onClick={onVolver} aria-label="Volver">
-            <ArrowLeft size={18} />
-            Volver
-          </button>
+    <div className="pago-flow-container">
+      <div className="pago-flow-header">
+        <button 
+          type="button" 
+          className="pago-flow-volver-btn"
+          onClick={onVolver}
+          aria-label="Volver atrás"
+        >
+          <ArrowLeft size={20} /> Volver
+        </button>
+      </div>
 
-          <div className="pago-resumen-card">
-            <span>{item.concepto}</span>
-            <span className="pago-resumen-monto">{formatearMonto(item.monto)}</span>
-          </div>
+      <div className="pago-flow-resumen">
+        <h2 className="pago-flow-titulo">Abonar {item.concepto}</h2>
+        <p className="pago-flow-monto">
+          Total a pagar: <span>{formatearPrecio(item.monto)}</span>
+        </p>
+      </div>
 
-          {errorPago && (
-            <p className="pago-error" role="alert">{MENSAJES_ERROR[errorPago]}</p>
-          )}
+      <div className="pago-flow-wallet-wrapper">
+        {loading && <p className="pago-flow-loading">Cargando pasarela de pago segura...</p>}
+        {error && <p className="pago-flow-error">{error}</p>}
 
-          <Payment
-            initialization={{ amount: Number(item.monto), payer: { email: socio.email } }}
-            customization={{ paymentMethods: { creditCard: 'all', debitCard: 'all' } }}
-            onSubmit={onSubmitPago}
-            onError={() => setErrorPago('brick')}
+        {preferenceId && (
+          <Wallet 
+            initialization={{ 
+              preferenceId: preferenceId,
+              // 'self' redirige en la misma pestaña. Para móviles es más nativo.
+              redirectMode: 'self' 
+            }} 
+            customization={{ 
+              texts: { valueProp: 'smart_option' } // "Paga con Mercado Pago"
+            }} 
           />
-        </>
-      )}
-
-      {paso === 'resultado' && (
-        <>
-          <StatusScreen initialization={{ paymentId: idPago }} onError={console.error} />
-          <button type="button" className="pago-finalizar-btn" onClick={onVolver}>
-            Volver a mis cuotas
-          </button>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 }
