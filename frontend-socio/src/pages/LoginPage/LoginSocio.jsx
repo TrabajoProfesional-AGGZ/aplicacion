@@ -30,7 +30,7 @@ function resolverMensajeErrorLogin(err) {
   if (CODIGOS_CREDENCIALES_INVALIDAS.includes(err.code)) {
     return 'Credenciales incorrectas';
   }
-  return err.message || 'Ocurrió un error al iniciar sesión.';
+  return 'Servicio no disponible';
 }
 
 function calcularExitAnimation(shouldReduceMotion, exiting) {

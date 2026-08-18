@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
             setAuthError(null);
           } else {
             setSocio(null);
-            setAuthError('No pudimos cargar tu perfil de socio. Probá de nuevo en unos segundos.');
+            setAuthError('Servicio no disponible');
           }
         } catch (error) {
           console.warn("Fallo la conexión con el backend:", error);
@@ -65,7 +65,7 @@ export function AuthProvider({ children }) {
             setAuthError(null);
           } else {
             setSocio(null);
-            setAuthError('No pudimos cargar tu perfil de socio. Probá de nuevo en unos segundos.');
+            setAuthError('Servicio no disponible');
           }
         }
       } else {

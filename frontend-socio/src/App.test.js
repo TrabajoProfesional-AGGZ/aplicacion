@@ -37,6 +37,7 @@ jest.mock('./pages/HomePage/HomePage', () => ({
 describe('App', () => {
   beforeEach(() => {
     mockAuthState = { socio: null, cargandoAuth: false, cerrarSesion: jest.fn() };
+    sessionStorage.clear();
   });
 
   test('muestra LoginSocio mientras no hay sesión, aunque el backend ya haya devuelto socio', () => {
@@ -70,5 +71,20 @@ describe('App', () => {
     fireEvent.click(screen.getByText('simular registro exitoso'));
     expect(screen.getByText('home-mock')).toBeInTheDocument();
     expect(screen.queryByText('login-mock')).not.toBeInTheDocument();
+  });
+
+  test('si la animación de login ya se mostró antes en esta pestaña y hay sesión activa, salta directo al dashboard sin montar LoginSocio', () => {
+    sessionStorage.setItem('su_intro_mostrada', '1');
+    mockAuthState = { ...mockAuthState, socio: { nro_socio: '1000', nombre: 'Ana', apellido: 'Pérez' } };
+    render(<App />);
+    expect(screen.getByText('home-mock')).toBeInTheDocument();
+    expect(screen.queryByText('login-mock')).not.toBeInTheDocument();
+  });
+
+  test('si es la primera vez que se resuelve la sesión en esta pestaña, LoginSocio se monta igual aunque ya haya socio (animación de entrada a la app)', () => {
+    mockAuthState = { ...mockAuthState, socio: { nro_socio: '1000', nombre: 'Ana', apellido: 'Pérez' } };
+    render(<App />);
+    expect(screen.getByText('login-mock')).toBeInTheDocument();
+    expect(sessionStorage.getItem('su_intro_mostrada')).toBe('1');
   });
 });
