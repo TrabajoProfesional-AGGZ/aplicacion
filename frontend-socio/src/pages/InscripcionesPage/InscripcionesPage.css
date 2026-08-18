@@ -170,6 +170,11 @@
   border-radius: var(--radius-md);
   margin-bottom: var(--space-3);
   box-shadow: var(--shadow-sm);
+  width: 100%;
+  border: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .inscripcion-info {
@@ -224,4 +229,199 @@
 
 .inscripciones-error {
   color: var(--status-danger-border);
+}
+
+.inscripciones-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: var(--space-4);
+}
+
+.inscripcion-detalle-banner {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  margin-bottom: var(--space-5);
+  background:
+    radial-gradient(120% 140% at 12% -10%, #3a3a3a 0%, transparent 55%),
+    linear-gradient(155deg, #1c1c1c 0%, #111111 42%, #0a0a0a 100%);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.inscripcion-detalle-banner-texture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.inscripcion-detalle-banner-badge {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: fit-content;
+  margin: 0 0 var(--space-4) auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+}
+
+.inscripcion-detalle-banner-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.inscripcion-detalle-banner-title {
+  margin: 0 0 var(--space-5);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--color-surface);
+  text-wrap: balance;
+}
+
+.inscripcion-detalle-banner-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  row-gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.inscripcion-detalle-banner-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+}
+
+.inscripcion-detalle-banner-stat-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.inscripcion-detalle-banner-stat-valor {
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-surface);
+}
+
+.inscripcion-detalle-banner-divider {
+  align-self: stretch;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 480px) {
+  .inscripcion-detalle-banner-title {
+    font-size: 1.35rem;
+  }
+
+  .inscripcion-detalle-banner-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: var(--space-4);
+    column-gap: var(--space-5);
+  }
+
+  .inscripcion-detalle-banner-divider {
+    display: none;
+  }
+}
+
+.inscripcion-baja-btn {
+  display: block;
+  width: 100%;
+  border: none;
+  background-color: #7a1010;
+  color: var(--color-surface);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: var(--space-4);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.inscripcion-baja-btn:hover {
+  background-color: #611010;
+}
+
+.inscripcion-baja-btn:active {
+  transform: scale(0.98);
+}
+
+.inscripcion-confirmar-card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+}
+
+.inscripcion-confirmar-aviso {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.inscripcion-confirmar-acciones {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.inscripcion-confirmar-btn-no,
+.inscripcion-confirmar-btn-si {
+  flex: 1;
+  border: none;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: var(--space-3);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.inscripcion-confirmar-btn-no {
+  background-color: var(--color-surface-secondary, #f0f0f0);
+  color: var(--color-text-primary);
+}
+
+.inscripcion-confirmar-btn-si {
+  background-color: var(--status-danger-border);
+  color: var(--color-on-accent);
+}
+
+.inscripcion-confirmar-btn-no:disabled,
+.inscripcion-confirmar-btn-si:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

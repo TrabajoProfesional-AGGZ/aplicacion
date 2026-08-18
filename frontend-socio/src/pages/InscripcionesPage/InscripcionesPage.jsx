@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ClipboardList, MapPin, Plus, Tag } from 'lucide-react';
-import { getDisciplinasPorSocio } from '../../services/disciplinasService';
+import { ArrowLeft, ClipboardList, MapPin, Plus, Tag } from 'lucide-react';
+import { getDisciplinasPorSocio, darDeBajaInscripcion } from '../../services/disciplinasService';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { ModalOverlay } from '../../components/createForm/ModalOverlay';
+import { useBackToRoot } from '../../hooks/useBackToRoot';
 import './InscripcionesPage.css';
 
 const FILTROS = [
@@ -20,6 +22,12 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [filtro, setFiltro] = useState('Todas');
+  const [detalle, setDetalle] = useState(null);
+  const [confirmarBaja, setConfirmarBaja] = useState(false);
+  const [dandoBaja, setDandoBaja] = useState(false);
+  const [errorBaja, setErrorBaja] = useState('');
+
+  useBackToRoot(detalle, null, () => setDetalle(null));
 
   useEffect(() => {
     let cancelled = false;
@@ -42,6 +50,106 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
     if (filtro === 'En espera') return i.estado_suscripcion === 'en_espera';
     return true;
   });
+
+  function abrirDetalle(inscripcion) {
+    setErrorBaja('');
+    setDetalle(inscripcion);
+  }
+
+  async function confirmarBajaInscripcion() {
+    setDandoBaja(true);
+    setErrorBaja('');
+    try {
+      await darDeBajaInscripcion(detalle.id, socio.id);
+      setInscripciones((prev) => prev.filter((i) => i.id !== detalle.id));
+      setConfirmarBaja(false);
+      setDetalle(null);
+    } catch {
+      setErrorBaja('No se pudo dar de baja la inscripción. Intentá de nuevo.');
+    } finally {
+      setDandoBaja(false);
+    }
+  }
+
+  if (detalle) {
+    return (
+      <div className="inscripciones-lista">
+        <button type="button" className="inscripciones-volver" onClick={() => setDetalle(null)}>
+          <ArrowLeft size={20} /> Volver
+        </button>
+
+        <section className="inscripcion-detalle-banner">
+          <div className="inscripcion-detalle-banner-texture" aria-hidden="true" />
+          {detalle.estado_suscripcion === 'en_espera' && (
+            <span className="inscripcion-detalle-banner-badge">En espera</span>
+          )}
+          <div className="inscripcion-detalle-banner-content">
+            <h2 className="inscripcion-detalle-banner-title">{detalle.nombre}</h2>
+            <div className="inscripcion-detalle-banner-stats">
+              <div className="inscripcion-detalle-banner-stat">
+                <span className="inscripcion-detalle-banner-stat-label">Categoría</span>
+                <span className="inscripcion-detalle-banner-stat-valor">
+                  {detalle.categoria_socio?.nombre ?? 'Todas'}
+                </span>
+              </div>
+              <div className="inscripcion-detalle-banner-divider" aria-hidden="true" />
+              <div className="inscripcion-detalle-banner-stat">
+                <span className="inscripcion-detalle-banner-stat-label">Sede</span>
+                <span className="inscripcion-detalle-banner-stat-valor">{detalle.sede.nombre}</span>
+              </div>
+              <div className="inscripcion-detalle-banner-divider" aria-hidden="true" />
+              <div className="inscripcion-detalle-banner-stat">
+                <span className="inscripcion-detalle-banner-stat-label">Arancel por mes</span>
+                <span className="inscripcion-detalle-banner-stat-valor">
+                  {detalle.arancelada ? formatearMonto(detalle.monto_mensual) : 'Sin costo'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {detalle.estado_suscripcion !== 'en_espera' && (
+          <button
+            type="button"
+            className="inscripcion-baja-btn"
+            onClick={() => { setErrorBaja(''); setConfirmarBaja(true); }}
+          >
+            Dar de Baja
+          </button>
+        )}
+
+        {confirmarBaja && (
+          <ModalOverlay onClose={() => setConfirmarBaja(false)}>
+            <div className="inscripcion-confirmar-card">
+              <p>¿Seguro que querés darte de baja de {detalle.nombre}?</p>
+              <p className="inscripcion-confirmar-aviso">
+                No se realizará el reintegro de la cuota paga de este mes.
+              </p>
+              {errorBaja && <p className="inscripciones-error">{errorBaja}</p>}
+              <div className="inscripcion-confirmar-acciones">
+                <button
+                  type="button"
+                  className="inscripcion-confirmar-btn-no"
+                  onClick={() => setConfirmarBaja(false)}
+                  disabled={dandoBaja}
+                >
+                  Volver
+                </button>
+                <button
+                  type="button"
+                  className="inscripcion-confirmar-btn-si"
+                  onClick={confirmarBajaInscripcion}
+                  disabled={dandoBaja}
+                >
+                  {dandoBaja ? 'Dando de baja...' : 'Sí, dar de baja'}
+                </button>
+              </div>
+            </div>
+          </ModalOverlay>
+        )}
+      </div>
+    );
+  }
 
   return (
     <>
@@ -100,7 +208,7 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
           )}
 
           {inscripcionesVisibles.map((i) => (
-            <div className="inscripcion-card" key={i.id}>
+            <button type="button" className="inscripcion-card" key={i.id} onClick={() => abrirDetalle(i)}>
               <div className="inscripcion-info">
                 <span className="inscripcion-nombre">{i.nombre}</span>
                 <span className="inscripcion-meta">
@@ -120,7 +228,7 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
                   {i.arancelada ? formatearMonto(i.monto_mensual) : 'Sin costo'}
                 </span>
               </div>
-            </div>
+            </button>
           ))}
         </section>
       )}

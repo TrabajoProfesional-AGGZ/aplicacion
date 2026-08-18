@@ -1,11 +1,17 @@
 import { PartyPopper } from 'lucide-react';
 import './WelcomeCard.css';
 
-const ESTADO_COLOR = {
-  Activo: 'var(--status-success-border)',
-  Moroso: 'var(--status-danger-border)',
-  Inactivo: 'var(--status-warning-border)',
-  Suspendido: 'var(--status-suspended-border)',
+// RGB (no hex) para poder variar la opacidad del texto/borde/glow del pill
+// de estado con una sola fuente por color (rgb(var(--estado-rgb) / alpha)).
+// Son los mismos tonos que --status-*-bg en tokens.css (pasteles, claros)
+// en vez de los --status-*-border (oscuros, pensados para texto sobre fondo
+// claro) — sobre el gradiente casi negro de esta card los oscuros casi no
+// se leían.
+const ESTADO_RGB = {
+  Activo: '167 218 167',
+  Moroso: '244 190 190',
+  Inactivo: '245 233 178',
+  Suspendido: '255 189 152',
 };
 
 function esCumpleaniosHoy(fechaNacimiento) {
@@ -31,7 +37,7 @@ export function WelcomeCard({ socio }) {
       <div className="welcome-card-texture" aria-hidden="true" />
       <div className="welcome-card-top">
         <p className="welcome-card-fecha">{fechaFormateada}</p>
-        <p className="welcome-card-estado" style={{ color: ESTADO_COLOR[socio.estado?.nombre] }}>
+        <p className="welcome-card-estado" style={{ '--estado-rgb': ESTADO_RGB[socio.estado?.nombre] }}>
           Estado: {socio.estado?.nombre}
         </p>
       </div>
