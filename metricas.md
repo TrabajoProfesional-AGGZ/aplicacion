@@ -10,7 +10,7 @@ Este espacio está destinado a medir el trabajo, la participación y el progreso
 
 ## Resumen del repositorio
 
-* **Actividad de commits:** ![Commits](https://img.shields.io/badge/Commits_Totales-159-blue)
+* **Actividad de commits:** ![Commits](https://img.shields.io/badge/Commits_Totales-160-blue)
 * **Pull Requests cerrados:** ![PRs](https://img.shields.io/badge/PRs_Cerrados-46-purple)
 * **Issues resueltos:** ![Issues](https://img.shields.io/badge/Issues_Resueltos-36-green)
 
@@ -20,7 +20,7 @@ Basado en el análisis automático del repositorio, la distribución tecnológic
 
 * 🟡 **JavaScript:** 78.3%
 * 🟣 **CSS:** 20.6%
-* 🔵 **Python:** 1.0%
+* 🔵 **Python:** 1.1%
 * 🟠 **HTML:** 0.1%
 * 🔴 **Ruby:** 0.0%
 
@@ -32,7 +32,7 @@ A continuación se detalla la participación de cada miembro del equipo basándo
 | :--- | :---: | :---: | :---: |
 | **Zielonka, Axel** (`axel-zielonka`) | 95 | 29.054 | 8.067 |
 | **Ghosn, Lautaro Gabriel** (`LGhosn`) | 34 | 19.481 | 7.025 |
-| **Ascencio, Felipe Santino** (`FelipeAscencio`) | 22 | 879 | 223 |
+| **Ascencio, Felipe Santino** (`FelipeAscencio`) | 23 | 879 | 223 |
 | **Guerrero, Martín** (`marttinguerrero`) | 8 | 680 | 135 |
 
 *(Nota: Cualquier diferencia entre el total de commits del repositorio y la suma de los aportes individuales corresponde a operaciones de mantenimiento automatizado realizadas por herramientas como dependabot).*
