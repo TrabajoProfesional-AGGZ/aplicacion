@@ -6,8 +6,8 @@ import logoVerde from '../../assets/logo-verde.png';
 import { ModalOverlay } from './ModalOverlay';
 
 const STEP_COLORS = {
-  bubbleActive: '#039f5d',
-  bubbleIdle: '#d6e6dc',
+  bubbleActive: '#231f20',
+  bubbleIdle: '#e6d6dc',
   onBubble: '#ffffff',
   idleIcon: '#5c7285',
   success: '#0D6E0D',
