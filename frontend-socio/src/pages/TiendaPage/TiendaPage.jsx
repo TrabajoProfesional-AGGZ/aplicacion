@@ -24,6 +24,10 @@ function formatearPrecio(monto) {
   return `$${Number(monto).toLocaleString('es-AR')}`;
 }
 
+/**
+ * Catálogo de la tienda del club: lista → detalle → compra → pago, más una
+ * vista de compras ya pagadas ("Mis compras").
+ */
 export function TiendaPage({ socio }) {
   const [productos, setProductos] = useState([]);
   const [detalle, setDetalle] = useState(null);

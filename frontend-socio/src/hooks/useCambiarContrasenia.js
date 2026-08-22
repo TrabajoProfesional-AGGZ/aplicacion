@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { changePassword } from '../utils/authService';
 import { validarFortalezaPassword } from '../utils/formValidators';
 
+/**
+ * Estado y validación del formulario de cambio de contraseña. Al confirmar
+ * el cambio, cierra la sesión (no hay router en esta app para redirigir).
+ */
 export function useCambiarContrasenia(cerrarSesion) {
   const [actual, setActual] = useState('');
   const [nueva, setNueva] = useState('');

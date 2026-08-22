@@ -26,6 +26,10 @@ function mensajeError(codigo) {
   return MENSAJES_ERROR_COMPRA[codigo] || 'No se pudo comprar la entrada. Intentá de nuevo.';
 }
 
+/**
+ * Flujo de compra de entrada a un evento: lista → detalle → pago (o pantalla
+ * de éxito directa si el evento es gratuito).
+ */
 export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
   const [step, setStep] = useState('lista');
 

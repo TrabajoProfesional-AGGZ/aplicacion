@@ -26,10 +26,17 @@ import { AnimatePresence } from 'framer-motion';
 import { enrolarYGuardarSecreto } from '../../services/accesosService';
 import { PagoResultado } from '../../components/PagoResultado/PagoResultado'; 
 
+/**
+ * Dashboard principal: dueño del estado `vista` que decide qué pantalla se
+ * renderiza (no hay router, es un switch plano sobre un string). También
+ * enrola el dispositivo para el pase de acceso offline y detecta la vuelta
+ * de una redirección de Mercado Pago para mostrar el resultado del pago.
+ */
 export function HomePage({ socio, cerrarSesion }) {
   const [proximamente, setProximamente] = useState(null);
   const [itemAPagarId, setItemAPagarId] = useState(null);
   const [noticiaSeleccionadaId, setNoticiaSeleccionadaId] = useState(null);
+  // Si la URL trae estos params, la app se abrió de vuelta desde la redirección de MP.
   const searchParams = new URLSearchParams(window.location.search);
   const statusMP = searchParams.get('status');
   const externalReferenceMP = searchParams.get('external_reference');

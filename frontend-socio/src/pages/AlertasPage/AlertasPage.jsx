@@ -21,6 +21,7 @@ function formatearFecha(fechaIso) {
   }).format(fecha);
 }
 
+/** Lista de alertas/novedades del club dirigidas al socio. */
 export function AlertasPage({ socio }) {
   const [alertas, setAlertas] = useState([]);
   const [cargando, setCargando] = useState(true);

@@ -17,6 +17,7 @@ function formatearMonto(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
+/** Grilla de instalaciones disponibles para reservar. */
 export function InstalacionesListStep({ instalaciones, cargando, error, onSeleccionar, onVolver }) {
   return (
     <section className="instalaciones-lista">

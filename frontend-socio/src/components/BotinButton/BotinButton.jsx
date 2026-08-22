@@ -5,6 +5,10 @@ import './BotinButton.css';
 
 const TELEGRAM_BOT_URL = 'https://t.me/sociounido_bot';
 
+/**
+ * Botón flotante que, tras confirmar en un modal, abre el chat de Telegram
+ * del bot de soporte "BotIn" en una pestaña nueva.
+ */
 export function BotinButton() {
   const [mostrarConfirmacion, setMostrarConfirmacion] = useState(false);
 

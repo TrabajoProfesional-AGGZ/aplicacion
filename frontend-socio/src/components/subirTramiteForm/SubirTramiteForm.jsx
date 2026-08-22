@@ -13,6 +13,7 @@ function mensajeError(err) {
   return 'No pudimos subir el trámite. Probá de nuevo.';
 }
 
+/** Modal de un solo paso para cargar un nuevo trámite (tipo + archivo adjunto). */
 export function SubirTramiteForm({ idSocio, onClose, onCreado }) {
   const inputRef = useRef(null);
   const [tipos, setTipos] = useState([]);

@@ -14,6 +14,7 @@ function formatearFecha(fechaIso) {
   }).format(new Date(fechaIso));
 }
 
+/** Resumen final de la reserva (instalación, turno y socios) con confirmación. */
 export function ResumenReservaStep({
   instalacion,
   fecha,

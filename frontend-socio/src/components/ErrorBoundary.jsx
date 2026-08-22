@@ -1,5 +1,9 @@
 import { Component } from 'react';
 
+/**
+ * Error boundary de React: captura errores no manejados en el árbol de componentes
+ * hijos y muestra una pantalla de fallback en vez de dejar la app en blanco.
+ */
 export class ErrorBoundary extends Component {
   constructor(props) {
     super(props);

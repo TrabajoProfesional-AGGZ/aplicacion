@@ -26,6 +26,10 @@ function mensajeError(codigo, categoriaRequerida) {
   return MENSAJES_ERROR_INSCRIPCION[codigo] || 'No se pudo registrar la inscripción. Intentá de nuevo.';
 }
 
+/**
+ * Flujo de inscripción a una disciplina: lista → detalle, con inscripción
+ * directa o suma a lista de espera si no hay cupo.
+ */
 export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrATramites = () => {} }) {
   const [step, setStep] = useState('lista');
 

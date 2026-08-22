@@ -1,12 +1,10 @@
 import { PartyPopper } from 'lucide-react';
 import './WelcomeCard.css';
 
-// RGB (no hex) para poder variar la opacidad del texto/borde/glow del pill
-// de estado con una sola fuente por color (rgb(var(--estado-rgb) / alpha)).
-// Son los mismos tonos que --status-*-bg en tokens.css (pasteles, claros)
-// en vez de los --status-*-border (oscuros, pensados para texto sobre fondo
-// claro) — sobre el gradiente casi negro de esta card los oscuros casi no
-// se leían.
+// RGB (no hex) para variar la opacidad de texto/borde/glow del pill de estado
+// con una sola fuente por color (rgb(var(--estado-rgb) / alpha)). Usa los
+// tonos claros --status-*-bg en vez de los oscuros --status-*-border, que
+// sobre el gradiente casi negro de la card no se leían bien.
 const ESTADO_RGB = {
   Activo: '167 218 167',
   Moroso: '244 190 190',
@@ -22,6 +20,7 @@ function esCumpleaniosHoy(fechaNacimiento) {
   return hoy.getMonth() + 1 === month && hoy.getDate() === day;
 }
 
+/** Tarjeta de bienvenida del Home: fecha, estado, saludo y datos de membresía. */
 export function WelcomeCard({ socio }) {
   const fechaFormateada = new Intl.DateTimeFormat('es-AR', {
     weekday: 'long',

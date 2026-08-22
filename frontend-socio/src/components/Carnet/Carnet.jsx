@@ -8,6 +8,10 @@ function nombreCompleto(socio) {
   return [socio?.nombre, socio?.apellido].filter(Boolean).join(' ') || '---';
 }
 
+/**
+ * Carnet de socio: tarjeta con el QR de acceso (`AccesoQR`) más nombre/nº de
+ * socio, y un botón para forzar un nuevo enrolamiento TOTP si el QR falla.
+ */
 export function Carnet({ socio }) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [recargando, setRecargando] = useState(false);
@@ -39,7 +43,6 @@ export function Carnet({ socio }) {
       </div>
 
       <div className="carnet-card">
-        {/* Encabezado de la tarjeta */}
         <div className="carnet-card-header">
           <div className="carnet-brand">
             <ShieldCheck size={28} className="brand-icon" />
@@ -69,7 +72,6 @@ export function Carnet({ socio }) {
           </div>
         )}
 
-        {/* Datos del Socio */}
         <div className="carnet-card-footer">
           <div className="socio-data">
             <span className="data-label">Socio</span>
@@ -81,7 +83,6 @@ export function Carnet({ socio }) {
           </div>
         </div>
 
-        {/* Indicador de actualización */}
         <div className="carnet-timer-bar">
           <div className="timer-progress"></div>
         </div>

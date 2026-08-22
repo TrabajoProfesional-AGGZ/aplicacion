@@ -14,6 +14,7 @@ function formatearMonto(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
+/** Detalle de un evento: banner con datos/cupo, descripción y acción para comprar la entrada. */
 export function EventoDetalleStep({
   evento,
   yaTieneEntrada = false,

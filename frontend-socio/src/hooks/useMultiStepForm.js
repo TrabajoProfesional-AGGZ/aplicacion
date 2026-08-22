@@ -1,7 +1,10 @@
-// src/hooks/useMultiStepForm.js
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+/**
+ * Estado y navegación (paso actual, dirección de la animación, validación
+ * por paso) para un formulario de varios pasos con react-hook-form.
+ */
 export function useMultiStepForm(stepFields) {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
@@ -33,7 +36,7 @@ export function useMultiStepForm(stepFields) {
     step, direction, submitted, setSubmitted,
     goBack, goNext, formError, setFormError,
     register, handleSubmit, errors, isSubmitting, setIsSubmitting,
-    navGuard: true,
+    navGuard: true, // valor constante: no está conectado a ningún control de navegación
     getValues,
     trigger
   };

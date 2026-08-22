@@ -1,6 +1,7 @@
 import { CheckCircle2 } from 'lucide-react';
 import './EntradaExitoStep.css';
 
+/** Pantalla de confirmación para la compra de una entrada gratuita (sin paso de pago). */
 export function EntradaExitoStep({ nombreEvento }) {
   return (
     <section className="entrada-exito">

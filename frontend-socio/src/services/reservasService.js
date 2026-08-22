@@ -32,6 +32,7 @@ export async function getTurnosDisponibles(idInstalacion, fecha) {
   return res.json();
 }
 
+/** Los distintos 409/403 se traducen a errores de código corto que los componentes matchean por `e.message`. */
 export async function createReserva(data) {
   const res = await fetchTo('/api/v1/reservas', 'POST', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');

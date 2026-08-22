@@ -5,18 +5,13 @@ import { computePopoverPosition } from './nativeInputUtils';
  * Estado + posicionamiento compartido por los popovers de `DatePicker`,
  * `TimePicker` y el dropdown custom de `StyledSelect`: abre anclado al
  * trigger (con flip hacia arriba si no entra abajo), cierra con click afuera
- * o Escape. El listener de Escape va en fase de captura y llama
- * `stopPropagation` para consumir la tecla antes de que el Escape global de
- * `ModalOverlay` la vea y cierre el modal entero en vez de solo el popover.
+ * o Escape. El listener de Escape va en fase de captura y hace
+ * `stopPropagation` para no disparar también el Escape global de `ModalOverlay`.
  *
- * `width`/`height` son una estimación usada solo para el primer cálculo
- * (antes de que el popover exista en el DOM, para decidir de entrada si abre
- * hacia arriba o hacia abajo). Apenas se monta, un `useLayoutEffect` vuelve a
- * calcular la posición con el tamaño real (`popoverRef.getBoundingClientRect`)
- * antes del paint — si la estimación se queda corta (ej. un `StyledSelect`
- * con pocas opciones, mucho más bajo que los 260px estimados) el popover
- * quedaba flotando lejos del trigger, con un hueco grande en el medio de la
- * pantalla en vez de pegado a donde correspondía.
+ * `width`/`height` son solo una estimación para el primer cálculo, antes de
+ * que el popover exista en el DOM; un `useLayoutEffect` la corrige con el
+ * tamaño real apenas se monta, para no quedar mal posicionado si la
+ * estimación no coincide con el contenido real.
  */
 export function usePickerPopover({ width = 280, height = 320 } = {}) {
   const [open, setOpen] = useState(false);

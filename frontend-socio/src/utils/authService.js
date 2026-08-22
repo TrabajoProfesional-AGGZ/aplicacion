@@ -21,6 +21,8 @@ export async function logout() {
   await signOut(auth);
 }
 
+// Firebase exige una reautenticación reciente antes de permitir operaciones
+// sensibles como cambiar la contraseña.
 export async function changePassword(currentPassword, newPassword) {
   const user = auth.currentUser;
   const credential = EmailAuthProvider.credential(user.email, currentPassword);
