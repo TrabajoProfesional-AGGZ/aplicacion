@@ -17,6 +17,10 @@ function formatearMonto(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
+/**
+ * Lista de inscripciones a disciplinas del socio, con filtros y detalle de
+ * cada una (incluyendo la baja de una inscripción activa).
+ */
 export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
   const [inscripciones, setInscripciones] = useState([]);
   const [cargando, setCargando] = useState(true);

@@ -32,6 +32,10 @@ function formatearFecha(fechaIso) {
   }).format(new Date(fechaIso));
 }
 
+/**
+ * Lista de reservas del socio con filtro por estado (históricas se cargan
+ * recién al elegir "Todas"/"Finalizadas") y cancelación con confirmación.
+ */
 export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva = () => {} }) {
   const [reservas, setReservas] = useState([]);
   const [historicas, setHistoricas] = useState(null);

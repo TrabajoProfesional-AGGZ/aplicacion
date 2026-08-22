@@ -30,6 +30,10 @@ function filtrarTurnosPasados(turnos, fecha) {
   });
 }
 
+/**
+ * Flujo de reserva de una instalación en 4 pasos: instalaciones → detalle
+ * (fecha y turno) → agregar socios → resumen y confirmación.
+ */
 export function NuevaReservaPage({ socio, onSalir, onExito }) {
   const [step, setStep] = useState('lista');
 

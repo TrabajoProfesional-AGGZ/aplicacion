@@ -4,6 +4,11 @@ import { getNoticiasVigentes, getNoticia } from '../../services/noticiasService'
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import './NoticiasPage.css';
 
+/**
+ * Lista de noticias vigentes del club y su detalle. Si recibe `noticiaInicialId`
+ * (atajo "Última Noticia" desde el Home), abre ese detalle directo sin pasar
+ * primero por la lista.
+ */
 export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial = () => {} }) {
   const [noticias, setNoticias] = useState([]);
   const [detalle, setDetalle] = useState(null);

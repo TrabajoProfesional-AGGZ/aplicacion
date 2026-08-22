@@ -20,6 +20,10 @@ function formatearFecha(fechaIso) {
   }).format(new Date(fechaIso));
 }
 
+/**
+ * Entradas del socio, con toggle Activas/Históricas (históricas se cargan
+ * recién al abrir esa pestaña por primera vez).
+ */
 export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet = () => {} }) {
   const [vista, setVista] = useState('activas');
   const [entradas, setEntradas] = useState([]);

@@ -4,6 +4,7 @@ import { resetPassword } from '../../utils/authService';
 import { MAX_LEN, validarCredencialSegura } from '../../utils/formValidators';
 import logoSocio from '../../assets/logo_socio.png';
 
+/** Modal de recuperación de contraseña por email. */
 export function RecuperarContraseniaModal({ onClose }) {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -25,7 +26,9 @@ export function RecuperarContraseniaModal({ onClose }) {
     try {
       await resetPassword(emailLimpio);
     } catch {
-
+      // Se ignora a propósito: mostrar un error distinto si el email no existe
+      // sería una vía de enumeración de cuentas, así que el mensaje final es
+      // siempre el mismo exista o no la cuenta.
     } finally {
       setEnviando(false);
       setEnviado(true);
