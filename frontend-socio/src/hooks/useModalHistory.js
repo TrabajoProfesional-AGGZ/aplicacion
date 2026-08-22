@@ -2,40 +2,21 @@ import { useEffect, useRef } from 'react';
 import { nextHistoryEntryId } from './historyEntryId';
 
 /**
- * Ties a modal's lifetime to a browser history entry so the phone's back
- * gesture/button closes the modal instead of the whole app. Pushes one
- * entry on mount; a `popstate` (hardware back) calls `onClose`. If the
- * modal is closed some other way (Escape, click-outside, Cancel), the
- * pushed entry is consumed on unmount so it doesn't linger as a second,
- * unrelated "back" the user would have to press through later — but only
- * if that entry is still the current one: if something else (e.g. a
- * router navigation) already pushed on top of it, going back would undo
- * that instead, so the cleanup skips it and leaves a harmless extra entry.
+ * Ata el ciclo de vida de un modal a una entrada del historial del navegador
+ * para que el gesto/botón de atrás lo cierre en vez de cerrar toda la app.
+ * Pushea una entrada al montar; un `popstate` (atrás por hardware) llama a
+ * `onClose`. Si el modal se cierra por otra vía (Escape, click afuera,
+ * Cancelar), la entrada se consume al desmontar con `history.back()` — pero
+ * solo si sigue siendo la vigente, para no deshacer una navegación ajena
+ * que haya pusheado encima en el medio.
  *
- * The consume-on-cleanup decision is deferred via `queueMicrotask` instead
- * of running synchronously, and cleanup no longer unconditionally pushes a
- * fresh entry on the following re-setup — both exist to survive React 18
- * StrictMode's dev-only double-invoke of mount effects (setup -> cleanup ->
- * setup, synchronously, back-to-back, same component instance, same refs).
- * `pendingConsumeRef` is a same-tick cancellation token: cleanup arms it
- * before queuing the deferred consume check; if a re-setup runs before
- * that check fires (StrictMode's phantom re-mount), it disarms the token
- * and *reuses* the entry cleanup was about to consume instead of pushing a
- * duplicate. Two bugs would otherwise follow from an unconditional
- * push-every-setup: (1) if cleanup called `history.back()` synchronously,
- * it would fire for a phantom unmount that the same-tick re-setup already
- * superseded — but `history.back()` only *requests* a navigation (the
- * actual popstate is dispatched asynchronously), so by the time it
- * resolves the second setup has already pushed a *new* entry on top of
- * the still-unmoved real position, corrupting the stack; (2) even just
- * deferring the consume check without also deduplicating the push leaves
- * the phantom mount's entry permanently un-consumed once the real
- * (surviving) mount reuses a *different* entry — an orphaned history
- * entry that desyncs any outer history consumer (e.g. useBackToRoot)
- * comparing against its own pushed id once this modal is later closed for
- * real. Reusing the same entry across the phantom cycle means exactly one
- * `pushState` happens for the whole double-invoke, matching what a single
- * (production, non-StrictMode) mount would have done.
+ * El consumo al desmontar se difiere con `queueMicrotask` (en vez de
+ * correr sincrónico), y un re-montaje puede reusar la misma entrada en vez
+ * de pushear una nueva: esto es necesario para sobrevivir al doble-invoke
+ * de efectos de React 18 StrictMode en desarrollo (montar → desmontar →
+ * remontar, todo sincrónico) sin duplicar ni perder entradas de historial
+ * — de lo contrario un consumidor externo (ej. `useBackToRoot`) queda
+ * desincronizado al comparar contra su propio id pusheado.
  */
 export function useModalHistory(onClose) {
   const onCloseRef = useRef(onClose);
@@ -50,10 +31,9 @@ export function useModalHistory(onClose) {
   useEffect(() => {
     let state;
     if (pendingConsumeRef.current) {
-      // A same-tick phantom cleanup already pushed an entry and armed its
-      // deferred consume check — reuse that entry instead of pushing a
-      // duplicate, and disarm the check so the entry survives for this
-      // (real) mount.
+      // Un desmontaje fantasma en el mismo tick ya pusheó una entrada y armó
+      // su chequeo de consumo diferido — se reusa esa entrada en vez de
+      // pushear una duplicada, y se desarma el chequeo para que sobreviva.
       state = pushedStateRef.current;
       pendingConsumeRef.current = false;
     } else {
@@ -73,8 +53,8 @@ export function useModalHistory(onClose) {
       window.removeEventListener('popstate', handlePopState);
       pendingConsumeRef.current = true;
       queueMicrotask(() => {
-        // Disarmed means a re-setup already reused this entry — that
-        // (real) mount owns it now, don't touch history here.
+        // Desarmado significa que un remontaje ya reusó esta entrada — ese
+        // montaje real es ahora su dueño, no tocar el historial acá.
         if (!pendingConsumeRef.current) return;
         pendingConsumeRef.current = false;
         if (!poppedRef.current && window.history.state?.id === state.id) {
