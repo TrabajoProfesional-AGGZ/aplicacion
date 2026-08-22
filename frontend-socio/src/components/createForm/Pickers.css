@@ -3,10 +3,9 @@
    oculto vía clip (`.csf-native-hidden` — nunca display:none/hidden, sigue
    en el árbol de accesibilidad) que sigue siendo la fuente de verdad para
    react-hook-form y los tests, más un trigger + popover custom animados que
-   solo escriben en ese elemento nativo.
-   Portado de WebApp/src/components/createForm/Pickers.css — esta app no
-   tiene tokens `--input-*` dedicados (no hay modo oscuro acá), así que usa
-   directamente los mismos tokens que ya usa `.csf-input` en ModalOverlay.css. */
+   solo escriben en ese elemento nativo. Esta app no tiene tokens `--input-*`
+   dedicados (no hay modo oscuro acá), así que usa directamente los mismos
+   tokens que ya usa `.csf-input` en ModalOverlay.css. */
 
 .csf-native-hidden {
   position: absolute;
