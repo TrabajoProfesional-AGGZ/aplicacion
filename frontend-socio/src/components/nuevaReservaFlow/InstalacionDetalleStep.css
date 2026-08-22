@@ -152,8 +152,8 @@
 }
 
 /* El estilo del selector en sí (trigger + calendario) lo aporta el
-   DatePicker compartido (createForm/Pickers.css, mismo que WebApp) — acá
-   solo queda el espaciado hacia el título "Turnos disponibles". */
+   DatePicker compartido (createForm/Pickers.css) — acá solo queda el
+   espaciado hacia el título "Turnos disponibles". */
 .detalle-fecha-input {
   margin-bottom: var(--space-6);
 }

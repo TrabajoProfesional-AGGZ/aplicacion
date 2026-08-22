@@ -25,6 +25,7 @@ export const MAX_LEN = {
 // eslint-disable-next-line no-control-regex
 const CARACTERES_DE_CONTROL = /[\x00-\x1F\x7F]/;
 
+/** Valida una credencial ya existente en el login (longitud, sin caracteres de control) — no es una política de fortaleza para contraseñas nuevas. */
 export function validarCredencialSegura(value, maxLength) {
   if (CARACTERES_DE_CONTROL.test(value)) {
     return 'El valor contiene caracteres no permitidos';
@@ -68,6 +69,7 @@ export function validarArchivoImagen(file) {
   if (partes.length < 2 || !EXTENSIONES_IMAGEN_PERMITIDAS.has(extension)) {
     return 'Solo se permiten imágenes JPG, PNG o WEBP';
   }
+  // Rechaza doble extensión peligrosa (ej. "foto.jpg.exe"), no solo la extensión final.
   if (partes.slice(1, -1).some((segmento) => EXTENSIONES_PELIGROSAS.has(segmento.toLowerCase()))) {
     return 'Nombre de archivo no permitido';
   }
@@ -88,6 +90,7 @@ export function validarArchivoTramite(file) {
   if (partes.length < 2 || !EXTENSIONES_TRAMITE_PERMITIDAS.has(extension)) {
     return 'Solo se permiten archivos JPG, PNG, WEBP o PDF';
   }
+  // Rechaza doble extensión peligrosa (ej. "foto.jpg.exe"), no solo la extensión final.
   if (partes.slice(1, -1).some((segmento) => EXTENSIONES_PELIGROSAS.has(segmento.toLowerCase()))) {
     return 'Nombre de archivo no permitido';
   }
