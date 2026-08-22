@@ -3,18 +3,17 @@ import { getToken } from 'firebase/messaging';
 import { messaging } from '../firebase';
 import { fetchTo } from '../utils/utils'
 
+/** Pide permiso de notificaciones push y registra el token FCM contra el backend. */
 export const usePushNotifications = (usuarioAutenticado) => {
   useEffect(() => {
     if (!usuarioAutenticado) return;
 
     const solicitarPermisoYRegistrar = async () => {
       try {
-        // Pedimos permiso al navegador
         const permission = await Notification.requestPermission();
-        
+
         if (permission === 'granted') {
-          // Generamos el token usando tu clave VAPID
-          const currentToken = await getToken(messaging, { 
+          const currentToken = await getToken(messaging, {
             vapidKey: import.meta.env.VITE_APP_VAPID_KEY
           });
 
