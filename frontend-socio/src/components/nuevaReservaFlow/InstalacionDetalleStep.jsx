@@ -14,6 +14,7 @@ function hoyISO() {
   return `${year}-${month}-${day}`;
 }
 
+/** Detalle de una instalación: banner con condiciones, selector de fecha y turnos disponibles. */
 export function InstalacionDetalleStep({
   instalacion,
   fecha,

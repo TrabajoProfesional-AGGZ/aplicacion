@@ -2,16 +2,18 @@ import { useState, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import * as OTPAuth from 'otpauth';
 
+/**
+ * Genera un código QR de acceso al club a partir de un token TOTP, regenerado
+ * cada segundo, enteramente client-side (funciona sin conexión).
+ */
 const AccesoQR = () => {
   const [qrData, setQrData] = useState('');
 
   useEffect(() => {
-    // El secreto TOTP se guarda de forma asíncrona (HomePage enrola el
-    // dispositivo contra el backend recién al loguearse) — si el socio entra
-    // a "Mi Carnet" antes de que ese enrolamiento termine, localStorage todavía
-    // no tiene nada. Por eso el chequeo va *dentro* de cada tick del intervalo
-    // en vez de una sola vez al montar: apenas el secreto aparece, el próximo
-    // tick (máximo 1s después) lo toma solo, sin necesitar "Recargar QR".
+    // El secreto TOTP se guarda de forma asíncrona (recién al loguearse), así que
+    // el chequeo va dentro de cada tick del intervalo en vez de una sola vez al
+    // montar: si el socio entra antes de que el secreto exista, el próximo tick
+    // lo toma solo, sin necesitar "Recargar QR".
     let generadorTotp = null;
     let socioIdActual = null;
 

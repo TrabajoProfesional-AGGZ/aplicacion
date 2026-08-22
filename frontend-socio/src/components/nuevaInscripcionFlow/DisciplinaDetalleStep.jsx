@@ -10,6 +10,11 @@ function textoCupos(disciplina) {
   return `${disciplina.cupos_ocupados}/${disciplina.cupo_maximo}`;
 }
 
+/**
+ * Detalle de una disciplina: banner con cupos/categoría/arancel y la acción de
+ * inscribirse (o sumarse a lista de espera si no hay cupo), con sus pantallas
+ * de éxito y error inline.
+ */
 export function DisciplinaDetalleStep({
   disciplina,
   yaInscripto = false,

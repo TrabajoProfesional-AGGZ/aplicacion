@@ -29,6 +29,7 @@ const CONFIG_RESULTADO = {
   }
 };
 
+/** Pantalla de resultado de un pago (aprobado, rechazado, pendiente o cancelado). */
 export function PagoResultado({ status, onVolver }) {
   // Evaluamos el estado que manda Mercado Pago. Si no es uno de los 3 oficiales, cae en default.
   const config = CONFIG_RESULTADO[status] || CONFIG_RESULTADO.default;

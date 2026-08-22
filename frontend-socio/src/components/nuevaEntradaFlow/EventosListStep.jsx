@@ -10,6 +10,7 @@ function formatearMonto(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
+/** Grilla de eventos disponibles para comprar entrada. */
 export function EventosListStep({ eventos, cargando, error, onSeleccionar, onVolver }) {
   return (
     <section className="eventos-lista">

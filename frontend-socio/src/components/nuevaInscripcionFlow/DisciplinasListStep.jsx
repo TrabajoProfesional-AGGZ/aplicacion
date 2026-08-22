@@ -7,6 +7,7 @@ function textoCupos(disciplina) {
   return `${disciplina.cupos_ocupados}/${disciplina.cupo_maximo} cupos`;
 }
 
+/** Grilla de disciplinas disponibles para inscribirse. */
 export function DisciplinasListStep({ disciplinas, cargando, error, onSeleccionar, onVolver }) {
   return (
     <section className="disciplinas-lista">

@@ -1,5 +1,6 @@
 import { ChevronRight } from 'lucide-react';
 
+/** Botón de acceso rápido, en variante `"featured"` (destacado) o `"row"` (fila de lista). */
 export function QuickAccessCard({ icon: Icon, titulo, desc, onClick, variant = 'featured' }) {
   const isRow = variant === 'row';
 

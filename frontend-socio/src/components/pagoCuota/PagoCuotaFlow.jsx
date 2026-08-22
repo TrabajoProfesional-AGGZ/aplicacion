@@ -9,6 +9,10 @@ function formatearPrecio(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
+/**
+ * Flujo de pago genérico (cuota, reserva, entrada o compra): crea la
+ * preferencia de pago en el backend y renderiza el botón de Mercado Pago (Wallet Brick).
+ */
 export function PagoCuotaFlow({ item, tipoItem, socio, onVolver }) {
   const [preferenceId, setPreferenceId] = useState(null);
   const [loading, setLoading] = useState(true);

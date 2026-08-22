@@ -1,4 +1,3 @@
-// src/components/createForm/MultiStepFormShell.jsx
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -13,6 +12,11 @@ const STEP_COLORS = {
   success: '#0D6E0D',
 };
 
+/**
+ * Shell reutilizable para formularios de varios pasos: header con progreso,
+ * burbujas de paso animadas, navegación Atrás/Siguiente/Enviar y una pantalla
+ * de éxito, todo dentro de un `ModalOverlay`.
+ */
 export function MultiStepFormShell({
   steps, step, submitted, isSubmitting, title,
   successTitle, successMessage, submitLabel, submitLoadingLabel,

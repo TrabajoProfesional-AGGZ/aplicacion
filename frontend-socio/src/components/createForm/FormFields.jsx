@@ -1,4 +1,3 @@
-// src/components/createForm/FormFields.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
@@ -14,6 +13,7 @@ const slideVariants = {
   exit: (dir) => ({ x: dir > 0 ? -52 : 52, opacity: 0 }),
 };
 
+/** Input de texto estándar; si `type="date"`, delega en `DatePicker`. */
 export const StyledInput = React.forwardRef(({ error, ...props }, ref) => {
   if (props.type === 'date') return <DatePicker error={error} ref={ref} {...props} />;
   return (
@@ -27,10 +27,9 @@ export const StyledInput = React.forwardRef(({ error, ...props }, ref) => {
 
 /**
  * Select con el estilo estándar de los formularios, con estado de error opcional.
- * Portado de WebApp/src/components/createForm/FormFields.jsx: por debajo sigue
- * siendo un `<select>` real (oculto vía clip, no `display:none` — sigue en el
- * árbol de accesibilidad y lo encuentran `getByRole('combobox')`/`getByLabelText`
- * de los tests existentes), reemplazado visualmente por un listbox custom
+ * Por debajo sigue siendo un `<select>` real (oculto vía clip, no `display:none`
+ * — sigue en el árbol de accesibilidad y lo encuentran `getByRole('combobox')`/
+ * `getByLabelText` de los tests), reemplazado visualmente por un listbox custom
  * animado que lee las opciones del DOM del `<select>` y escribe en él con
  * `setNativeValue` (dispara `change` real, así que `register()` de
  * react-hook-form lo recibe sin cambios).
@@ -156,6 +155,7 @@ export function StyledSelect({ error, className, children, ref: forwardedRef, ..
   );
 }
 
+/** Fila de label + input/select + mensaje de error. */
 export const Field = ({ label, icon: Icon, error, children }) => (
   <div className="csf-field">
     <label className="csf-label">
@@ -170,6 +170,7 @@ export const Field = ({ label, icon: Icon, error, children }) => (
   </div>
 );
 
+/** Wrapper animado (slide in/out según `direction`) de un paso del formulario multi-step. */
 export const FormStep = ({ direction, children }) => (
   <motion.div
     custom={direction}
@@ -184,12 +185,14 @@ export const FormStep = ({ direction, children }) => (
   </motion.div>
 );
 
+/** Campo de número de documento, ya conectado a react-hook-form vía `docNumberRegister`. */
 export const DocNumberField = ({ docNumberRegister, errors, fieldKey = 'nroDocumento', placeholder = 'Ej. 12345678' }) => (
   <Field label="Número de Documento" error={errors[fieldKey]?.message}>
     <StyledInput {...docNumberRegister} placeholder={placeholder} error={!!errors[fieldKey]} />
   </Field>
 );
 
+/** Campo de email con validación de formato incorporada. */
 export const EmailField = ({ register, errors, required, placeholder = 'maria@ejemplo.com' }) => (
   <Field label="Email" error={errors.email?.message}>
     <StyledInput
