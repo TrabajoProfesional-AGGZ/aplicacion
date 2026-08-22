@@ -106,6 +106,7 @@ export function SubirTramiteForm({ idSocio, onClose, onCreado }) {
                   <label className="csf-label" htmlFor="tramite-tipo">Tipo de trámite</label>
                   <StyledSelect
                     id="tramite-tipo"
+                    className="tramite-tipo-select"
                     value={tipoId}
                     onChange={(e) => setTipoId(e.target.value)}
                     required
@@ -138,7 +139,7 @@ export function SubirTramiteForm({ idSocio, onClose, onCreado }) {
                     style={{ display: 'none' }}
                     aria-label="Adjuntar archivo del trámite"
                   />
-                  <p className="csf-hint">JPG, PNG, WEBP o PDF. Máximo 10MB.</p>
+                  <p className="csf-hint tramite-tipos-hint">JPG, PNG, WEBP o PDF. Máximo 10MB.</p>
                 </div>
 
                 {estado === 'subiendo' && (

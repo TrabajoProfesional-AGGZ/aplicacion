@@ -152,10 +152,13 @@
 }
 
 /* El estilo del selector en sí (trigger + calendario) lo aporta el
-   DatePicker compartido (createForm/Pickers.css) — acá solo queda el
-   espaciado hacia el título "Turnos disponibles". */
+   DatePicker compartido (createForm/Pickers.css) — acá solo se pisa el
+   fondo (blanco en vez de --color-bg) para que se distinga del fondo de la
+   página, y queda el espaciado hacia el título "Turnos disponibles". */
 .detalle-fecha-input {
   margin-bottom: var(--space-6);
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
 }
 
 .detalle-turnos-titulo {
@@ -168,6 +171,11 @@
 .detalle-turnos-lista {
   display: flex;
   flex-direction: column;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .detalle-turno-row {
@@ -177,11 +185,15 @@
   border: none;
   border-bottom: 1px solid var(--color-border);
   background: none;
-  padding: var(--space-4) var(--space-2);
+  padding: var(--space-4);
   cursor: pointer;
   font-family: inherit;
   text-align: left;
   transition: background-color var(--transition-fast);
+}
+
+.detalle-turno-row:last-child {
+  border-bottom: none;
 }
 
 .detalle-turno-row:hover {
