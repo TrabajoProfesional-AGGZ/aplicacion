@@ -9,6 +9,10 @@ const ITEMS = [
   { id: 'entradas', icon: Ticket, label: 'Mis Entradas', vista: 'mis-entradas' },
 ];
 
+/**
+ * Barra de navegación inferior de 5 ítems. Un ítem sin handler dedicado cae en
+ * `onProximamente`. "Mi Carnet" se renderiza destacado como botón circular flotante.
+ */
 export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripciones, onMisEntradas, onCarnet, vistaActual }) {
   const handlersPorId = {
     inicio: onInicio,

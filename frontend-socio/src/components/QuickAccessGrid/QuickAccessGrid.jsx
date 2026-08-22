@@ -14,6 +14,12 @@ const ACCESOS_RAPIDOS = [
   { id: 'noticias', icon: Newspaper, titulo: 'Noticias', desc: 'Enterate de las últimas novedades del club.' },
 ];
 
+/**
+ * Grilla de accesos rápidos del Home: un ítem destacado (Cuotas y pagos) más
+ * una lista agrupada del resto. Un ítem sin handler dedicado cae en
+ * `onProximamente`. Debajo de "Noticias" agrega una extensión con la última
+ * noticia publicada, si hay alguna.
+ */
 export function QuickAccessGrid({
   onProximamente, onPagos, onTramites, onReservas, onInscripciones, onEventos, onNoticias, onTienda,
   onVerNoticia = () => {},

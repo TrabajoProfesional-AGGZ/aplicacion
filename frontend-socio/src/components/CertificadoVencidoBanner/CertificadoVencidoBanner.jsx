@@ -3,6 +3,11 @@ import { AlertTriangle } from 'lucide-react';
 import { getTramitesPendientes } from '../../services/tramitesService';
 import './CertificadoVencidoBanner.css';
 
+/**
+ * Banner persistente en el Home que avisa si el socio tiene trámites vencidos
+ * (severidad "danger") o por vencer (severidad "warning"); no renderiza nada
+ * si no tiene ninguno pendiente.
+ */
 export function CertificadoVencidoBanner({ socio, onClick }) {
   const [pendientes, setPendientes] = useState(null);
 

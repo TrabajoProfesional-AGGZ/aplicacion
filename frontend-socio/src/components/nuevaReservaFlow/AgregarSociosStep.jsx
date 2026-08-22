@@ -3,6 +3,7 @@ import { ArrowLeft, Hash, CheckCircle2, AlertCircle, Trash2, UserRound } from 'l
 import { getSocioByNroSocio } from '../../services/sociosService';
 import './AgregarSociosStep.css';
 
+/** Paso del flujo de reserva para sumar socios (buscados por número) además del titular. */
 export function AgregarSociosStep({ socioTitular, sociosAgregados, cuposDisponibles, onAgregar, onQuitar, onContinuar, onVolver }) {
   const [nroSocioInput, setNroSocioInput] = useState('');
   const [buscando, setBuscando] = useState(false);

@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { useModalHistory } from '../../hooks/useModalHistory';
 import './ModalOverlay.css';
 
+/**
+ * Backdrop de modal reutilizable: cierra con click afuera, Escape o el gesto
+ * de atrás del celular (`useModalHistory`).
+ */
 export function ModalOverlay({ onClose, wrapperClass, children }) {
   useModalHistory(onClose);
 

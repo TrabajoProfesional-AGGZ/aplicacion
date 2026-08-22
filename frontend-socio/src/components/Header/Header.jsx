@@ -2,6 +2,7 @@ import { Bell, CircleUserRound } from 'lucide-react';
 import logoTexto from '../../assets/texto.png';
 import './Header.css';
 
+/** Barra superior fija: acceso a perfil, logo centrado y acceso a alertas. */
 export function Header({ onPerfil, onAlertas, mostrarPerfil = true }) {
   return (
     <header className="app-header">
