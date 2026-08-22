@@ -6,6 +6,12 @@ import { fetchTo } from '../utils/utils';
 import { getSocioPorEmail } from '../services/sociosService';
 import { AuthContext } from './authContextObject';
 
+/**
+ * Provee la sesión del socio (estado Firebase + perfil de backend) a toda la
+ * app. Si no hay conexión, o si el fetch del perfil falla en medio de una
+ * sesión ya iniciada, reconstruye una sesión mínima desde los datos cacheados
+ * en localStorage en vez de deslogear al socio.
+ */
 export function AuthProvider({ children }) {
   const [socio, setSocio] = useState(null);
   const [cargandoAuth, setCargandoAuth] = useState(true);
@@ -52,7 +58,9 @@ export function AuthProvider({ children }) {
           }
         } catch (error) {
           console.warn("Fallo la conexión con el backend:", error);
-          
+
+          // Sesión de Firebase válida pero el backend no respondió: rescata la
+          // misma sesión cacheada en vez de deslogear al socio.
           const savedSecret = localStorage.getItem('socio_totp_secret');
           const savedSocioId = localStorage.getItem('socio_id');
           const savedSocioNombre = localStorage.getItem('socio_nombre');
@@ -80,12 +88,10 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    // Si no hay un socio cargado en el contexto, no hacemos nada
     if (!socio) return;
 
     const registrarPushToken = async () => {
       try {
-        // Pedimos permiso al sistema operativo/navegador
         const permission = await Notification.requestPermission();
 
         if (permission === 'granted') {
@@ -105,7 +111,7 @@ export function AuthProvider({ children }) {
     };
 
     registrarPushToken();
-  }, [socio]); // Solo se ejecuta cuando el estado "socio" cambia
+  }, [socio]);
 
   const cerrarSesion = useCallback(async () => {
     await signOut(auth);
