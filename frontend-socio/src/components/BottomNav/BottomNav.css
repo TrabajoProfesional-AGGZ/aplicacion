@@ -30,7 +30,7 @@
 }
 
 .bottom-nav-item span {
-  font-size: 15px;
+  font-size: 1rem;
   text-align: center;
   line-height: 1.1;
 }
@@ -80,6 +80,6 @@
 
 @media (max-width: 480px) {
   .bottom-nav-item span {
-    font-size: 9px;
+    font-size: 0.75rem;
   }
 }

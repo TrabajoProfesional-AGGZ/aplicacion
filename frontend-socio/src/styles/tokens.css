@@ -2,6 +2,12 @@
 :root {
   color-scheme: light;
 
+  /* Tamaño base para el cálculo de rem (16px default del navegador).
+     115% = fuentes ~15% más grandes en toda la app sin tocar cada
+     declaración individual — todo font-size del proyecto está en rem
+     (mismo mecanismo que WebApp/src/styles/tokens.css). */
+  font-size: 115%;
+
   /* Colors */
   --color-text-primary: #111111;
   --color-text-secondary: #4a4a4a;
@@ -68,6 +74,7 @@
   --z-dropdown: 100;
   --z-sticky: 200;
   --z-modal: 400;
+  --z-popover: 450;
   --z-toast: 500;
 
   /* Layout */
