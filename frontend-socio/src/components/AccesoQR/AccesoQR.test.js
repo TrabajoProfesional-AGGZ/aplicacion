@@ -72,6 +72,21 @@ describe('AccesoQR', () => {
     expect(screen.getByText('Cargando pase seguro...')).toBeInTheDocument();
   });
 
+  test('detecta el secreto en localStorage aunque aparezca recién después de montar (enrolamiento async)', () => {
+    render(<AccesoQR />);
+    expect(screen.getByText('Cargando pase seguro...')).toBeInTheDocument();
+
+    localStorage.setItem('socio_id', '855c1d5e-8a3d');
+    localStorage.setItem('socio_totp_secret', 'SECRETO_PRUEBA');
+
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(screen.getByTestId('qr-mock')).toHaveTextContent('855c1d5e-8a3d|TOKEN123');
+    expect(screen.queryByText('Cargando pase seguro...')).not.toBeInTheDocument();
+  });
+
   test('no crashea si generate() lanza una excepción en un tick', () => {
     localStorage.setItem('socio_id', '855c1d5e-8a3d');
     localStorage.setItem('socio_totp_secret', 'SECRETO_PRUEBA');

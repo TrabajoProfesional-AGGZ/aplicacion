@@ -6,36 +6,48 @@ const AccesoQR = () => {
   const [qrData, setQrData] = useState('');
 
   useEffect(() => {
-    const socioId = localStorage.getItem('socio_id');
-    const secreto = localStorage.getItem('socio_totp_secret');
+    // El secreto TOTP se guarda de forma asíncrona (HomePage enrola el
+    // dispositivo contra el backend recién al loguearse) — si el socio entra
+    // a "Mi Carnet" antes de que ese enrolamiento termine, localStorage todavía
+    // no tiene nada. Por eso el chequeo va *dentro* de cada tick del intervalo
+    // en vez de una sola vez al montar: apenas el secreto aparece, el próximo
+    // tick (máximo 1s después) lo toma solo, sin necesitar "Recargar QR".
+    let generadorTotp = null;
+    let socioIdActual = null;
 
-    if (!socioId || !secreto) return;
+    const generarQR = () => {
+      if (!generadorTotp) {
+        socioIdActual = localStorage.getItem('socio_id');
+        const secreto = localStorage.getItem('socio_totp_secret');
+        if (!socioIdActual || !secreto) return;
 
-    try {
-      const generadorTotp = new OTPAuth.TOTP({
-        issuer: 'SocioUnido',
-        label: 'AccesoSocio',
-        algorithm: 'SHA1',
-        digits: 6,
-        period: 30,
-        secret: OTPAuth.Secret.fromBase32(secreto)
-      });
-
-      const generarQR = () => {
         try {
-          const token = generadorTotp.generate();
-          setQrData(`${socioId}|${token}`);
+          generadorTotp = new OTPAuth.TOTP({
+            issuer: 'SocioUnido',
+            label: 'AccesoSocio',
+            algorithm: 'SHA1',
+            digits: 6,
+            period: 30,
+            secret: OTPAuth.Secret.fromBase32(secreto)
+          });
         } catch (err) {
-          console.error('Error al generar TOTP token:', err);
+          console.error('Secreto TOTP inválido o corrupto:', err);
+          generadorTotp = null;
+          return;
         }
-      };
+      }
 
-      generarQR();
-      const intervalo = setInterval(generarQR, 1000);
-      return () => clearInterval(intervalo);
-    } catch (err) {
-      console.error('Secreto TOTP inválido o corrupto:', err);
-    }
+      try {
+        const token = generadorTotp.generate();
+        setQrData(`${socioIdActual}|${token}`);
+      } catch (err) {
+        console.error('Error al generar TOTP token:', err);
+      }
+    };
+
+    generarQR();
+    const intervalo = setInterval(generarQR, 1000);
+    return () => clearInterval(intervalo);
   }, []);
 
   if (!qrData) {

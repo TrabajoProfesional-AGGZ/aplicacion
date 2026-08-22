@@ -4,7 +4,7 @@
   align-items: center;
   padding: 2rem 1.5rem;
   min-height: calc(100vh - var(--bottom-nav-height) - 70px);
-  background-color: var(--color-surface); /* O el fondo que uses en tu app */
+  background-color: var(--color-bg);
   animation: fadeIn 0.3s ease-out;
 }
 
