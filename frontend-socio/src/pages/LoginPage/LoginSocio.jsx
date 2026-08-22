@@ -45,6 +45,13 @@ function calcularFormAnimateState(exiting, animStarted, shouldReduceMotion) {
   return 'hidden';
 }
 
+/**
+ * Pantalla de login. Al montar, una banda a pantalla completa con el logo se
+ * achica a una franja superior mientras aparece el formulario; al loguearse
+ * con éxito, la banda vuelve a cubrir la pantalla como transición de salida
+ * antes de avisar a `onIngresoCompleto` (con `prefers-reduced-motion`, sin
+ * animación, avisa directo).
+ */
 export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -74,6 +81,8 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
     }
   }, [socio, shouldReduceMotion, onIngresoCompleto]);
 
+  // authError: Firebase aceptó las credenciales pero el fetch del perfil falló —
+  // se trata como fallo del servicio, no como credenciales inválidas.
   useEffect(() => {
     if (authError && cargando) {
       cerrarSesion().finally(() => {

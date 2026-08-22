@@ -31,6 +31,7 @@ const ESTADO_COLOR = {
   Suspendido: 'var(--status-suspended-border)',
 };
 
+/** Input de contraseña con botón para mostrar/ocultar el valor. */
 function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, error }) {
   const [mostrar, setMostrar] = useState(false);
   return (
@@ -58,6 +59,7 @@ function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, er
   );
 }
 
+/** Modal de cambio de contraseña, con validación de fortaleza en tiempo real al perder foco. */
 function CambiarContraseniaModal({ cerrarSesion, onClose }) {
   const {
     actual, setActual, nueva, setNueva, confirmar, setConfirmar, error, loading, handleSubmit,
@@ -140,6 +142,7 @@ function CambiarContraseniaModal({ cerrarSesion, onClose }) {
   );
 }
 
+/** Modal para subir una nueva foto de perfil, desde archivo o cámara. */
 function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
   const inputDispositivoRef = useRef(null);
   const inputCamaraRef = useRef(null);
@@ -291,6 +294,7 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
   );
 }
 
+/** Modal que muestra la foto de perfil actual en tamaño completo. */
 function FotoAmpliadaModal({ socio, onClose, onCambiarFoto }) {
   return (
     <ModalOverlay onClose={onClose} wrapperClass="foto-ampliada-wrapper">
@@ -309,6 +313,7 @@ function FotoAmpliadaModal({ socio, onClose, onCambiarFoto }) {
   );
 }
 
+/** Vista de perfil del socio: datos personales, foto y cambio de contraseña. */
 export function PerfilPage({ socio, cerrarSesion }) {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [fotoModalAbierto, setFotoModalAbierto] = useState(false);

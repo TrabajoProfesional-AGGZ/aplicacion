@@ -35,6 +35,10 @@ function inferirTipoItem(concepto) {
   return 'cuota';
 }
 
+/**
+ * Estado financiero del socio: resumen de deuda y lista de cuotas/reservas/
+ * entradas, con acceso al flujo de pago (`PagoCuotaFlow`) de cada ítem pendiente.
+ */
 export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar = () => {} }) {
   const { refrescarSocio } = useAuth();
   const [resumen, setResumen] = useState(null);

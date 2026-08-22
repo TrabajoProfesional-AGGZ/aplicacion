@@ -27,6 +27,13 @@ const stepFields = {
   4: ['email', 'password'],
 };
 
+/**
+ * Formulario de reclamo de cuenta (no de alta): valida la identidad contra un
+ * socio ya existente en el backend, crea las credenciales de Firebase recién
+ * después, y adjunta esos datos al registro existente. Si falla el guardado
+ * en el backend, revierte creando un rollback del usuario de Firebase recién
+ * creado, para no dejar una cuenta huérfana.
+ */
 export function RegistroSocioForm({ onSuccess, onCancel }) {
 const {
     step, direction, submitted, setSubmitted, navGuard,
@@ -176,7 +183,7 @@ const {
           </FormStep>
         )}
 
-        {/* PASO 2: DATOS PERSONALES[cite: 1] */}
+        {/* PASO 2: DATOS PERSONALES */}
         {step === 2 && (
           <FormStep key="step2" direction={direction}>
             <div className="csf-grid-2">
@@ -241,7 +248,7 @@ const {
           </FormStep>
         )}
 
-        {/* PASO 4: CREDENCIALES (Firebase)[cite: 1] */}
+        {/* PASO 4: CREDENCIALES */}
         {step === 4 && (
           <FormStep key="step4" direction={direction}>
             <EmailField register={register} errors={errors} required />

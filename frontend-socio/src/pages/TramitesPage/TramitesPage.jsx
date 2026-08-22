@@ -26,6 +26,7 @@ function formatearFecha(fechaIso) {
   }).format(new Date(fechaIso));
 }
 
+/** Lista de trámites cargados por el socio, con acceso al formulario de carga. */
 export function TramitesPage({ socio }) {
   const [tramites, setTramites] = useState([]);
   const [cargando, setCargando] = useState(true);
