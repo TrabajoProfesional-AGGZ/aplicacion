@@ -82,10 +82,13 @@
 .compra-card-precio { font-weight: 700; color: var(--color-text-primary); font-size: 0.95rem; }
 
 /* ── Grid de productos ── */
-.tienda-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-3); }
+.tienda-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+@media (max-width: 380px) {
+  .tienda-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 .tienda-card {
-  display: flex; flex-direction: column;
+  display: flex; flex-direction: column; min-width: 0;
   background-color: var(--color-surface); border-radius: var(--radius-md);
   overflow: hidden; cursor: pointer; border: none; text-align: left; width: 100%;
   box-shadow: var(--shadow-sm);
@@ -107,10 +110,16 @@
 .tienda-card--agotado .tienda-card-img,
 .tienda-card--agotado .tienda-card-img-placeholder { opacity: 0.55; filter: grayscale(0.4); }
 
-.tienda-card-info { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); }
-.tienda-card-nombre { font-weight: 700; color: var(--color-text-primary); font-size: 0.92rem; }
-.tienda-card-precio { font-weight: 700; color: var(--color-text-primary); font-size: 1rem; }
-.tienda-card-stock { font-size: 0.78rem; color: var(--color-text-secondary); }
+.tienda-card-info { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.tienda-card-nombre {
+  font-weight: 700; color: var(--color-text-primary); font-size: 0.92rem;
+  overflow-wrap: break-word; word-break: break-word;
+}
+.tienda-card-precio {
+  font-weight: 700; color: var(--color-text-primary); font-size: 1rem;
+  overflow-wrap: break-word; word-break: break-word;
+}
+.tienda-card-stock { font-size: 0.78rem; color: var(--color-text-secondary); overflow-wrap: break-word; }
 .tienda-card-stock--agotado {
   font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
   font-size: 0.72rem; color: var(--status-danger-border);
