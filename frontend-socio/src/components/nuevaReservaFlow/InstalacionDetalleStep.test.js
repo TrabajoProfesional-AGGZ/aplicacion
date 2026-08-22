@@ -49,34 +49,21 @@ describe('InstalacionDetalleStep', () => {
     expect(onFechaChange).toHaveBeenCalledWith('2027-01-15');
   });
 
-  test('clickear el input de fecha abre el calendario nativo en vez de permitir tipear', () => {
+  test('clickear el selector de fecha abre el calendario custom (mismo estilo que WebApp)', () => {
     render(<InstalacionDetalleStep {...baseProps} />);
-    const input = screen.getByLabelText('Fecha');
-    input.showPicker = jest.fn();
-
-    fireEvent.click(input);
-
-    expect(input.showPicker).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: /10 de enero de 2027/i }));
+    expect(screen.getByRole('dialog', { name: /elegir fecha/i })).toBeInTheDocument();
   });
 
-  test('no permite editar la fecha con el teclado (solo vía el calendario)', () => {
+  test('elegir un día en el calendario llama a onFechaChange y cierra el popover', () => {
     const onFechaChange = jest.fn();
     render(<InstalacionDetalleStep {...baseProps} onFechaChange={onFechaChange} />);
-    const input = screen.getByLabelText('Fecha');
+    fireEvent.click(screen.getByRole('button', { name: /10 de enero de 2027/i }));
 
-    const evento = fireEvent.keyDown(input, { key: '5' });
+    fireEvent.click(screen.getByRole('button', { name: '15' }));
 
-    expect(evento).toBe(false); // false === preventDefault() fue llamado
-    expect(onFechaChange).not.toHaveBeenCalled();
-  });
-
-  test('permite navegar con Tab fuera del input de fecha', () => {
-    render(<InstalacionDetalleStep {...baseProps} />);
-    const input = screen.getByLabelText('Fecha');
-
-    const evento = fireEvent.keyDown(input, { key: 'Tab' });
-
-    expect(evento).toBe(true); // no se llamó preventDefault()
+    expect(onFechaChange).toHaveBeenCalledWith('2027-01-15');
+    expect(screen.queryByRole('dialog', { name: /elegir fecha/i })).not.toBeInTheDocument();
   });
 
   test('muestra un esqueleto de carga mientras llegan los turnos', () => {
