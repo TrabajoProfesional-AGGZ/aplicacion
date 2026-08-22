@@ -1,4 +1,5 @@
 import { ArrowLeft, Clock, ChevronRight, AlertCircle } from 'lucide-react';
+import { DatePicker } from '../createForm/DatePicker';
 import './InstalacionDetalleStep.css';
 
 function formatearMonto(monto) {
@@ -11,22 +12,6 @@ function hoyISO() {
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
-}
-
-function abrirCalendario(e) {
-  try {
-    e.target.showPicker?.();
-  } catch {
-    // Navegadores sin soporte (Safari viejo, Firefox <101) o sin gesto de usuario
-    // válido: el input sigue siendo clickeable/enfocable normalmente.
-  }
-}
-
-function bloquearEdicionManual(e) {
-  // Solo se puede cambiar la fecha a través del calendario nativo (showPicker),
-  // no tipeando sobre el input — evita fechas mal formadas / fuera de la grilla.
-  if (e.key === 'Tab' || e.key === 'Escape') return;
-  e.preventDefault();
 }
 
 export function InstalacionDetalleStep({
@@ -75,16 +60,12 @@ export function InstalacionDetalleStep({
       </section>
 
       <label className="detalle-fecha-label" htmlFor="detalle-fecha-input">Fecha</label>
-      <input
+      <DatePicker
         id="detalle-fecha-input"
-        type="date"
         className="detalle-fecha-input"
         min={hoyISO()}
         value={fecha}
         onChange={(e) => onFechaChange(e.target.value)}
-        onClick={abrirCalendario}
-        onFocus={abrirCalendario}
-        onKeyDown={bloquearEdicionManual}
       />
 
       <h3 className="detalle-turnos-titulo">Turnos disponibles</h3>
