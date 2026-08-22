@@ -15,14 +15,9 @@ export async function getNoticia(id) {
 // Caché en memoria (variable de módulo) de la última noticia vigente ya
 // resuelta con su detalle completo (foto incluida). `getNoticiasVigentes`
 // (barata, sin foto) se llama siempre para detectar si cambió la más
-// reciente; `getNoticia` (con foto) solo se vuelve a llamar si su id
-// cambió — así una noticia nueva se refleja al toque, sin esperar un TTL.
-//
-// Deliberadamente una variable de módulo, no `sessionStorage`: se resetea
-// si se recarga la página/PWA (se evaluó `sessionStorage` para sobrevivir
-// un refresh dentro de la misma sesión; ver `aplicacion/CLAUDE.md`, sección
-// "Extensión Última Noticia", si en algún momento hace falta ese nivel de
-// persistencia).
+// reciente; `getNoticia` (con foto) solo se vuelve a llamar si cambió el id.
+// Se resetea al recargar la página/PWA — es una variable de módulo, no
+// `sessionStorage`, a propósito.
 let cacheUltimaNoticia = null; // { id, detalle } | null
 
 export async function getUltimaNoticia() {

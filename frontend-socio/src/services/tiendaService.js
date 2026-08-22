@@ -12,6 +12,7 @@ export async function getProducto(id) {
   return res.json();
 }
 
+/** Traduce la respuesta HTTP a errores de código corto (ej. `'sin-stock'`) que los componentes matchean por `e.message`. */
 async function manejarRespuestaCompra(res) {
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (res.status === 404) throw new Error('producto-no-encontrado');
