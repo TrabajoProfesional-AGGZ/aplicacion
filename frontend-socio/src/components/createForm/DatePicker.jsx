@@ -79,6 +79,7 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
 
   function selectDay(iso) {
     setNativeValue(inputRef.current, iso);
+    setValue(iso);
     closePopover();
   }
 
