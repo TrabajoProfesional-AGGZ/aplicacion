@@ -71,7 +71,7 @@ describe('DatePicker', () => {
     const hiddenInput = container.querySelector('input[type="date"]');
     expect(hiddenInput.value).toMatch(/-10$/);
 
-    fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
+    fireEvent.click(container.querySelector('.csf-picker-trigger'));
     expect(screen.getByRole('dialog', { name: /elegir fecha/i })).toBeInTheDocument();
   });
 });

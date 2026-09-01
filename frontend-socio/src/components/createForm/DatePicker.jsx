@@ -163,6 +163,7 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
                   type="button"
                   disabled={isDisabled}
                   onClick={() => selectDay(iso)}
+                  aria-label={inMonth ? undefined : `${date.getDate()} de ${MESES[date.getMonth()]}`}
                   className={[
                     'csf-calendar-day',
                     !inMonth && 'csf-calendar-day--muted',
