@@ -1,6 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { Carnet } from './Carnet';
-import { enrolarYGuardarSecreto } from '../../services/accesosService';
+import { enrolarYGuardarSecreto, obtenerUltimoAcceso } from '../../services/accesosService';
 
 jest.mock('../AccesoQR/AccesoQr', () => {
   return function MockAccesoQR() {
@@ -10,9 +10,15 @@ jest.mock('../AccesoQR/AccesoQr', () => {
 
 jest.mock('../../services/accesosService', () => ({
   enrolarYGuardarSecreto: jest.fn(),
+  obtenerUltimoAcceso: jest.fn(),
 }));
 
 describe('Carnet', () => {
+  beforeEach(() => {
+    obtenerUltimoAcceso.mockReset();
+    obtenerUltimoAcceso.mockResolvedValue(null);
+  });
+
   test('renderiza la estructura básica de la credencial', () => {
     render(<Carnet socio={null} />);
     
@@ -100,6 +106,150 @@ describe('Carnet', () => {
       fireEvent.click(screen.getByRole('button', { name: /recargar qr/i }));
 
       expect(await screen.findByText(/no se pudo recargar el qr/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('feedback de acceso (polling)', () => {
+    const socioMock = { id: 'socio-1', nombre: 'Lautaro Ghosn', nro_socio: '12345' };
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test('aparece overlay verde cuando el polling detecta un acceso aprobado', async () => {
+      obtenerUltimoAcceso.mockResolvedValue({
+        id: 1,
+        aprobado: true,
+        mensaje: 'Acceso permitido. Molinete liberado.',
+        nombre: 'Lautaro Ghosn',
+        creado_en: new Date(Date.now() + 1000).toISOString(),
+      });
+      enrolarYGuardarSecreto.mockResolvedValue('SECRETO_NUEVO');
+
+      render(<Carnet socio={socioMock} />);
+
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      expect(screen.getByText('Acceso permitido. Molinete liberado.')).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveClass('carnet-resultado-overlay--exito');
+    });
+
+    test('aparece overlay rojo cuando el polling detecta un acceso rechazado', async () => {
+      obtenerUltimoAcceso.mockResolvedValue({
+        id: 1,
+        aprobado: false,
+        mensaje: 'Código QR inválido o expirado',
+        estado_financiero: 'Moroso',
+        creado_en: new Date(Date.now() + 1000).toISOString(),
+      });
+
+      render(<Carnet socio={socioMock} />);
+
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      expect(screen.getByText('Código QR inválido o expirado')).toBeInTheDocument();
+      expect(screen.getByText('Estado financiero: Moroso')).toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveClass('carnet-resultado-overlay--error');
+    });
+
+    test('"Ok" descarta el resultado y no reaparece con el mismo id', async () => {
+      obtenerUltimoAcceso.mockResolvedValue({
+        id: 1,
+        aprobado: false,
+        mensaje: 'Código QR inválido o expirado',
+        creado_en: new Date(Date.now() + 1000).toISOString(),
+      });
+
+      render(<Carnet socio={socioMock} />);
+
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      fireEvent.click(screen.getByRole('button', { name: /ok/i }));
+      expect(screen.queryByText('Código QR inválido o expirado')).not.toBeInTheDocument();
+
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      expect(screen.queryByText('Código QR inválido o expirado')).not.toBeInTheDocument();
+    });
+
+    test('ignora un resultado con creado_en anterior al momento de apertura', async () => {
+      obtenerUltimoAcceso.mockResolvedValue({
+        id: 1,
+        aprobado: true,
+        mensaje: 'Acceso permitido. Molinete liberado.',
+        creado_en: new Date(Date.now() - 60000).toISOString(),
+      });
+
+      render(<Carnet socio={socioMock} />);
+
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      expect(screen.queryByText('Acceso permitido. Molinete liberado.')).not.toBeInTheDocument();
+    });
+
+    test('no hace polling si el dispositivo está offline', async () => {
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+
+      render(<Carnet socio={socioMock} />);
+
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
+        await Promise.resolve();
+      });
+
+      expect(obtenerUltimoAcceso).not.toHaveBeenCalled();
+
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: true });
+    });
+
+    test('"Recargar QR" limpia un resultado ya mostrado', async () => {
+      obtenerUltimoAcceso.mockResolvedValue({
+        id: 1,
+        aprobado: false,
+        mensaje: 'Código QR inválido o expirado',
+        creado_en: new Date(Date.now() + 1000).toISOString(),
+      });
+      enrolarYGuardarSecreto.mockResolvedValue('SECRETO_NUEVO');
+
+      render(<Carnet socio={socioMock} />);
+
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      expect(screen.getByText('Código QR inválido o expirado')).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: /recargar qr/i }));
+
+      await waitFor(() => {
+        expect(screen.queryByText('Código QR inválido o expirado')).not.toBeInTheDocument();
+      });
     });
   });
 });

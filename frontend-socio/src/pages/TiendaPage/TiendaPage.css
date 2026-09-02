@@ -83,7 +83,7 @@
 .compra-card-precio { font-weight: 700; color: var(--color-text-primary); font-size: 0.95rem; }
 
 /* ── Grid de productos ── */
-.tienda-grid {display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+.tienda-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
 @media (max-width: 380px) {
   .tienda-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
@@ -120,7 +120,7 @@
   font-weight: 700; color: var(--color-text-primary); font-size: 1rem;
   overflow-wrap: break-word; word-break: break-word;
 }
-.tienda-card-stock { font-size: 0.78rem; color: var(--color-text-primary); overflow-wrap: break-word; }
+.tienda-card-stock { font-size: 0.78rem; color: var(--color-text-secondary); overflow-wrap: break-word; }
 .tienda-card-stock--agotado {
   font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
   font-size: 0.72rem; color: var(--status-danger-border);

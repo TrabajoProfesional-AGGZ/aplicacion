@@ -1,4 +1,4 @@
-import { enrolarYGuardarSecreto } from './accesosService';
+import { enrolarYGuardarSecreto, obtenerUltimoAcceso } from './accesosService';
 import { fetchTo } from '../utils/utils';
 
 jest.mock('../utils/utils', () => ({
@@ -82,5 +82,45 @@ test('intercepta secretos con formato inválido y registra un error seguro (sin 
     await enrolarYGuardarSecreto(socio);
 
     expect(localStorage.getItem('socio_totp_secret')).toBe('SECRETONUEVO');
+  });
+});
+
+describe('obtenerUltimoAcceso', () => {
+  beforeEach(() => {
+    fetchTo.mockClear();
+  });
+
+  test('pide el último estado y devuelve el body si la respuesta es ok', async () => {
+    const body = { id: 1, aprobado: true, mensaje: 'Acceso permitido. Molinete liberado.' };
+    fetchTo.mockResolvedValueOnce({ ok: true, json: async () => body });
+
+    const resultado = await obtenerUltimoAcceso('socio-1');
+
+    expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/ultimo-estado/socio-1', 'GET');
+    expect(resultado).toEqual(body);
+  });
+
+  test('devuelve null si la respuesta no es ok', async () => {
+    fetchTo.mockResolvedValueOnce({ ok: false });
+
+    const resultado = await obtenerUltimoAcceso('socio-1');
+
+    expect(resultado).toBeNull();
+  });
+
+  test('devuelve null si fetchTo lanza', async () => {
+    fetchTo.mockRejectedValueOnce(new Error('network error'));
+
+    const resultado = await obtenerUltimoAcceso('socio-1');
+
+    expect(resultado).toBeNull();
+  });
+
+  test('devuelve null si el body es null (nunca fue escaneado)', async () => {
+    fetchTo.mockResolvedValueOnce({ ok: true, json: async () => null });
+
+    const resultado = await obtenerUltimoAcceso('socio-1');
+
+    expect(resultado).toBeNull();
   });
 });

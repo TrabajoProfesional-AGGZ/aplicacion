@@ -79,6 +79,7 @@
 
 /* Fondo obligatoriamente blanco para la lectura del QR */
 .carnet-qr-container {
+  position: relative;
   background: white;
   padding: 20px;
   border-radius: 16px;
@@ -87,6 +88,67 @@
   align-items: center;
   margin-bottom: 24px;
   box-shadow: 0 10px 20px rgba(0,0,0,0.15) inset;
+}
+
+.carnet-resultado-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px;
+  text-align: center;
+  color: white;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.carnet-resultado-overlay--exito {
+  background-color: var(--status-success-border);
+}
+
+.carnet-resultado-overlay--error {
+  background-color: var(--status-danger-border);
+}
+
+.carnet-resultado-icono {
+  flex-shrink: 0;
+}
+
+.carnet-resultado-mensaje {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.carnet-resultado-nombre {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.carnet-resultado-estado-financiero {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.carnet-resultado-ok {
+  margin-top: 10px;
+  padding: 6px 28px;
+  border: none;
+  border-radius: 999px;
+  background-color: white;
+  color: #1a1a1c;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.carnet-resultado-ok:active {
+  transform: scale(0.96);
 }
 
 .qr-skeleton {

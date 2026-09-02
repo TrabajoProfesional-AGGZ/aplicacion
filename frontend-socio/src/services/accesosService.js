@@ -31,3 +31,19 @@ export async function enrolarYGuardarSecreto(socio) {
 
   return secreto;
 }
+
+/**
+ * Pide el último resultado de escaneo registrado para este socio (usado por
+ * el polling de "Mi Carnet" para mostrar feedback de acceso concedido/rechazado).
+ * Nunca lanza — cualquier error de red o respuesta no-ok se degrada a null,
+ * igual criterio que el resto de este servicio.
+ */
+export async function obtenerUltimoAcceso(socioId) {
+  try {
+    const res = await fetchTo(`/api/v1/accesos/ultimo-estado/${encodeURIComponent(socioId)}`, 'GET');
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
