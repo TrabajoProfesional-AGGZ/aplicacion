@@ -160,6 +160,50 @@ describe('PerfilPage', () => {
     expect(changePassword).not.toHaveBeenCalled();
   });
 
+  test('el botón de mostrar/ocultar cambia el tipo del input de contraseña', () => {
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    abrirModalCambiarContrasenia();
+    const input = screen.getByLabelText('Contraseña actual');
+    expect(input).toHaveAttribute('type', 'password');
+
+    fireEvent.click(screen.getAllByLabelText('Mostrar contraseña')[0]);
+    expect(input).toHaveAttribute('type', 'text');
+    expect(screen.getAllByLabelText('Ocultar contraseña')[0]).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByLabelText('Ocultar contraseña')[0]);
+    expect(input).toHaveAttribute('type', 'password');
+  });
+
+  test('si el input estaba enfocado al togglear, restaura el foco tras el cambio de tipo', () => {
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    abrirModalCambiarContrasenia();
+    const input = screen.getByLabelText('Contraseña actual');
+    input.focus();
+    expect(document.activeElement).toBe(input);
+
+    fireEvent.click(screen.getAllByLabelText('Mostrar contraseña')[0]);
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+
+    expect(document.activeElement).toBe(input);
+  });
+
+  test('si el input no estaba enfocado al togglear, no fuerza blur/focus', () => {
+    render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    abrirModalCambiarContrasenia();
+    const input = screen.getByLabelText('Contraseña actual');
+    expect(document.activeElement).not.toBe(input);
+
+    fireEvent.click(screen.getAllByLabelText('Mostrar contraseña')[0]);
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+
+    expect(input).toHaveAttribute('type', 'text');
+    expect(document.activeElement).not.toBe(input);
+  });
+
   test('al cambiar la contraseña con éxito, cierra la sesión automáticamente', async () => {
     changePassword.mockResolvedValueOnce();
     const cerrarSesion = jest.fn().mockResolvedValueOnce();
