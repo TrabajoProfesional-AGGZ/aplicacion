@@ -34,9 +34,27 @@ const ESTADO_COLOR = {
 /** Input de contraseña con botón para mostrar/ocultar el valor. */
 function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, error }) {
   const [mostrar, setMostrar] = useState(false);
+  const inputRef = useRef(null);
+
+  function alternarMostrar() {
+    const estabaEnfocado = document.activeElement === inputRef.current;
+    setMostrar((v) => !v);
+    if (estabaEnfocado) {
+      // Con autocompletado activo, algunos navegadores (Chrome) no repintan
+      // el enmascarado del input al cambiar `type` mientras sigue enfocado
+      // — solo lo actualizan al perder el foco. Forzamos un blur/focus real
+      // para que el cambio se vea al instante sin que el usuario pierda el foco.
+      requestAnimationFrame(() => {
+        inputRef.current?.blur();
+        inputRef.current?.focus();
+      });
+    }
+  }
+
   return (
     <div className="perfil-password-wrapper">
       <input
+        ref={inputRef}
         id={id}
         type={mostrar ? 'text' : 'password'}
         value={value}
@@ -50,7 +68,7 @@ function PasswordInput({ id, value, onChange, onBlur, autoComplete, required, er
       <button
         type="button"
         className="perfil-toggle-password"
-        onClick={() => setMostrar((v) => !v)}
+        onClick={alternarMostrar}
         aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
       >
         {mostrar ? <EyeOff size={16} /> : <Eye size={16} />}

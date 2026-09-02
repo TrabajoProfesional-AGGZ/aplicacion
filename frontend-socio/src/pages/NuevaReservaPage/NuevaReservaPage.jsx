@@ -17,7 +17,13 @@ const MENSAJES_ERROR_SUBMIT = {
 };
 
 function hoyISO() {
-  return new Date().toISOString().slice(0, 10);
+  // Fecha local, no UTC: `toISOString()` adelanta el día para usuarios en
+  // husos horarios negativos (ej. Argentina, UTC-3) cerca de la medianoche.
+  const ahora = new Date();
+  const anio = ahora.getFullYear();
+  const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+  const dia = String(ahora.getDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
 }
 
 function filtrarTurnosPasados(turnos, fecha) {
@@ -105,7 +111,9 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
   function irASocios(turno) {
     setTurnoSeleccionado(turno.hora_inicio);
     setCuposDisponiblesTurno(turno.cupos_disponibles);
-    setStep('socios');
+    // Con capacidad máxima 1 (ej. parrillas) no tiene sentido agregar otros
+    // socios a la reserva: se salta directo al resumen.
+    setStep(instalacionSeleccionada.capacidad_maxima === 1 ? 'resumen' : 'socios');
   }
 
   function volverAInstalaciones() {
