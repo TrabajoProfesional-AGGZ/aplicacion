@@ -26,6 +26,8 @@ export async function crearTramite(idSocio, { id_tipo_tramite, archivo_base64, f
     id_tipo_tramite,
     archivo_base64,
     fecha_vencimiento: fecha_vencimiento || null,
+    // Pago/aprobación simulados (rama demo) — ver PagoCuotaFlow.jsx.
+    demo_secreto: import.meta.env.VITE_DEMO_PAGO_SECRET,
   });
   if (res.status === 413) throw new Error('archivo-muy-grande');
   if (res.status >= 500) throw new Error('servicio-no-disponible');

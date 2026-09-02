@@ -88,6 +88,7 @@ describe('tramitesService', () => {
         id_tipo_tramite: 1,
         archivo_base64: 'data:application/pdf;base64,AAAA',
         fecha_vencimiento: '2027-07-10',
+        demo_secreto: undefined,
       });
       expect(resultado).toEqual(TRAMITE_MOCK);
     });
@@ -99,6 +100,7 @@ describe('tramitesService', () => {
         id_tipo_tramite: 2,
         archivo_base64: 'data:image/jpeg;base64,AAAA',
         fecha_vencimiento: null,
+        demo_secreto: undefined,
       });
     });
 
