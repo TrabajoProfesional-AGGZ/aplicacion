@@ -21,18 +21,19 @@ const STEPS = [
 ];
 
 const stepFields = {
-  1: ['nroSocio', 'nroDocumento'],
+  1: ['nroSocio', 'nroDocumento', 'email'],
   2: ['nombre', 'apellido', 'fechaNacimiento', 'genero'],
   3: ['telefono', 'direccion'],
-  4: ['email', 'password'],
+  4: ['password'],
 };
 
 /**
- * Formulario de reclamo de cuenta (no de alta): valida la identidad contra un
- * socio ya existente en el backend, crea las credenciales de Firebase recién
- * después, y adjunta esos datos al registro existente. Si falla el guardado
- * en el backend, revierte creando un rollback del usuario de Firebase recién
- * creado, para no dejar una cuenta huérfana.
+ * Formulario de reclamo de cuenta (no de alta): valida la identidad (incluido
+ * el mail, que debe coincidir con el que ya tiene el socio en el backend)
+ * contra un socio ya existente, crea las credenciales de Firebase recién
+ * después, y adjunta el resto de los datos al registro existente. Si falla
+ * el guardado en el backend, revierte creando un rollback del usuario de
+ * Firebase recién creado, para no dejar una cuenta huérfana.
  */
 export function RegistroSocioForm({ onSuccess, onCancel }) {
 const {
@@ -64,9 +65,9 @@ const {
     if (step === 1) {
       setValidandoPaso(true);
       try {
-        const { nroSocio, nroDocumento } = getValues();
+        const { nroSocio, nroDocumento, email } = getValues();
 
-        await validarSocio(nroSocio, nroDocumento);
+        await validarSocio(nroSocio, nroDocumento, email);
 
         goNext();
       } catch (error) {
@@ -95,13 +96,14 @@ const {
       usuarioCreado = userCredential.user;
       const tokenJWT = await getIdToken(userCredential.user);
 
+      // No se manda "email": ya quedó validado contra el de la base en el paso 1,
+      // reenviarlo acá lo pisaría innecesariamente.
       const payload = {
         nombre: data.nombre,
         apellido: data.apellido,
         fecha_nacimiento: data.fechaNacimiento,
         nro_documento: data.nroDocumento,
         genero: data.genero,
-        email: data.email,
         telefono: data.telefono,
         direccion: data.direccion
       };
@@ -178,7 +180,8 @@ const {
               />
             </Field>
             <DocNumberField docNumberRegister={nroDocumentoRegister} errors={errors} fieldKey="nroDocumento" />
-            
+            <EmailField register={register} errors={errors} required />
+
             {formError && <p className="csf-form-error">{formError}</p>}
           </FormStep>
         )}
@@ -251,7 +254,6 @@ const {
         {/* PASO 4: CREDENCIALES */}
         {step === 4 && (
           <FormStep key="step4" direction={direction}>
-            <EmailField register={register} errors={errors} required />
             <Field label="Contraseña" icon={Lock} error={errors.password?.message}>
               <StyledInput
                 {...register('password', getPasswordRules())}

@@ -28,6 +28,7 @@ const onCancel = jest.fn();
 async function fillStep1() {
   await userEvent.type(screen.getByPlaceholderText('Ej: 1234'), '1000');
   await userEvent.type(screen.getByPlaceholderText('Ej. 12345678'), '12345678');
+  await userEvent.type(screen.getByPlaceholderText('maria@ejemplo.com'), 'juan@club.com');
 }
 
 async function fillStep2() {
@@ -43,7 +44,6 @@ async function fillStep3() {
 }
 
 async function fillStep4() {
-  await userEvent.type(screen.getByPlaceholderText('maria@ejemplo.com'), 'juan@club.com');
   await userEvent.type(
     screen.getByPlaceholderText('Mínimo 10 caracteres, con mayúscula, minúscula y número'),
     'Clave12345',
@@ -75,7 +75,7 @@ async function navigateToStep4() {
   await fillStep3();
   await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
   expect(await screen.findByText(/Paso 4 de 4/)).toBeInTheDocument();
-  expect(await screen.findByPlaceholderText('maria@ejemplo.com')).toBeInTheDocument();
+  expect(await screen.findByPlaceholderText('Mínimo 10 caracteres, con mayúscula, minúscula y número')).toBeInTheDocument();
 }
 
 describe('RegistroSocioForm', () => {
@@ -90,6 +90,7 @@ describe('RegistroSocioForm', () => {
     expect(screen.getByText(/Paso 1 de 4/)).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Ej: 1234')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Ej. 12345678')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('maria@ejemplo.com')).toBeInTheDocument();
   });
 
   test('muestra errores de validación si se intenta avanzar con campos vacíos', async () => {
@@ -104,7 +105,7 @@ describe('RegistroSocioForm', () => {
   test('avanza al paso 2 cuando la validación de identidad es exitosa', async () => {
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await navigateToStep2();
-    expect(validarSocio).toHaveBeenCalledWith('1000', '12345678');
+    expect(validarSocio).toHaveBeenCalledWith('1000', '12345678', 'juan@club.com');
   });
 
   test('muestra error cuando los datos no coinciden con ningún socio', async () => {
@@ -117,6 +118,20 @@ describe('RegistroSocioForm', () => {
       expect(screen.getByText(/no pudimos validar tu identidad/i)).toBeInTheDocument();
     });
     expect(screen.queryByText(/Paso 2 de 4/)).not.toBeInTheDocument();
+  });
+
+  test('no permite avanzar si el mail no coincide con el de la base (mismo error genérico de identidad)', async () => {
+    validarSocio.mockRejectedValueOnce(new Error('socio-no-encontrado'));
+    render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
+    await fillStep1();
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+
+    expect(validarSocio).toHaveBeenCalledWith('1000', '12345678', 'juan@club.com');
+    await waitFor(() => {
+      expect(screen.getByText(/no pudimos validar tu identidad/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/Paso 2 de 4/)).not.toBeInTheDocument();
+    expect(createUserWithEmailAndPassword).not.toHaveBeenCalled();
   });
 
   test('muestra aviso de cuenta ya registrada cuando el socio ya reclamó su cuenta', async () => {
@@ -155,6 +170,7 @@ describe('RegistroSocioForm', () => {
     await waitFor(() => expect(fetchTo).toHaveBeenCalledWith(
       '/api/v1/socios/por-dni/12345678', 'PATCH', expect.objectContaining({ nombre: 'Juan', apellido: 'Lopez' })
     ));
+    expect(fetchTo.mock.calls[0][2]).not.toHaveProperty('email');
     await waitFor(() => expect(reclamarCuentaSocio).toHaveBeenCalledWith('12345678'));
     expect(await screen.findByText('¡Cuenta configurada!')).toBeInTheDocument();
     expect(deleteUser).not.toHaveBeenCalled();

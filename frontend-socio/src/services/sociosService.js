@@ -1,7 +1,7 @@
 import { fetchTo, fetchWithOutAuth } from '../utils/utils';
 
-export async function validarSocio(nroSocio, dni) {
-  const res = await fetchWithOutAuth('/api/v1/socios/validar', 'POST', { nro_socio: nroSocio, dni });
+export async function validarSocio(nroSocio, dni, mail) {
+  const res = await fetchWithOutAuth('/api/v1/socios/validar', 'POST', { nro_socio: nroSocio, dni, mail });
   if (res.status === 404) throw new Error('socio-no-encontrado');
   if (res.status === 409) throw new Error('cuenta-ya-registrada');
   if (!res.ok) throw new Error('Error al validar el socio');
