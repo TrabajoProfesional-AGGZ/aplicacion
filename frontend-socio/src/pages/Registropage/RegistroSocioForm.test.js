@@ -153,10 +153,11 @@ describe('RegistroSocioForm', () => {
     expect(await screen.findByText(/Paso 1 de 4/)).toBeInTheDocument();
   });
 
-  test('completa el registro: crea el usuario en Firebase, actualiza el perfil y reclama la cuenta', async () => {
+  test('completa el registro: crea el usuario en Firebase, asigna el claim tipo, actualiza el perfil y reclama la cuenta', async () => {
     createUserWithEmailAndPassword.mockResolvedValueOnce({ user: { uid: 'firebase-uid' } });
-    getIdToken.mockResolvedValueOnce('mock-id-token');
-    fetchTo.mockResolvedValueOnce({ ok: true });
+    getIdToken.mockResolvedValue('mock-id-token');
+    fetchTo.mockResolvedValueOnce({ ok: true, json: async () => ({ uid: 'firebase-uid', tipo: 'socio' }) }); // claims/tipo
+    fetchTo.mockResolvedValueOnce({ ok: true }); // PATCH por-dni
     reclamarCuentaSocio.mockResolvedValueOnce({});
 
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
@@ -168,9 +169,12 @@ describe('RegistroSocioForm', () => {
       expect.anything(), 'juan@club.com', 'Clave12345'
     ));
     await waitFor(() => expect(fetchTo).toHaveBeenCalledWith(
+      '/api/v1/auth/claims/tipo', 'POST', { id_token: 'mock-id-token', tipo: 'socio' }
+    ));
+    await waitFor(() => expect(fetchTo).toHaveBeenCalledWith(
       '/api/v1/socios/por-dni/12345678', 'PATCH', expect.objectContaining({ nombre: 'Juan', apellido: 'Lopez' })
     ));
-    expect(fetchTo.mock.calls[0][2]).not.toHaveProperty('email');
+    expect(fetchTo.mock.calls[1][2]).not.toHaveProperty('email');
     await waitFor(() => expect(reclamarCuentaSocio).toHaveBeenCalledWith('12345678'));
     expect(await screen.findByText('¡Cuenta configurada!')).toBeInTheDocument();
     expect(deleteUser).not.toHaveBeenCalled();
@@ -178,8 +182,9 @@ describe('RegistroSocioForm', () => {
 
   test('llama a onSuccess tras 1800ms de la pantalla de éxito', async () => {
     createUserWithEmailAndPassword.mockResolvedValueOnce({ user: { uid: 'firebase-uid' } });
-    getIdToken.mockResolvedValueOnce('mock-id-token');
-    fetchTo.mockResolvedValueOnce({ ok: true });
+    getIdToken.mockResolvedValue('mock-id-token');
+    fetchTo.mockResolvedValueOnce({ ok: true, json: async () => ({ uid: 'firebase-uid', tipo: 'socio' }) }); // claims/tipo
+    fetchTo.mockResolvedValueOnce({ ok: true }); // PATCH por-dni
     reclamarCuentaSocio.mockResolvedValueOnce({});
 
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
@@ -193,10 +198,27 @@ describe('RegistroSocioForm', () => {
     await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 3000 });
   });
 
+  test('si falla la asignación del claim tipo, hace rollback del usuario recién creado en Firebase', async () => {
+    createUserWithEmailAndPassword.mockResolvedValueOnce({ user: { uid: 'firebase-uid' } });
+    getIdToken.mockResolvedValue('mock-id-token');
+    fetchTo.mockResolvedValueOnce({ ok: false }); // claims/tipo falla
+    deleteUser.mockResolvedValueOnce();
+
+    render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
+    await navigateToStep4();
+    await fillStep4();
+    await userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
+
+    await waitFor(() => expect(deleteUser).toHaveBeenCalledWith({ uid: 'firebase-uid' }));
+    expect(reclamarCuentaSocio).not.toHaveBeenCalled();
+    expect(screen.getByText(/hubo un error al guardar tus datos/i)).toBeInTheDocument();
+  });
+
   test('si falla la actualización del perfil, hace rollback del usuario recién creado en Firebase', async () => {
     createUserWithEmailAndPassword.mockResolvedValueOnce({ user: { uid: 'firebase-uid' } });
-    getIdToken.mockResolvedValueOnce('mock-id-token');
-    fetchTo.mockResolvedValueOnce({ ok: false });
+    getIdToken.mockResolvedValue('mock-id-token');
+    fetchTo.mockResolvedValueOnce({ ok: true, json: async () => ({ uid: 'firebase-uid', tipo: 'socio' }) }); // claims/tipo
+    fetchTo.mockResolvedValueOnce({ ok: false }); // PATCH por-dni falla
     deleteUser.mockResolvedValueOnce();
 
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
