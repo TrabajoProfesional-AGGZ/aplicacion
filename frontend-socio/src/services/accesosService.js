@@ -11,7 +11,9 @@ const SECRETO_VALIDO_REGEX = /^[a-zA-Z0-9]+$/;
  * solo por errores de red (fetchTo/AbortError).
  */
 export async function enrolarYGuardarSecreto(socio) {
-  const res = await fetchTo('/api/v1/accesos/enrolar', 'POST', { socio_id: socio.id });
+  // El socio_id ya no viaja en el body: ms-acceso lo deriva de la identidad
+  // propagada por el Gateway (X-User-Email), nunca del cliente.
+  const res = await fetchTo('/api/v1/accesos/enrolar', 'POST', {});
 
   if (!res.ok) return null;
 
