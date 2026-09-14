@@ -48,8 +48,24 @@ describe('sociosService', () => {
 
       const resultado = await reclamarCuentaSocio('12345678');
 
-      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-dni/12345678/reclamar', 'POST');
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-dni/12345678/reclamar', 'POST', null);
       expect(resultado).toEqual(respuesta);
+    });
+
+    test('manda el token de validación cuando lo hay', async () => {
+      fetchTo.mockResolvedValue({ ok: true, status: 200, json: () => Promise.resolve({}) });
+
+      await reclamarCuentaSocio('12345678', 'tok-123');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-dni/12345678/reclamar', 'POST', {
+        token: 'tok-123',
+      });
+    });
+
+    test('lanza "validacion-vencida" en 403', async () => {
+      fetchTo.mockResolvedValue({ ok: false, status: 403 });
+
+      await expect(reclamarCuentaSocio('12345678', 'tok-viejo')).rejects.toThrow('validacion-vencida');
     });
 
     test('lanza cuenta-ya-registrada en 409', async () => {

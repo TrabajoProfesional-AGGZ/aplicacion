@@ -1,17 +1,32 @@
 import { fetchTo, fetchWithOutAuth } from '../utils/utils';
 
+/**
+ * Valida nro de socio + DNI + mail contra el registro pre-cargado (sin sesión Firebase todavía).
+ * Devuelve `{ ok, token }`: `token` es de un solo uso y hay que pasárselo después a
+ * `reclamarCuentaSocio` (issue #249/A-01).
+ * @throws {Error} 'socio-no-encontrado' | 'cuenta-ya-registrada' | 'demasiados-intentos'
+ */
 export async function validarSocio(nroSocio, dni, mail) {
   const res = await fetchWithOutAuth('/api/v1/socios/validar', 'POST', { nro_socio: nroSocio, dni, mail });
   if (res.status === 404) throw new Error('socio-no-encontrado');
   if (res.status === 409) throw new Error('cuenta-ya-registrada');
+  if (res.status === 429) throw new Error('demasiados-intentos');
   if (!res.ok) throw new Error('Error al validar el socio');
   return res.json();
 }
 
-export async function reclamarCuentaSocio(dni) {
-  const res = await fetchTo(`/api/v1/socios/por-dni/${encodeURIComponent(dni)}/reclamar`, 'POST');
+/**
+ * Marca la cuenta como reclamada. `token` es el que devolvió `validarSocio`: ata el reclamo a
+ * esa validación puntual. Se manda siempre que exista; el backend todavía lo acepta ausente
+ * mientras dure el rollout.
+ * @throws {Error} 'cuenta-ya-registrada' | 'socio-no-encontrado' | 'validacion-vencida'
+ */
+export async function reclamarCuentaSocio(dni, token) {
+  const cuerpo = token ? { token } : null;
+  const res = await fetchTo(`/api/v1/socios/por-dni/${encodeURIComponent(dni)}/reclamar`, 'POST', cuerpo);
   if (res.status === 409) throw new Error('cuenta-ya-registrada');
   if (res.status === 404) throw new Error('socio-no-encontrado');
+  if (res.status === 403) throw new Error('validacion-vencida');
   if (!res.ok) throw new Error('Error al reclamar la cuenta del socio');
   return res.json();
 }

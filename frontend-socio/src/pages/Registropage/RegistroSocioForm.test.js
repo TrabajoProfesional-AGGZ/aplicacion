@@ -81,7 +81,7 @@ async function navigateToStep4() {
 describe('RegistroSocioForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    validarSocio.mockResolvedValue({ nro_socio: '1000', nro_documento: '12345678', email: 'placeholder@club.com' });
+    validarSocio.mockResolvedValue({ ok: true, token: 'tok-validacion' });
   });
 
   test('renderiza el paso 1 con los campos de validación de identidad', () => {
@@ -146,6 +146,18 @@ describe('RegistroSocioForm', () => {
     expect(screen.queryByText(/Paso 2 de 4/)).not.toBeInTheDocument();
   });
 
+  test('avisa cuando el backend corta por demasiados intentos de validación', async () => {
+    validarSocio.mockRejectedValueOnce(new Error('demasiados-intentos'));
+    render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
+    await fillStep1();
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/demasiados intentos/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/Paso 2 de 4/)).not.toBeInTheDocument();
+  });
+
   test('retrocede al paso 1 desde el paso 2', async () => {
     render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await navigateToStep2();
@@ -175,7 +187,7 @@ describe('RegistroSocioForm', () => {
       '/api/v1/socios/por-dni/12345678', 'PATCH', expect.objectContaining({ nombre: 'Juan', apellido: 'Lopez' })
     ));
     expect(fetchTo.mock.calls[1][2]).not.toHaveProperty('email');
-    await waitFor(() => expect(reclamarCuentaSocio).toHaveBeenCalledWith('12345678'));
+    await waitFor(() => expect(reclamarCuentaSocio).toHaveBeenCalledWith('12345678', 'tok-validacion'));
     expect(await screen.findByText('¡Cuenta configurada!')).toBeInTheDocument();
     expect(deleteUser).not.toHaveBeenCalled();
   });
