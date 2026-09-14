@@ -14,8 +14,9 @@ import { createUserWithEmailAndPassword, getIdToken, deleteUser } from 'firebase
 jest.mock('../../services/sociosService', () => ({
   validarSocio: jest.fn(),
   reclamarCuentaSocio: jest.fn(),
+  asignarPagoSimuladoClaim: jest.fn(),
 }));
-import { validarSocio, reclamarCuentaSocio } from '../../services/sociosService';
+import { validarSocio, reclamarCuentaSocio, asignarPagoSimuladoClaim } from '../../services/sociosService';
 
 jest.mock('../../utils/utils', () => ({
   fetchTo: jest.fn(),
