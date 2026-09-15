@@ -22,7 +22,6 @@ import { useBackToRoot } from '../../hooks/useBackToRoot';
 import '../../socio-theme.css';
 import './HomePage.css';
 import { Carnet } from '../../components/Carnet/Carnet';
-import { AnimatePresence } from 'framer-motion';
 import { enrolarYGuardarSecreto } from '../../services/accesosService';
 import { PagoResultado } from '../../components/PagoResultado/PagoResultado'; 
 
@@ -177,11 +176,7 @@ export function HomePage({ socio, cerrarSesion }) {
             />
           </>
         )}
-        {vista === 'carnet' && (
-          <AnimatePresence>
-            <Carnet socio={socio} onClose={() => setVista('inicio')} />
-          </AnimatePresence>
-        )}
+        {vista === 'carnet' && <Carnet socio={socio} />}
       </main>
       
       <BottomNav
