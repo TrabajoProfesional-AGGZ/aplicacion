@@ -205,7 +205,10 @@
   padding: var(--space-4); border-radius: var(--radius-full); cursor: pointer;
   transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
-.tienda-comprar-btn:hover { opacity: 0.9; }
+@media (hover: hover) {
+  .tienda-comprar-btn:hover { opacity: 0.9; }
+}
+
 .tienda-comprar-btn:active { transform: scale(0.98); }
 
 /* ── Utils ── */

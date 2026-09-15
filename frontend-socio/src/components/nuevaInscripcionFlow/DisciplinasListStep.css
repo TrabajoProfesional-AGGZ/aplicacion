@@ -47,9 +47,12 @@
   transition: background-color var(--transition-fast);
 }
 
-.disciplinas-banner-volver:hover {
-  background-color: rgba(255, 255, 255, 0.18);
+@media (hover: hover) {
+  .disciplinas-banner-volver:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+  }
 }
+
 
 .disciplinas-banner-eyebrow {
   position: relative;
@@ -101,10 +104,13 @@
   transition: box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
-.disciplina-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .disciplina-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
 }
+
 
 .disciplina-card-info {
   flex: 1;

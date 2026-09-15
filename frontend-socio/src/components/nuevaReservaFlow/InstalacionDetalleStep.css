@@ -19,9 +19,12 @@
   cursor: pointer;
 }
 
-.detalle-volver-btn:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .detalle-volver-btn:hover {
+    color: var(--color-text-primary);
+  }
 }
+
 
 /* Banner — mismo lenguaje visual que WelcomeCard/finanzas-resumen (radial gradient + grano),
    sin tinte de estado (la instalación no tiene un "tono" propio) */
@@ -183,9 +186,16 @@
   transition: background-color var(--transition-fast);
 }
 
-.detalle-turno-row:hover {
+@media (hover: hover) {
+  .detalle-turno-row:hover {
+    background-color: var(--color-row-hover);
+  }
+}
+
+.detalle-turno-row:active {
   background-color: var(--color-row-hover);
 }
+
 
 .detalle-turno-hora {
   display: inline-flex;

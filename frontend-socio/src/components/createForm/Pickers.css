@@ -74,9 +74,12 @@
   color: var(--color-text-placeholder);
 }
 
-.csf-picker-trigger:hover:not(:disabled) {
-  background-color: var(--color-row-hover);
+@media (hover: hover) {
+  .csf-picker-trigger:hover:not(:disabled) {
+    background-color: var(--color-row-hover);
+  }
 }
+
 
 .csf-picker-trigger:focus-visible,
 .csf-picker-trigger[aria-expanded='true'] {
@@ -145,9 +148,12 @@
   cursor: pointer;
 }
 
-.csf-calendar-select:hover {
-  background-color: var(--color-row-hover);
+@media (hover: hover) {
+  .csf-calendar-select:hover {
+    background-color: var(--color-row-hover);
+  }
 }
+
 
 .csf-calendar-select:focus-visible {
   outline: 2px solid var(--color-border-strong);
@@ -168,10 +174,13 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-calendar-nav:hover {
-  background-color: var(--color-row-hover);
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .csf-calendar-nav:hover {
+    background-color: var(--color-row-hover);
+    color: var(--color-text-primary);
+  }
 }
+
 
 .csf-calendar-weekdays {
   display: grid;
@@ -209,9 +218,16 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-calendar-day:hover:not(:disabled):not(.csf-calendar-day--selected) {
+@media (hover: hover) {
+  .csf-calendar-day:hover:not(:disabled):not(.csf-calendar-day--selected) {
+    background-color: var(--color-row-hover);
+  }
+}
+
+.csf-calendar-day:active:not(:disabled):not(.csf-calendar-day--selected) {
   background-color: var(--color-row-hover);
 }
+
 
 .csf-calendar-day--muted {
   color: var(--color-border-medium);
@@ -249,9 +265,12 @@
   transition: color var(--transition-fast);
 }
 
-.csf-calendar-today-btn:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .csf-calendar-today-btn:hover {
+    color: var(--color-text-primary);
+  }
 }
+
 
 /* ── Dropdown (StyledSelect) ── */
 
@@ -300,7 +319,8 @@
   color: var(--color-text-primary);
 }
 
-.csf-dropdown-option--highlighted {
+.csf-dropdown-option--highlighted,
+.csf-dropdown-option:active:not(:disabled) {
   background-color: var(--color-row-hover);
 }
 

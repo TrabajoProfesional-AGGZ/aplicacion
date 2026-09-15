@@ -38,9 +38,12 @@
   cursor: pointer;
 }
 
-.resumen-volver-btn:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .resumen-volver-btn:hover {
+    color: var(--color-text-primary);
+  }
 }
+
 
 /* Banner — mismo lenguaje visual que el resto del flujo de reserva
    (WelcomeCard/finanzas-resumen: radial gradient + grano) */

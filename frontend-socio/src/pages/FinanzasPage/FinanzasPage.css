@@ -182,9 +182,12 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.finanzas-pagar-btn:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .finanzas-pagar-btn:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
+
 
 .finanzas-pagar-btn:active {
   transform: scale(0.96);

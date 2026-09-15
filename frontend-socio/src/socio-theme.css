@@ -170,9 +170,12 @@ body {
   transition: background-color var(--transition-normal), transform var(--transition-fast);
 }
 
-.su-button:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .su-button:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
+
 
 .su-button:active:not(:disabled) {
   transform: scale(0.98);
@@ -218,6 +221,9 @@ body {
   transition: background-color var(--transition-normal);
 }
 
-.proximamente-cerrar:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .proximamente-cerrar:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
+

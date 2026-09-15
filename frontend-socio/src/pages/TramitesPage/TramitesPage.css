@@ -68,9 +68,12 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.tramites-banner-cargar-btn:hover {
-  background-color: rgba(255, 255, 255, 0.85);
+@media (hover: hover) {
+  .tramites-banner-cargar-btn:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
 }
+
 
 .tramites-banner-cargar-btn:active {
   transform: scale(0.96);

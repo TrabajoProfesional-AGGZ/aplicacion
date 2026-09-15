@@ -49,9 +49,12 @@
   transition: background-color var(--transition-fast);
 }
 
-.instalaciones-banner-volver:hover {
-  background-color: rgba(255, 255, 255, 0.18);
+@media (hover: hover) {
+  .instalaciones-banner-volver:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+  }
 }
+
 
 .instalaciones-banner-eyebrow {
   position: relative;
@@ -103,10 +106,13 @@
   transition: box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
-.instalacion-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .instalacion-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
 }
+
 
 .instalacion-card-icono {
   flex-shrink: 0;

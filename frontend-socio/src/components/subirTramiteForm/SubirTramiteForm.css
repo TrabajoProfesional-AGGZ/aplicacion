@@ -14,9 +14,12 @@
   cursor: pointer;
 }
 
-.tramite-adjuntar-btn:hover {
-  background-color: var(--color-bg-subtle);
+@media (hover: hover) {
+  .tramite-adjuntar-btn:hover {
+    background-color: var(--color-bg-subtle);
+  }
 }
+
 
 .tramite-estado {
   display: flex;

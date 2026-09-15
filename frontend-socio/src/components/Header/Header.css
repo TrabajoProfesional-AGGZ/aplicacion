@@ -40,9 +40,12 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.app-header-perfil:hover {
-  background-color: var(--color-bg-subtle);
+@media (hover: hover) {
+  .app-header-perfil:hover {
+    background-color: var(--color-bg-subtle);
+  }
 }
+
 
 .app-header-perfil:active {
   transform: scale(0.92);
@@ -60,9 +63,12 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.app-header-bell:hover {
-  background-color: var(--color-bg-subtle);
+@media (hover: hover) {
+  .app-header-bell:hover {
+    background-color: var(--color-bg-subtle);
+  }
 }
+
 
 .app-header-bell:active {
   transform: scale(0.92);

@@ -67,9 +67,12 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.reservas-banner-nueva-btn:hover {
-  background-color: rgba(255, 255, 255, 0.85);
+@media (hover: hover) {
+  .reservas-banner-nueva-btn:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
 }
+
 
 .reservas-banner-nueva-btn:active {
   transform: scale(0.96);
@@ -149,6 +152,16 @@
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.reservas-filtro-btn:active {
+  background-color: var(--color-row-hover);
+}
+
+@media (hover: hover) {
+  .reservas-filtro-btn:hover {
+    background-color: var(--color-row-hover);
+  }
 }
 
 .reservas-filtro-btn--activo {
@@ -251,9 +264,12 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.reserva-pagar-btn:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .reserva-pagar-btn:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
+
 
 .reserva-pagar-btn:active {
   transform: scale(0.96);

@@ -79,6 +79,16 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
+.entradas-toggle-btn:active {
+  background-color: var(--color-row-hover);
+}
+
+@media (hover: hover) {
+  .entradas-toggle-btn:hover {
+    background-color: var(--color-row-hover);
+  }
+}
+
 .entradas-toggle-btn--activo {
   background-color: var(--color-text-primary);
   border-color: var(--color-text-primary);
@@ -158,9 +168,12 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.entrada-pagar-btn:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .entrada-pagar-btn:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
+
 
 .entrada-pagar-btn:active {
   transform: scale(0.96);
@@ -181,6 +194,9 @@
   transition: background-color var(--transition-fast);
 }
 
-.entrada-qr-btn:hover {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .entrada-qr-btn:hover {
+    background-color: var(--color-bg);
+  }
 }
+

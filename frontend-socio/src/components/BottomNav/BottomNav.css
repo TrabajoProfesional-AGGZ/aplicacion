@@ -39,9 +39,12 @@
   max-width: 100%;
 }
 
-.bottom-nav-item:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .bottom-nav-item:hover {
+    color: var(--color-text-primary);
+  }
 }
+
 
 .bottom-nav-item:active {
   transform: scale(0.94);
@@ -74,9 +77,12 @@
   transition: transform var(--transition-fast), box-shadow var(--transition-normal);
 }
 
-.bottom-nav-item--carnet:hover .bottom-nav-carnet-icon {
-  box-shadow: 0 10px 20px -6px rgba(17, 17, 17, 0.5), 0 0 0 4px var(--color-surface);
+@media (hover: hover) {
+  .bottom-nav-item--carnet:hover .bottom-nav-carnet-icon {
+    box-shadow: 0 10px 20px -6px rgba(17, 17, 17, 0.5), 0 0 0 4px var(--color-surface);
+  }
 }
+
 
 .bottom-nav-item--carnet:active .bottom-nav-carnet-icon {
   transform: scale(0.92);

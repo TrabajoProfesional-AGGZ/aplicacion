@@ -47,9 +47,12 @@
   transition: background-color var(--transition-fast);
 }
 
-.eventos-banner-volver:hover {
-  background-color: rgba(255, 255, 255, 0.18);
+@media (hover: hover) {
+  .eventos-banner-volver:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+  }
 }
+
 
 .eventos-banner-eyebrow {
   position: relative;
@@ -101,10 +104,13 @@
   transition: box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
-.evento-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .evento-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
 }
+
 
 .evento-card-info {
   flex: 1;

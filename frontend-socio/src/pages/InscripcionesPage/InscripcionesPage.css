@@ -67,9 +67,12 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.inscripciones-banner-nueva-btn:hover {
-  background-color: rgba(255, 255, 255, 0.85);
+@media (hover: hover) {
+  .inscripciones-banner-nueva-btn:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
 }
+
 
 .inscripciones-banner-nueva-btn:active {
   transform: scale(0.96);
@@ -147,6 +150,16 @@
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.inscripciones-filtro-btn:active {
+  background-color: var(--color-row-hover);
+}
+
+@media (hover: hover) {
+  .inscripciones-filtro-btn:hover {
+    background-color: var(--color-row-hover);
+  }
 }
 
 .inscripciones-filtro-btn--activo {
@@ -370,9 +383,12 @@
   transition: background-color var(--transition-fast), transform var(--transition-fast);
 }
 
-.inscripcion-baja-btn:hover {
-  background-color: #611010;
+@media (hover: hover) {
+  .inscripcion-baja-btn:hover {
+    background-color: #611010;
+  }
 }
+
 
 .inscripcion-baja-btn:active {
   transform: scale(0.98);

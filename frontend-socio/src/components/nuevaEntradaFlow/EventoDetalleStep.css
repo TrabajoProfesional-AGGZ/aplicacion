@@ -19,9 +19,12 @@
   cursor: pointer;
 }
 
-.detalle-volver-btn:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .detalle-volver-btn:hover {
+    color: var(--color-text-primary);
+  }
 }
+
 
 .evento-banner {
   position: relative;
@@ -184,9 +187,12 @@
   transition: opacity var(--transition-fast);
 }
 
-.evento-pagar-btn:hover {
-  opacity: 0.9;
+@media (hover: hover) {
+  .evento-pagar-btn:hover {
+    opacity: 0.9;
+  }
 }
+
 
 .evento-pagar-btn:disabled {
   opacity: 0.6;

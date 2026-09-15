@@ -19,9 +19,12 @@
   cursor: pointer;
 }
 
-.detalle-volver-btn:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .detalle-volver-btn:hover {
+    color: var(--color-text-primary);
+  }
 }
+
 
 .disciplina-banner {
   position: relative;
@@ -148,9 +151,12 @@
   transition: opacity var(--transition-fast);
 }
 
-.disciplina-inscribirme-btn:hover {
-  opacity: 0.9;
+@media (hover: hover) {
+  .disciplina-inscribirme-btn:hover {
+    opacity: 0.9;
+  }
 }
+
 
 .disciplina-inscribirme-btn:disabled {
   opacity: 0.6;
