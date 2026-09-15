@@ -198,7 +198,7 @@ export function HomePage({ socio, cerrarSesion }) {
         <ProximamenteOverlay titulo={proximamente} onClose={() => setProximamente(null)} />
       )}
 
-      <BotinButton />
+      {vista === 'inicio' && <BotinButton />}
     </div>
   );
 }
