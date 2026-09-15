@@ -107,8 +107,8 @@
   line-height: 1.1;
 }
 
-.reservas-banner-stat-value--success { color: var(--status-success-border); }
-.reservas-banner-stat-value--warning { color: var(--status-warning-border); }
+.reservas-banner-stat-value--success { color: var(--status-success-on-dark); }
+.reservas-banner-stat-value--warning { color: var(--status-warning-on-dark); }
 
 .reservas-banner-stat-label {
   font-size: 0.78rem;

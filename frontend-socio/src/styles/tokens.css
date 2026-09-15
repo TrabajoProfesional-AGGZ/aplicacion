@@ -46,6 +46,12 @@
   --status-error-surface-bg: #fdecea;
   --status-error-surface-border: #f5c6cb;
 
+  /* Tonos de estado para texto sobre fondos oscuros (banners, carnet) */
+  --status-success-on-dark: #a7daa7;
+  --status-warning-on-dark: #f5e9b2;
+  --status-danger-on-dark: #f4bebe;
+  --status-suspended-on-dark: #ffbd98;
+
   /* Variante suave para banners de éxito */
   --surface-success-bg: #f0faf5;
   --surface-success-border: #b7dfc8;

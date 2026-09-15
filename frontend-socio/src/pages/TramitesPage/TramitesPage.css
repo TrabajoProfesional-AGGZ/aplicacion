@@ -109,9 +109,9 @@
   line-height: 1.1;
 }
 
-.tramites-banner-stat-value--success { color: var(--status-success-border); }
-.tramites-banner-stat-value--warning { color: var(--status-warning-border); }
-.tramites-banner-stat-value--danger { color: var(--status-danger-border); }
+.tramites-banner-stat-value--success { color: var(--status-success-on-dark); }
+.tramites-banner-stat-value--warning { color: var(--status-warning-on-dark); }
+.tramites-banner-stat-value--danger { color: var(--status-danger-on-dark); }
 
 .tramites-banner-stat-label {
   font-size: 0.78rem;
