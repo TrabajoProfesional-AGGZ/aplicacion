@@ -108,9 +108,9 @@ describe('HomePage', () => {
   test.each([
     ['click en "Mis trámites" navega a la página de trámites (no abre el overlay)', 'Mis trámites', 'Mis trámites'],
     ['click en "Inscribirme a actividad" navega a la grilla de disciplinas (no abre el overlay)', 'Inscribirme a actividad', 'Inscribite a una actividad'],
-    ['"Mis Inscripciones" del nav inferior navega a la página de inscripciones', 'Mis Inscripciones', 'Mis inscripciones'],
+    ['"Mis Inscripciones" del nav inferior navega a la página de inscripciones', 'Inscripciones', 'Mis inscripciones'],
     ['click en "Reservar instalación" navega al flujo de nueva reserva (no abre el overlay ni la lista de reservas)', 'Reservar instalación', 'Realizá tu reserva'],
-    ['"Mis Reservas" del nav inferior navega a la lista de reservas, no al flujo de nueva reserva', 'Mis Reservas', 'Mis Reservas'],
+    ['"Mis Reservas" del nav inferior navega a la lista de reservas, no al flujo de nueva reserva', 'Reservas', 'Mis Reservas'],
     ['click en "Cuotas y pagos" navega a la página de finanzas (no abre el overlay)', 'Cuotas y pagos', 'Cuotas'],
   ])('%s', async (_descripcion, label, heading) => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
@@ -135,7 +135,7 @@ describe('HomePage', () => {
 
   test('"Nueva Inscripcion" del banner de Mis Inscripciones navega a la grilla de disciplinas', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Inscripciones'));
+    fireEvent.click(screen.getByText('Inscripciones'));
     await screen.findByRole('heading', { name: 'Mis inscripciones' });
 
     fireEvent.click(screen.getByRole('button', { name: /nueva inscripcion/i }));
@@ -206,7 +206,7 @@ describe('HomePage', () => {
 
   test('"Nueva reserva" del banner de Mis Reservas navega al flujo de nueva reserva', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Reservas'));
+    fireEvent.click(screen.getByText('Reservas'));
     await screen.findByRole('heading', { name: 'Mis Reservas' });
 
     fireEvent.click(screen.getByRole('button', { name: /nueva reserva/i }));
@@ -232,13 +232,13 @@ describe('HomePage', () => {
   test('muestra el nav inferior con los 5 botones y "Inicio" activo', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     expect(screen.getByText('Inicio').closest('button')).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByText('Mis Inscripciones')).toBeInTheDocument();
+    expect(screen.getByText('Inscripciones')).toBeInTheDocument();
   });
 
   test('click en un botón del nav inferior (distinto de Inicio) abre el overlay', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mi Carnet'));
-    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();    
+    fireEvent.click(screen.getByText('Carnet'));
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
     expect(await screen.findByText('Mi Pase de Acceso')).toBeInTheDocument();
   });
 
@@ -325,7 +325,7 @@ describe('HomePage', () => {
 
   test('"Mis Entradas" del nav inferior navega a la página de entradas, dentro del layout', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Entradas'));
+    fireEvent.click(screen.getByText('Entradas'));
     expect(await screen.findByRole('heading', { name: 'Mis Entradas' })).toBeInTheDocument();
     expect(screen.getByLabelText('Mi perfil')).toBeInTheDocument();
     expect(screen.getByText('Inicio').closest('button')).toBeInTheDocument();
@@ -334,7 +334,7 @@ describe('HomePage', () => {
   test('"Ir a pagar" en una entrada pendiente navega a la página de pagos (onPagarEntrada)', async () => {
     getEntradasPendientes.mockResolvedValueOnce([entradaPendienteFixture]);
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Entradas'));
+    fireEvent.click(screen.getByText('Entradas'));
     fireEvent.click(await screen.findByText('Ir a pagar'));
     expect(await screen.findByRole('heading', { name: 'Cuotas' })).toBeInTheDocument();
   });
@@ -342,7 +342,7 @@ describe('HomePage', () => {
   test('el botón de QR de una entrada pagada navega al carnet (onVerCarnet)', async () => {
     getEntradasActivas.mockResolvedValueOnce([entradaPagadaFixture]);
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Entradas'));
+    fireEvent.click(screen.getByText('Entradas'));
     fireEvent.click(await screen.findByLabelText('Ver código QR de la entrada'));
     expect(await screen.findByText('Mi Pase de Acceso')).toBeInTheDocument();
   });

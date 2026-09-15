@@ -3,10 +3,10 @@ import './BottomNav.css';
 
 const ITEMS = [
   { id: 'inicio', icon: Home, label: 'Inicio', vista: 'inicio' },
-  { id: 'reservas', icon: Calendar, label: 'Mis Reservas', vista: 'reservas' },
-  { id: 'carnet', icon: QrCode, label: 'Mi Carnet', vista: 'carnet' },
-  { id: 'inscripciones', icon: ClipboardList, label: 'Mis Inscripciones', vista: 'inscripciones' },
-  { id: 'entradas', icon: Ticket, label: 'Mis Entradas', vista: 'mis-entradas' },
+  { id: 'reservas', icon: Calendar, label: 'Reservas', vista: 'reservas' },
+  { id: 'carnet', icon: QrCode, label: 'Carnet', vista: 'carnet' },
+  { id: 'inscripciones', icon: ClipboardList, label: 'Inscripciones', vista: 'inscripciones' },
+  { id: 'entradas', icon: Ticket, label: 'Entradas', vista: 'mis-entradas' },
 ];
 
 /**
