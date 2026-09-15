@@ -192,7 +192,7 @@ describe('RegistroSocioForm', () => {
     expect(deleteUser).not.toHaveBeenCalled();
   });
 
-  test('llama a onSuccess tras 1800ms de la pantalla de éxito', async () => {
+  test('llama a onSuccess tras 3000ms de la pantalla de éxito', async () => {
     createUserWithEmailAndPassword.mockResolvedValueOnce({ user: { uid: 'firebase-uid' } });
     getIdToken.mockResolvedValue('mock-id-token');
     fetchTo.mockResolvedValueOnce({ ok: true, json: async () => ({ uid: 'firebase-uid', tipo: 'socio' }) }); // claims/tipo
@@ -207,7 +207,25 @@ describe('RegistroSocioForm', () => {
     expect(await screen.findByText('¡Cuenta configurada!')).toBeInTheDocument();
     expect(onSuccess).not.toHaveBeenCalled();
 
-    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 3000 });
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 3600 });
+  });
+
+  test('tocar "Listo" en la pantalla de éxito llama a onSuccess antes del timer', async () => {
+    createUserWithEmailAndPassword.mockResolvedValueOnce({ user: { uid: 'firebase-uid' } });
+    getIdToken.mockResolvedValue('mock-id-token');
+    fetchTo.mockResolvedValueOnce({ ok: true, json: async () => ({ uid: 'firebase-uid', tipo: 'socio' }) }); // claims/tipo
+    fetchTo.mockResolvedValueOnce({ ok: true }); // PATCH por-dni
+    reclamarCuentaSocio.mockResolvedValueOnce({});
+
+    render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
+    await navigateToStep4();
+    await fillStep4();
+    await userEvent.click(screen.getByRole('button', { name: /completar registro/i }));
+
+    await screen.findByText('¡Cuenta configurada!');
+    await userEvent.click(screen.getByRole('button', { name: 'Listo' }));
+
+    expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 
   test('si falla la asignación del claim tipo, hace rollback del usuario recién creado en Firebase', async () => {

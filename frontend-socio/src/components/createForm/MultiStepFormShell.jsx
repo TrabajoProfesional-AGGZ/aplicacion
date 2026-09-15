@@ -21,7 +21,8 @@ const STEP_COLORS = {
 export function MultiStepFormShell({
   steps, step, submitted, isSubmitting, title,
   successTitle, successMessage, submitLabel, submitLoadingLabel,
-  onCancel, goBack, goNext, direction, onFormSubmit, children
+  onCancel, goBack, goNext, direction, onFormSubmit, children,
+  onSuccessAction, successActionLabel,
 }) {
   const progress = (step / steps.length) * 100;
   const formRef = useRef(null);
@@ -66,6 +67,11 @@ export function MultiStepFormShell({
               <h2>{successTitle}</h2>
               <p>{successMessage}</p>
             </div>
+            {onSuccessAction && (
+              <button type="button" className="csf-btn-submit csf-btn-submit--full" onClick={onSuccessAction}>
+                {successActionLabel}
+              </button>
+            )}
           </motion.div>
         ) : (
           <motion.div

@@ -50,15 +50,22 @@ const {
   // /reclamar al final: ata el reclamo a esta validación puntual (issue #249/A-01).
   // Va en un ref y no en estado porque no se renderiza: cambiarlo no debe re-renderizar.
   const tokenValidacionRef = useRef(null);
+  const successTimeoutRef = useRef(null);
 
   useEffect(() => {
     return () => {
       montadoRef.current = false;
+      if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
     };
   }, []);
 
   const notificarExito = () => {
     if (montadoRef.current) onSuccess();
+  };
+
+  const handleListo = () => {
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+    notificarExito();
   };
 
   const manejarSiguiente = async () => {
@@ -140,7 +147,7 @@ const {
 
       localStorage.setItem('socioToken', tokenJWT);
       setSubmitted(true);
-      setTimeout(notificarExito, 1800);
+      successTimeoutRef.current = setTimeout(notificarExito, 3000);
 
     } catch (err) {
       if (usuarioCreado) {
@@ -179,6 +186,8 @@ const {
       title="Registro de Socio"
       successTitle="¡Cuenta configurada!"
       successMessage="Ya podés empezar a usar la aplicación del club."
+      onSuccessAction={handleListo}
+      successActionLabel="Listo"
       submitLabel="Completar registro"
       submitLoadingLabel="Procesando..."
       onCancel={onCancel}

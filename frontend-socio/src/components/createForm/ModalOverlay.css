@@ -285,6 +285,11 @@ button.csf-overlay {
   background-color: var(--color-text-primary);
 }
 
+.csf-btn-submit--full {
+  width: 100%;
+  justify-content: center;
+}
+
 @media (hover: hover) {
   .csf-btn-next:hover,
   .csf-btn-submit:hover:not(:disabled) {

@@ -28,6 +28,7 @@ export function DisciplinaDetalleStep({
   onSumarseListaEspera = () => {},
   mostrarBotonTramites = false,
   onIrATramites = () => {},
+  onVerInscripciones,
 }) {
   if (submitted || enEspera) {
     return (
@@ -41,6 +42,11 @@ export function DisciplinaDetalleStep({
             ? 'Te avisaremos si se libera un cupo en esta disciplina.'
             : 'Ya podés disfrutar de esta disciplina.'}
         </p>
+        {onVerInscripciones && (
+          <button type="button" className="csf-btn-submit" onClick={onVerInscripciones}>
+            Ver mis inscripciones
+          </button>
+        )}
       </section>
     );
   }

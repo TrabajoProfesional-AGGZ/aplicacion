@@ -72,6 +72,21 @@ describe('NuevaInscripcionPage', () => {
     expect(inscribirseADisciplina).toHaveBeenCalledWith('disc-1', 'socio-1');
   });
 
+  test('tocar "Ver mis inscripciones" en la confirmación llama a onExito antes del timer', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    inscribirseADisciplina.mockResolvedValue({ estado_suscripcion: 'activa' });
+    const onExito = jest.fn();
+    render(<NuevaInscripcionPage socio={SOCIO} onSalir={jest.fn()} onExito={onExito} />);
+    fireEvent.click(await screen.findByText('Natación'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
+    await screen.findByText('¡Inscripción confirmada!');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ver mis inscripciones' }));
+
+    expect(onExito).toHaveBeenCalledTimes(1);
+  });
+
   test('muestra el error de apto médico y ofrece ir a trámites', async () => {
     getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
     inscribirseADisciplina.mockRejectedValue(new Error('apto-medico'));

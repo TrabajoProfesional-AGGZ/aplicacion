@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import {
   Hash, Layers, IdCard, Cake, Mail, Phone, Lock, Eye, EyeOff, AlertCircle, LogOut,
@@ -168,6 +168,16 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
   const [estado, setEstado] = useState('inicial'); // inicial | previsualizando | subiendo | exito | error
   const [error, setError] = useState('');
   const [archivoDataUrl, setArchivoDataUrl] = useState(null);
+  const cierreTimeoutRef = useRef(null);
+
+  useEffect(() => () => {
+    if (cierreTimeoutRef.current) clearTimeout(cierreTimeoutRef.current);
+  }, []);
+
+  function handleListo() {
+    if (cierreTimeoutRef.current) clearTimeout(cierreTimeoutRef.current);
+    onClose();
+  }
 
   async function manejarArchivoSeleccionado(e) {
     const file = e.target.files?.[0];
@@ -208,7 +218,7 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
       setArchivoDataUrl(null);
       setEstado('exito');
       onFotoActualizada(foto_url);
-      setTimeout(onClose, 900);
+      cierreTimeoutRef.current = setTimeout(onClose, 3000);
     } catch {
       setEstado('error');
       setError('No pudimos subir la foto. Probá de nuevo.');
@@ -298,6 +308,12 @@ function FotoPerfilModal({ socio, onClose, onFotoActualizada }) {
               </button>
               <button type="button" className="csf-btn-submit" onClick={confirmarSubida} disabled={estado === 'subiendo'}>
                 {estado === 'subiendo' ? 'Subiendo...' : 'Confirmar'}
+              </button>
+            </div>
+          ) : estado === 'exito' ? (
+            <div className="csf-nav csf-nav--end">
+              <button type="button" className="csf-btn-submit csf-btn-submit--full" onClick={handleListo}>
+                Listo
               </button>
             </div>
           ) : (

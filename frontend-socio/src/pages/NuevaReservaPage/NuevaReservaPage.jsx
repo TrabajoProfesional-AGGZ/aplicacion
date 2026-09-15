@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles, createReserva } from '../../services/reservasService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
@@ -62,8 +62,13 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
   const [reservaConfirmada, setReservaConfirmada] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [sociosIncumplen, setSociosIncumplen] = useState([]);
+  const successTimeoutRef = useRef(null);
 
   useBackToRoot(step, 'lista', volverAInstalaciones);
+
+  useEffect(() => () => {
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,6 +121,11 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
     setStep(instalacionSeleccionada.capacidad_maxima === 1 ? 'resumen' : 'socios');
   }
 
+  function verMisReservas() {
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+    onExito();
+  }
+
   function volverAInstalaciones() {
     setInstalacionSeleccionada(null);
     setTurnos([]);
@@ -141,7 +151,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
       });
       setReservaConfirmada(reserva.estado === 'Confirmada');
       setSubmitted(true);
-      setTimeout(() => onExito(), 1800);
+      successTimeoutRef.current = setTimeout(() => onExito(), 3000);
     } catch (e) {
       setSubmitError(MENSAJES_ERROR_SUBMIT[e.message] || 'No se pudo registrar la reserva. Intentá de nuevo.');
       setSociosIncumplen(e.sociosIncumplen ?? []);
@@ -206,6 +216,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
       reservaConfirmada={reservaConfirmada}
       submitError={submitError}
       sociosIncumplen={sociosIncumplen}
+      onVerReservas={verMisReservas}
     />
   );
 }

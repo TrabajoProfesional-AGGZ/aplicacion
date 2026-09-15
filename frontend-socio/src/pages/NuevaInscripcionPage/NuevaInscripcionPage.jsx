@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   getDisciplinasActivas,
   getDisciplinasPorSocio,
@@ -47,8 +47,13 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
   const [sinCupo, setSinCupo] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [enEspera, setEnEspera] = useState(false);
+  const successTimeoutRef = useRef(null);
 
   useBackToRoot(step, 'lista', volverALista);
+
+  useEffect(() => () => {
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,6 +86,11 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
     setStep('lista');
   }
 
+  function verMisInscripciones() {
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+    onExito();
+  }
+
   async function handleInscribirme() {
     setEnviando(true);
     setErrorTipo('');
@@ -89,7 +99,7 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
     try {
       await inscribirseADisciplina(disciplinaSeleccionada.id, socio.id);
       setSubmitted(true);
-      setTimeout(() => onExito(), 1800);
+      successTimeoutRef.current = setTimeout(() => onExito(), 3000);
     } catch (e) {
       if (e.message === 'sin-cupo') {
         setSinCupo(true);
@@ -109,7 +119,7 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
       await sumarseAListaEspera(disciplinaSeleccionada.id, socio.id);
       setSinCupo(false);
       setEnEspera(true);
-      setTimeout(() => onExito(), 1800);
+      successTimeoutRef.current = setTimeout(() => onExito(), 3000);
     } catch (e) {
       setErrorTipo(e.message);
     } finally {
@@ -132,6 +142,7 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
         onSumarseListaEspera={handleSumarseListaEspera}
         mostrarBotonTramites={errorTipo === 'apto-medico'}
         onIrATramites={onIrATramites}
+        onVerInscripciones={verMisInscripciones}
       />
     );
   }

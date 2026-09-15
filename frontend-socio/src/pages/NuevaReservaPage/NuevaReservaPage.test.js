@@ -101,7 +101,30 @@ describe('NuevaReservaPage', () => {
     }));
 
     expect(await screen.findByText('¡Reserva registrada!')).toBeInTheDocument();
-    await waitFor(() => expect(onExito).toHaveBeenCalledTimes(1), { timeout: 3000 });
+    await waitFor(() => expect(onExito).toHaveBeenCalledTimes(1), { timeout: 3600 });
+  });
+
+  test('tocar "Ver mis reservas" en el resumen de éxito llama a onExito antes del timer', async () => {
+    createReserva.mockResolvedValue({ id: 'reserva-1', estado: 'Pendiente' });
+    const onExito = jest.fn();
+    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={onExito} />);
+
+    await screen.findByText('Cancha de fútbol');
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+
+    await screen.findByText('08:00');
+    fireEvent.click(screen.getByText('08:00'));
+
+    await screen.findByText('Agregar socios');
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
+
+    await screen.findByText('Confirmá tu reserva');
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
+
+    await screen.findByText('¡Reserva registrada!');
+    fireEvent.click(screen.getByRole('button', { name: 'Ver mis reservas' }));
+
+    expect(onExito).toHaveBeenCalledTimes(1);
   });
 
   test('si la instalación es gratuita, la reserva queda confirmada y lo muestra en el resumen', async () => {
@@ -125,7 +148,7 @@ describe('NuevaReservaPage', () => {
     expect(
       screen.getByText('Esta instalación es gratuita, así que tu reserva ya quedó confirmada. No hace falta ningún pago.')
     ).toBeInTheDocument();
-    await waitFor(() => expect(onExito).toHaveBeenCalledTimes(1), { timeout: 3000 });
+    await waitFor(() => expect(onExito).toHaveBeenCalledTimes(1), { timeout: 3600 });
   });
 
   test('incluye a los socios agregados en el resumen y en el envío', async () => {

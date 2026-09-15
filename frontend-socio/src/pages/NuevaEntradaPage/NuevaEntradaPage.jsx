@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   getEventos,
   comprarEntrada,
@@ -43,8 +43,13 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
   const [entradaPendiente, setEntradaPendiente] = useState(null);
   const [enviando, setEnviando] = useState(false);
   const [errorCompra, setErrorCompra] = useState('');
+  const successTimeoutRef = useRef(null);
 
   useBackToRoot(step, 'lista', volverALista);
+
+  useEffect(() => () => {
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,7 +88,7 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
       setEntradaPendiente(entrada);
       if (entrada.estado === 'Pagada') {
         setStep('exito');
-        setTimeout(() => onExito(), 1800);
+        successTimeoutRef.current = setTimeout(() => onExito(), 3000);
       } else {
         setStep('pago');
       }
@@ -94,8 +99,13 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
     }
   }
 
+  function verMisEntradas() {
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+    onExito();
+  }
+
   if (step === 'exito' && entradaPendiente) {
-    return <EntradaExitoStep nombreEvento={entradaPendiente.evento.nombre} />;
+    return <EntradaExitoStep nombreEvento={entradaPendiente.evento.nombre} onVerEntradas={verMisEntradas} />;
   }
 
   if (step === 'pago' && entradaPendiente) {

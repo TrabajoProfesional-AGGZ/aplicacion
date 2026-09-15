@@ -97,7 +97,24 @@ describe('NuevaEntradaPage', () => {
 
     expect(await screen.findByText('¡Entrada confirmada!')).toBeInTheDocument();
     expect(screen.queryByTestId('payment-brick')).not.toBeInTheDocument();
-    await waitFor(() => expect(onExito).toHaveBeenCalledTimes(1), { timeout: 3000 });
+    await waitFor(() => expect(onExito).toHaveBeenCalledTimes(1), { timeout: 3600 });
+  });
+
+  test('tocar "Ver mis entradas" en la pantalla de éxito llama a onExito antes del timer', async () => {
+    const eventoGratis = { ...EVENTO, id: 'ev-2', valor_entrada: '0.00' };
+    const entradaGratis = { ...ENTRADA, id: 'ent-2', estado: 'Pagada', monto: '0.00', evento: eventoGratis };
+    getEventos.mockResolvedValue([eventoGratis]);
+    comprarEntrada.mockResolvedValue(entradaGratis);
+    const onExito = jest.fn();
+    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} onExito={onExito} />);
+    fireEvent.click(await screen.findByText('Fiesta de fin de año'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
+
+    await screen.findByText('¡Entrada confirmada!');
+    fireEvent.click(screen.getByRole('button', { name: 'Ver mis entradas' }));
+
+    expect(onExito).toHaveBeenCalledTimes(1);
   });
 
   test('muestra el error cuando no hay cupo', async () => {

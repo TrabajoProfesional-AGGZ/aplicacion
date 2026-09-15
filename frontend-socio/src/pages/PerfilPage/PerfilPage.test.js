@@ -289,6 +289,19 @@ describe('PerfilPage', () => {
     expect(await screen.findByText('Foto actualizada')).toBeInTheDocument();
   });
 
+  test('tocar "Listo" tras subir la foto cierra el modal antes del cierre automático', async () => {
+    subirFotoSocio.mockResolvedValueOnce({ foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' });
+    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} />);
+    abrirModalFoto();
+    await subirArchivoDesdeDispositivo(crearArchivo());
+    fireEvent.click(screen.getByText('Confirmar'));
+
+    await screen.findByText('Foto actualizada');
+    fireEvent.click(screen.getByRole('button', { name: 'Listo' }));
+
+    await waitFor(() => expect(screen.queryByText('Foto actualizada')).not.toBeInTheDocument());
+  });
+
   test('rechaza un archivo con tipo no permitido sin llamar al backend', async () => {
     render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalFoto();

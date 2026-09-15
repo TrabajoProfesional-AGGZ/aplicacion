@@ -29,6 +29,7 @@ export function ResumenReservaStep({
   reservaConfirmada = false,
   submitError,
   sociosIncumplen = [],
+  onVerReservas,
 }) {
   if (submitted) {
     return (
@@ -42,6 +43,11 @@ export function ResumenReservaStep({
             ? 'Esta instalación es gratuita, así que tu reserva ya quedó confirmada. No hace falta ningún pago.'
             : 'Tu reserva quedó pendiente hasta confirmar el pago.'}
         </p>
+        {onVerReservas && (
+          <button type="button" className="csf-btn-submit" onClick={onVerReservas}>
+            Ver mis reservas
+          </button>
+        )}
       </section>
     );
   }
