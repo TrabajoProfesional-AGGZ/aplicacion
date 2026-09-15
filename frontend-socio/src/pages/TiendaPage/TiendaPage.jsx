@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, ShoppingBag, Package, Minus, Plus, Receipt } from 'lucide-react';
 import { getProductosDisponibles, getProducto, comprarProducto, getComprasPorSocio } from '../../services/tiendaService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
-import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import './TiendaPage.css';
 
@@ -121,8 +121,6 @@ export function TiendaPage({ socio }) {
       .finally(() => setCargandoMisCompras(false));
   }
 
-  if (loading) return <LoadingScreen />;
-
   // ─── Pago ───
   if (vistaInterna === 'pago' && compraEnCurso) {
     return (
@@ -149,7 +147,7 @@ export function TiendaPage({ socio }) {
 
         <h2 className="tienda-detalle-nombre" style={{ padding: 0, marginBottom: 'var(--space-4)' }}>Mis compras</h2>
 
-        {cargandoMisCompras && <p className="tienda-empty">Cargando...</p>}
+        {cargandoMisCompras && <SkeletonRows n={3} altura={76} />}
 
         {!cargandoMisCompras && errorMisCompras && (
           <p className="tienda-error">No se pudieron cargar tus compras.</p>
@@ -270,7 +268,7 @@ export function TiendaPage({ socio }) {
         <h2 className="tienda-banner-title">Explorá nuestros productos</h2>
         <div className="tienda-banner-stats">
           <div className="tienda-banner-stat">
-            <span className="tienda-banner-stat-value">{productos.length}</span>
+            <span className="tienda-banner-stat-value">{loading ? '—' : productos.length}</span>
             <span className="tienda-banner-stat-label">Disponibles</span>
           </div>
         </div>
@@ -280,11 +278,15 @@ export function TiendaPage({ socio }) {
         <Receipt size={16} /> Mis compras
       </button>
 
-      {error && <p className="tienda-error">{error}</p>}
+      {loading && <SkeletonRows n={4} altura={140} />}
 
-      {productos.length === 0 ? (
+      {!loading && error && <p className="tienda-error">{error}</p>}
+
+      {!loading && !error && productos.length === 0 && (
         <p className="tienda-empty">No hay productos disponibles por el momento.</p>
-      ) : (
+      )}
+
+      {!loading && !error && productos.length > 0 && (
         <div className="tienda-grid">
           {productos.map(p => {
             const agotado = Number(p.stock) === 0;
@@ -313,7 +315,7 @@ export function TiendaPage({ socio }) {
         </div>
       )}
 
-      {loadingDetalle && <p className="tienda-empty">Cargando...</p>}
+      {loadingDetalle && <SkeletonRows n={1} altura={220} />}
     </div>
   );
 }

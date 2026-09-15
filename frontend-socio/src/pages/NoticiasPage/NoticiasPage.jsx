@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Newspaper } from 'lucide-react';
 import { getNoticiasVigentes, getNoticia } from '../../services/noticiasService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import './NoticiasPage.css';
 
 /**
@@ -63,8 +64,6 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
     abrirDetalle(id);
   }
 
-  if (loading) return <p className="noticias-empty">Cargando noticias...</p>;
-
   // ─── Detalle ───
   if (detalle) {
     return (
@@ -98,17 +97,21 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
         <h2 className="noticias-banner-title">Noticias del Club</h2>
         <div className="noticias-banner-stats">
           <div className="noticias-banner-stat">
-            <span className="noticias-banner-stat-value">{noticias.length}</span>
+            <span className="noticias-banner-stat-value">{loading ? '—' : noticias.length}</span>
             <span className="noticias-banner-stat-label">Vigentes</span>
           </div>
         </div>
       </div>
 
-      {error && <p className="noticias-error">{error}</p>}
+      {loading && <SkeletonRows n={4} altura={64} />}
 
-      {noticias.length === 0 ? (
+      {!loading && error && <p className="noticias-error">{error}</p>}
+
+      {!loading && !error && noticias.length === 0 && (
         <p className="noticias-empty">No hay noticias publicadas por el momento.</p>
-      ) : (
+      )}
+
+      {!loading && !error && noticias.length > 0 && (
         <div className="noticias-lista">
           {noticias.map(n => (
             <button key={n.id} type="button" className="noticias-card" onClick={() => abrirDetalleDesdeLista(n.id)}>
@@ -124,7 +127,7 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
         </div>
       )}
 
-      {loadingDetalle && <p className="noticias-empty">Cargando...</p>}
+      {loadingDetalle && <SkeletonRows n={1} altura={220} />}
     </div>
   );
 }

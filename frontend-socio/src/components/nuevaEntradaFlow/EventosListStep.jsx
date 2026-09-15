@@ -1,5 +1,5 @@
 import { ArrowLeft, Users, Calendar, ChevronRight } from 'lucide-react';
-import { LoadingScreen } from '../LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
 import './EventosListStep.css';
 
 function formatearFecha(fechaIso) {
@@ -23,7 +23,7 @@ export function EventosListStep({ eventos, cargando, error, onSeleccionar, onVol
         <h2 className="eventos-banner-title">Comprá tu entrada</h2>
       </section>
 
-      {cargando && <LoadingScreen />}
+      {cargando && <SkeletonRows n={4} altura={76} />}
 
       {!cargando && error && (
         <p className="eventos-error">No se pudieron cargar los eventos.</p>

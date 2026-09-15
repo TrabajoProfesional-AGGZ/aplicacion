@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Bell, BellOff } from 'lucide-react';
 import { getAlertasSocio } from '../../services/alertasService';
-import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import './AlertasPage.css';
 
 function formatearFecha(fechaIso) {
@@ -39,52 +39,50 @@ export function AlertasPage({ socio }) {
   }, [socio.id]);
 
   const sufijoPlural = alertas.length === 1 ? '' : 'es';
-  const subtitulo = alertas.length > 0
-    ? `${alertas.length} novedad${sufijoPlural} del club para vos.`
-    : 'Acá vas a ver las novedades que el club envíe para vos.';
+  const subtitulo = cargando
+    ? 'Buscando novedades del club...'
+    : alertas.length > 0
+      ? `${alertas.length} novedad${sufijoPlural} del club para vos.`
+      : 'Acá vas a ver las novedades que el club envíe para vos.';
 
   return (
-    <>
-      {cargando && <LoadingScreen />}
+    <section className="alertas-lista">
+      <header className="alertas-page-header">
+        <span className="alertas-header-icon" aria-hidden="true"><Bell size={20} /></span>
+        <div className="alertas-header-text">
+          <h2 className="alertas-title">Mis alertas</h2>
+          <p className="alertas-subtitle">{subtitulo}</p>
+        </div>
+      </header>
+
+      {cargando && <SkeletonRows n={3} altura={56} />}
 
       {!cargando && error && (
         <p className="alertas-error">No se pudieron cargar tus alertas.</p>
       )}
 
-      {!cargando && !error && (
-        <section className="alertas-lista">
-          <header className="alertas-page-header">
-            <span className="alertas-header-icon" aria-hidden="true"><Bell size={20} /></span>
-            <div className="alertas-header-text">
-              <h2 className="alertas-title">Mis alertas</h2>
-              <p className="alertas-subtitle">{subtitulo}</p>
-            </div>
-          </header>
-
-          {alertas.length === 0 && (
-            <div className="alertas-vacio">
-              <span className="alertas-vacio-icon" aria-hidden="true"><BellOff size={22} /></span>
-              <p className="alertas-empty">No tenés alertas por el momento.</p>
-            </div>
-          )}
-
-          {alertas.length > 0 && (
-            <div className="alertas-grupo">
-              {alertas.map((a, i) => (
-                <div className="alerta-row" key={a.id} style={{ animationDelay: `${Math.min(i, 6) * 45}ms` }}>
-                  <span className="alerta-row-icon" aria-hidden="true"><Bell size={16} /></span>
-                  <div className="alerta-row-text">
-                    <p className="alerta-mensaje">{a.mensaje}</p>
-                    <span className="alerta-meta">
-                      {formatearFecha(a.creado_en)}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+      {!cargando && !error && alertas.length === 0 && (
+        <div className="alertas-vacio">
+          <span className="alertas-vacio-icon" aria-hidden="true"><BellOff size={22} /></span>
+          <p className="alertas-empty">No tenés alertas por el momento.</p>
+        </div>
       )}
-    </>
+
+      {!cargando && !error && alertas.length > 0 && (
+        <div className="alertas-grupo">
+          {alertas.map((a, i) => (
+            <div className="alerta-row" key={a.id} style={{ animationDelay: `${Math.min(i, 6) * 45}ms` }}>
+              <span className="alerta-row-icon" aria-hidden="true"><Bell size={16} /></span>
+              <div className="alerta-row-text">
+                <p className="alerta-mensaje">{a.mensaje}</p>
+                <span className="alerta-meta">
+                  {formatearFecha(a.creado_en)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

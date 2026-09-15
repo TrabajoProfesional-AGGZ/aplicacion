@@ -1,5 +1,5 @@
 import { ArrowLeft, Users, ChevronRight, MapPin, Tag } from 'lucide-react';
-import { LoadingScreen } from '../LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
 import './DisciplinasListStep.css';
 
 function textoCupos(disciplina) {
@@ -20,7 +20,7 @@ export function DisciplinasListStep({ disciplinas, cargando, error, onSelecciona
         <h2 className="disciplinas-banner-title">Inscribite a una actividad</h2>
       </section>
 
-      {cargando && <LoadingScreen />}
+      {cargando && <SkeletonRows n={4} altura={76} />}
 
       {!cargando && error && (
         <p className="disciplinas-error">No se pudieron cargar las disciplinas.</p>

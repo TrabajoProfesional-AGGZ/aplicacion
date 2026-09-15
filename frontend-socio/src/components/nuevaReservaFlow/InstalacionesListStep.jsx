@@ -1,5 +1,5 @@
 import { ArrowLeft, Users, ChevronRight, Dumbbell, Building2 } from 'lucide-react';
-import { LoadingScreen } from '../LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
 import './InstalacionesListStep.css';
 
 const ICONO_POR_TIPO = [
@@ -30,7 +30,7 @@ export function InstalacionesListStep({ instalaciones, cargando, error, onSelecc
         <h2 className="instalaciones-banner-title">Realizá tu reserva</h2>
       </section>
 
-      {cargando && <LoadingScreen />}
+      {cargando && <SkeletonRows n={4} altura={76} />}
 
       {!cargando && error && (
         <p className="instalaciones-error">No se pudieron cargar las instalaciones.</p>

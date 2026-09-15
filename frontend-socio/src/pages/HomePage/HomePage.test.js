@@ -130,7 +130,7 @@ describe('HomePage', () => {
   test('click en "Noticias" abre la vista de noticias', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Noticias'));
-    expect(screen.getByText('Cargando noticias...')).toBeInTheDocument();
+    expect(screen.getByText('Noticias del Club')).toBeInTheDocument();
   });
 
   test('"Nueva inscripción" del banner de Mis Inscripciones navega a la grilla de disciplinas', async () => {

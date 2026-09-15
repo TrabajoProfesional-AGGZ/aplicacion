@@ -1,5 +1,6 @@
 import { ArrowLeft, Clock, ChevronRight, AlertCircle } from 'lucide-react';
 import { DatePicker } from '../createForm/DatePicker';
+import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
 import './InstalacionDetalleStep.css';
 
 function formatearMonto(monto) {
@@ -71,11 +72,7 @@ export function InstalacionDetalleStep({
 
       <h3 className="detalle-turnos-titulo">Turnos disponibles</h3>
 
-      {cargandoTurnos && (
-        <div className="detalle-turnos-skeleton" aria-label="Cargando turnos">
-          {[0, 1, 2].map((i) => <div key={i} className="detalle-turno-skeleton-row" />)}
-        </div>
-      )}
+      {cargandoTurnos && <SkeletonRows n={3} altura={48} label="Cargando turnos" />}
 
       {!cargandoTurnos && errorTurnos && (
         <p className="detalle-turnos-error">

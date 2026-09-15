@@ -236,24 +236,6 @@
   color: var(--status-danger-border);
 }
 
-.detalle-turnos-skeleton {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.detalle-turno-skeleton-row {
-  height: 48px;
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-subtle);
-  animation: detalle-turno-pulse 1.4s ease-in-out infinite;
-}
-
-@keyframes detalle-turno-pulse {
-  0%, 100% { opacity: 0.6; }
-  50% { opacity: 1; }
-}
-
 @media (prefers-reduced-transparency: reduce) {
   .instalacion-banner-texture { display: none; }
 }

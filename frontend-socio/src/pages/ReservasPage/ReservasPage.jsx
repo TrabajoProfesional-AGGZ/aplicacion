@@ -3,7 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Plus } from 'lucide-react';
 import { getReservasPorSocio, getReservasHistoricasPorSocio, cancelReserva } from '../../services/reservasService';
 import { getInstalaciones } from '../../services/instalacionesService';
-import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import './ReservasPage.css';
 
@@ -118,60 +118,63 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
 
   return (
     <>
-      {cargando && <LoadingScreen />}
-
-      {!cargando && error && <p className="reservas-error">No se pudieron cargar tus reservas.</p>}
-
-      {!cargando && !error && (
-        <section className="reservas-lista">
-          <section className="reservas-banner">
-            <div className="reservas-banner-texture" aria-hidden="true" />
-            <div className="reservas-banner-top">
-              <span className="reservas-banner-eyebrow">
-                <Calendar size={13} />
-                Instalaciones del club
-              </span>
-              <button type="button" className="reservas-banner-nueva-btn" onClick={onNuevaReserva}>
-                <Plus size={15} />
-                Nueva reserva
-              </button>
+      <section className="reservas-lista">
+        <section className="reservas-banner">
+          <div className="reservas-banner-texture" aria-hidden="true" />
+          <div className="reservas-banner-top">
+            <span className="reservas-banner-eyebrow">
+              <Calendar size={13} />
+              Instalaciones del club
+            </span>
+            <button type="button" className="reservas-banner-nueva-btn" onClick={onNuevaReserva}>
+              <Plus size={15} />
+              Nueva reserva
+            </button>
+          </div>
+          <h2 className="reservas-banner-title">Mis Reservas</h2>
+          <div className="reservas-banner-stats">
+            <div className="reservas-banner-stat" aria-label={`Reservas confirmadas: ${cargando ? '—' : cantidadConfirmadas}`}>
+              <span className="reservas-banner-stat-value reservas-banner-stat-value--success">{cargando ? '—' : cantidadConfirmadas}</span>
+              <span className="reservas-banner-stat-label">Confirmadas</span>
             </div>
-            <h2 className="reservas-banner-title">Mis Reservas</h2>
-            <div className="reservas-banner-stats">
-              <div className="reservas-banner-stat" aria-label={`Reservas confirmadas: ${cantidadConfirmadas}`}>
-                <span className="reservas-banner-stat-value reservas-banner-stat-value--success">{cantidadConfirmadas}</span>
-                <span className="reservas-banner-stat-label">Confirmadas</span>
-              </div>
-              <div className="reservas-banner-stat-divider" aria-hidden="true" />
-              <div className="reservas-banner-stat" aria-label={`Reservas pendientes: ${cantidadPendientes}`}>
-                <span className="reservas-banner-stat-value reservas-banner-stat-value--warning">{cantidadPendientes}</span>
-                <span className="reservas-banner-stat-label">Pendientes</span>
-              </div>
+            <div className="reservas-banner-stat-divider" aria-hidden="true" />
+            <div className="reservas-banner-stat" aria-label={`Reservas pendientes: ${cargando ? '—' : cantidadPendientes}`}>
+              <span className="reservas-banner-stat-value reservas-banner-stat-value--warning">{cargando ? '—' : cantidadPendientes}</span>
+              <span className="reservas-banner-stat-label">Pendientes</span>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <fieldset className="reservas-filtros" aria-label="Filtrar reservas por estado">
-            {FILTROS.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                className={`reservas-filtro-btn${filtro === f.id ? ' reservas-filtro-btn--activo' : ''}`}
-                onClick={() => setFiltro(f.id)}
-              >
-                {f.label}
-              </button>
-            ))}
-          </fieldset>
+        <fieldset className="reservas-filtros" aria-label="Filtrar reservas por estado">
+          {FILTROS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              className={`reservas-filtro-btn${filtro === f.id ? ' reservas-filtro-btn--activo' : ''}`}
+              onClick={() => setFiltro(f.id)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </fieldset>
 
-          {(filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas && (
-            <p className="reservas-empty">Cargando historial...</p>
-          )}
+        {cargando && <SkeletonRows n={3} altura={88} />}
 
-          {!((filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas) && reservasVisibles.length === 0 && (
+        {!cargando && error && <p className="reservas-error">No se pudieron cargar tus reservas.</p>}
+
+        {!cargando && !error && (filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas && (
+          <SkeletonRows n={2} altura={88} />
+        )}
+
+        {!cargando && !error
+          && !((filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas)
+          && reservasVisibles.length === 0 && (
             <p className="reservas-empty">No tenés reservas en este estado.</p>
-          )}
+        )}
 
-          {!((filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas) && reservasVisibles.map((r) => {
+        {!cargando && !error
+          && !((filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas)
+          && reservasVisibles.map((r) => {
             const tono = ESTADO_TAG[r.estado] ?? 'neutral';
             return (
               <div className={`reserva-card reserva-card--${tono}`} key={r.id}>
@@ -207,8 +210,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
               </div>
             );
           })}
-        </section>
-      )}
+      </section>
 
       <AnimatePresence>
         {reservaAConfirmarCancelacion && (
