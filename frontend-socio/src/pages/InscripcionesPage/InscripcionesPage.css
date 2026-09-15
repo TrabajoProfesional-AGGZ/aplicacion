@@ -43,9 +43,9 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 0.72rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
 }
@@ -58,7 +58,7 @@
   background-color: var(--color-surface);
   color: var(--color-text-primary);
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: var(--text-caption);
   font-weight: 600;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
@@ -80,10 +80,10 @@
 
 .inscripciones-banner-title {
   margin: 0 0 var(--space-5);
-  font-size: 2rem;
+  font-size: var(--text-display);
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
   text-wrap: balance;
 }
 
@@ -104,15 +104,15 @@
 .inscripciones-banner-stat-value {
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: 1.8rem;
+  font-size: var(--text-display);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
   color: var(--color-surface);
 }
 
 .inscripciones-banner-stat-label {
-  font-size: 0.78rem;
+  font-size: var(--text-caption);
   color: rgba(255, 255, 255, 0.55);
 }
 
@@ -124,7 +124,7 @@
 
 @media (max-width: 480px) {
   .inscripciones-banner-title {
-    font-size: 1.65rem;
+    font-size: var(--text-title);
   }
 }
 
@@ -144,7 +144,7 @@
   background-color: var(--color-surface);
   color: var(--color-text-secondary);
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: var(--text-caption);
   font-weight: 600;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
@@ -206,7 +206,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   color: var(--color-text-secondary);
 }
 
@@ -218,7 +218,7 @@
 }
 
 .inscripcion-tag {
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   font-weight: 700;
   padding: 0.35em 0.75em;
   border-radius: var(--radius-sm);
@@ -251,7 +251,7 @@
   background: none;
   border: none;
   color: var(--color-text-secondary);
-  font-size: 0.88rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   cursor: pointer;
   padding: 0;
@@ -288,9 +288,9 @@
   display: block;
   width: fit-content;
   margin: 0 0 var(--space-4) auto;
-  font-size: 0.72rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-label);
   color: var(--color-text-primary);
   background-color: var(--color-surface);
   padding: var(--space-1) var(--space-3);
@@ -305,10 +305,10 @@
 
 .inscripcion-detalle-banner-title {
   margin: 0 0 var(--space-5);
-  font-size: 1.6rem;
+  font-size: var(--text-title);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  letter-spacing: var(--tracking-title);
+  line-height: var(--leading-title);
   color: var(--color-surface);
   text-wrap: balance;
 }
@@ -333,7 +333,7 @@
 }
 
 .inscripcion-detalle-banner-stat-label {
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   color: rgba(255, 255, 255, 0.55);
 }
 
@@ -341,7 +341,7 @@
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: var(--text-body);
   color: var(--color-surface);
 }
 
@@ -353,7 +353,7 @@
 
 @media (max-width: 480px) {
   .inscripcion-detalle-banner-title {
-    font-size: 1.35rem;
+    font-size: var(--text-title);
   }
 
   .inscripcion-detalle-banner-stats {
@@ -375,7 +375,7 @@
   background-color: #7a1010;
   color: var(--color-surface);
   font-family: inherit;
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   font-weight: 700;
   padding: var(--space-4);
   border-radius: var(--radius-full);
@@ -404,7 +404,7 @@
 }
 
 .inscripcion-confirmar-aviso {
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   color: var(--color-text-secondary);
 }
 
@@ -419,7 +419,7 @@
   flex: 1;
   border: none;
   font-family: inherit;
-  font-size: 0.88rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   padding: var(--space-3);
   border-radius: var(--radius-full);

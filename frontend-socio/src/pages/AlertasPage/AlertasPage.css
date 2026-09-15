@@ -24,25 +24,25 @@
 
 .alertas-title {
   margin: 0;
-  font-size: 2rem;
+  font-size: var(--text-display);
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
   text-wrap: balance;
 }
 
 .alertas-subtitle {
   margin: var(--space-2) 0 0;
   max-width: 42ch;
-  font-size: 0.95rem;
-  line-height: 1.5;
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
   color: var(--color-text-secondary);
   text-wrap: pretty;
 }
 
 @media (max-width: 480px) {
   .alertas-title {
-    font-size: 1.65rem;
+    font-size: var(--text-title);
   }
 }
 
@@ -120,7 +120,7 @@
 }
 
 .alerta-meta {
-  font-size: 0.8rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
 }
 
@@ -131,7 +131,7 @@
   background-color: var(--status-error-surface-bg);
   border: 1px solid var(--status-error-surface-border);
   color: var(--status-danger-border);
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
 }
 
 @keyframes alerta-row-in {

@@ -55,13 +55,13 @@
 }
 
 .qa-featured-title {
-  font-size: 1.05rem;
+  font-size: var(--text-heading);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-heading);
 }
 
 .qa-featured-desc {
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   color: var(--color-text-secondary);
 }
 
@@ -125,12 +125,12 @@
 }
 
 .qa-row-title {
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   font-weight: 500;
 }
 
 .qa-row-desc {
-  font-size: 0.8rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -200,15 +200,15 @@
 }
 
 .qa-noticia-extension-label {
-  font-size: 0.7rem;
+  font-size: var(--text-label);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: var(--tracking-label);
   color: var(--color-text-secondary);
 }
 
 .qa-noticia-extension-titulo {
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   display: -webkit-box;
   -webkit-line-clamp: 2;

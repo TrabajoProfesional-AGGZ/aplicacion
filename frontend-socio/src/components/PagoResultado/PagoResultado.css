@@ -89,17 +89,17 @@
 
 .pago-resultado-title {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: var(--text-display);
   font-weight: 700;
   color: var(--color-surface);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-display);
 }
 
 .pago-resultado-desc {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--text-body);
   color: rgba(255, 255, 255, 0.8);
-  line-height: 1.5;
+  line-height: var(--leading-body);
 }
 
 .pago-resultado-btn {
@@ -110,7 +110,7 @@
   color: var(--color-text-strong);
   border: none;
   font-family: inherit;
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-weight: 600;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-full);

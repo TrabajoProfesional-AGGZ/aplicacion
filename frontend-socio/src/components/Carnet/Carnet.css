@@ -14,14 +14,14 @@
 }
 
 .carnet-header-mobile h2 {
-  font-size: 1.5rem;
+  font-size: var(--text-title);
   font-weight: 700;
   margin: 0 0 0.5rem 0;
 }
 
 .carnet-header-mobile p {
   color: var(--color-text-secondary);
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   margin: 0;
 }
 
@@ -63,8 +63,8 @@
   align-items: center;
   gap: 8px;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  font-size: 1.1rem;
+  letter-spacing: var(--tracking-heading);
+  font-size: var(--text-heading);
 }
 
 .carnet-status {
@@ -72,9 +72,9 @@
   color: #8fe3a1;
   padding: 4px 10px;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: var(--tracking-caption);
 }
 
 /* Fondo obligatoriamente blanco para la lectura del QR */
@@ -120,19 +120,19 @@
 
 .carnet-resultado-mensaje {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: var(--text-heading);
   font-weight: 700;
 }
 
 .carnet-resultado-nombre {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
 .carnet-resultado-estado-financiero {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   opacity: 0.9;
 }
 
@@ -156,7 +156,7 @@
   height: 220px;
   display: flex;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
 }
 
 .carnet-recargar-container {
@@ -176,7 +176,7 @@
   border-radius: 999px;
   background: transparent;
   color: rgba(255, 255, 255, 0.85);
-  font-size: 0.8rem;
+  font-size: var(--text-caption);
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.15s ease;
@@ -200,7 +200,7 @@
 
 .carnet-recargar-error {
   margin: 0;
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   color: #ff8a80;
 }
 
@@ -225,14 +225,14 @@
 }
 
 .data-label {
-  font-size: 0.7rem;
+  font-size: var(--text-label);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: var(--tracking-label);
   color: #999;
 }
 
 .data-value {
-  font-size: 1.05rem;
+  font-size: var(--text-heading);
   font-weight: 600;
 }
 

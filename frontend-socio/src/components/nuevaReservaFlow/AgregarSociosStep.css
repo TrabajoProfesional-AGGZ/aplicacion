@@ -12,7 +12,7 @@
   background: none;
   color: var(--color-text-secondary);
   font-family: inherit;
-  font-size: 0.88rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   padding: var(--space-2) 0;
   margin-bottom: var(--space-4);
@@ -59,9 +59,9 @@
 
 .agregar-socios-banner-eyebrow {
   display: block;
-  font-size: 0.72rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
   margin-bottom: var(--space-2);
@@ -69,10 +69,10 @@
 
 .agregar-socios-banner-title {
   margin: 0 0 var(--space-2);
-  font-size: 1.6rem;
+  font-size: var(--text-title);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  letter-spacing: var(--tracking-title);
+  line-height: var(--leading-title);
   color: var(--color-surface);
   text-wrap: balance;
 }
@@ -80,7 +80,7 @@
 .agregar-socios-banner-subtitulo {
   margin: 0;
   color: rgba(255, 255, 255, 0.65);
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
 }
 
 .agregar-socios-input-row {
@@ -111,7 +111,7 @@
   outline: none;
   background: none;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
   padding: var(--space-3) 0;
   color: var(--color-text-primary);
 }
@@ -121,7 +121,7 @@
   background-color: var(--color-text-primary);
   color: var(--color-surface);
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   padding: 0 var(--space-5);
   border-radius: var(--radius-md);
@@ -137,7 +137,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 0.82rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
   margin-bottom: var(--space-2);
 }
@@ -147,7 +147,7 @@
   align-items: center;
   gap: var(--space-2);
   color: var(--status-danger-border);
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   margin: var(--space-1) 0 var(--space-2);
 }
 
@@ -187,19 +187,19 @@
 .agregar-socios-item-nombre {
   font-weight: 600;
   color: var(--color-text-primary);
-  font-size: 0.92rem;
+  font-size: var(--text-body);
 }
 
 .agregar-socios-item-nro {
-  font-size: 0.78rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
 }
 
 .agregar-socios-item-badge {
   flex-shrink: 0;
-  font-size: 0.68rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   padding: 0.3em 0.7em;
   border-radius: var(--radius-sm);
@@ -222,7 +222,7 @@
   background-color: var(--color-text-primary);
   color: var(--color-surface);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-full);

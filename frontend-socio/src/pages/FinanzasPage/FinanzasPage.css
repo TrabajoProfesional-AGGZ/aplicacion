@@ -48,9 +48,9 @@
 
 .finanzas-resumen-tag {
   align-self: flex-start;
-  font-size: 0.7rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   padding: 0.35em 0.85em;
   border-radius: var(--radius-sm);
@@ -65,24 +65,24 @@
   margin: var(--space-2) 0 0;
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: 2.6rem;
+  font-size: var(--text-display);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
   color: var(--color-surface);
 }
 
 .finanzas-resumen-copy {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
   color: rgba(255, 255, 255, 0.7);
 }
 
 .finanzas-cuotas-title {
   margin: 0 0 var(--space-4);
-  font-size: 1.1rem;
+  font-size: var(--text-heading);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-heading);
 }
 
 /* Tarjetas de cuota: franja de color a la izquierda + sombra tintada según urgencia,
@@ -132,16 +132,16 @@
 }
 
 .finanzas-cuota-vencimiento {
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   color: var(--color-text-secondary);
 }
 
 .finanzas-cuota-tag {
   align-self: flex-start;
   margin-top: var(--space-1);
-  font-size: 0.68rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   padding: 0.25em 0.65em;
   border-radius: var(--radius-sm);
@@ -163,7 +163,7 @@
 .finanzas-cuota-monto {
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: 1.15rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -173,7 +173,7 @@
   background-color: var(--color-text-primary);
   color: var(--color-surface);
   font-family: inherit;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-md);
@@ -203,7 +203,7 @@
   }
 
   .finanzas-resumen-deuda {
-    font-size: 2.1rem;
+    font-size: var(--text-display);
   }
 }
 

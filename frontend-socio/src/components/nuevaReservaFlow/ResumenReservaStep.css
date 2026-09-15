@@ -12,7 +12,7 @@
 
 .resumen-exito-titulo {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: var(--text-title);
   font-weight: 700;
   color: var(--color-text-primary);
 }
@@ -31,7 +31,7 @@
   background: none;
   color: var(--color-text-secondary);
   font-family: inherit;
-  font-size: 0.88rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   padding: var(--space-2) 0;
   margin-bottom: var(--space-4);
@@ -78,9 +78,9 @@
 
 .resumen-banner-eyebrow {
   display: block;
-  font-size: 0.72rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
   margin-bottom: var(--space-2);
@@ -88,10 +88,10 @@
 
 .resumen-banner-title {
   margin: 0 0 var(--space-5);
-  font-size: 1.6rem;
+  font-size: var(--text-title);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.15;
+  letter-spacing: var(--tracking-title);
+  line-height: var(--leading-title);
   color: var(--color-surface);
   text-wrap: balance;
 }
@@ -112,14 +112,14 @@
 }
 
 .resumen-banner-stat-label {
-  font-size: 0.82rem;
+  font-size: var(--text-caption);
   color: rgba(255, 255, 255, 0.55);
 }
 
 .resumen-banner-stat-valor {
   font-family: var(--font-numeric);
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   color: var(--color-surface);
   text-align: right;
 }
@@ -131,7 +131,7 @@
 
 .resumen-socios-titulo {
   margin: 0 0 var(--space-3);
-  font-size: 1.05rem;
+  font-size: var(--text-heading);
   font-weight: 700;
   color: var(--color-text-primary);
 }
@@ -165,15 +165,15 @@
 .resumen-socios-item-nombre {
   flex: 1;
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: var(--text-body);
   color: var(--color-text-primary);
 }
 
 .resumen-socios-item-badge {
   flex-shrink: 0;
-  font-size: 0.68rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   padding: 0.3em 0.7em;
   border-radius: var(--radius-sm);
@@ -194,7 +194,7 @@
   align-items: center;
   gap: var(--space-2);
   color: var(--status-danger-border);
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   margin: 0;
 }
 
@@ -209,7 +209,7 @@
 }
 
 .resumen-error-socios-item {
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   color: var(--status-danger-border);
 }
@@ -224,7 +224,7 @@
 .resumen-btn-confirmar {
   border: none;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-full);

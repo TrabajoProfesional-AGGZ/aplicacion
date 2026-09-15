@@ -58,9 +58,9 @@
   position: relative;
   z-index: 1;
   display: block;
-  font-size: 0.72rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
   margin-bottom: var(--space-2);
@@ -70,10 +70,10 @@
   position: relative;
   z-index: 1;
   margin: 0;
-  font-size: 2rem;
+  font-size: var(--text-display);
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
   text-wrap: balance;
 }
 
@@ -122,8 +122,8 @@
 
 .evento-card-nombre {
   font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
+  font-size: var(--text-heading);
+  letter-spacing: var(--tracking-heading);
   color: var(--color-text-primary);
 }
 
@@ -138,7 +138,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  font-size: 0.82rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
 }
 
@@ -146,7 +146,7 @@
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
   color: var(--color-text-primary);
 }
 

@@ -43,9 +43,9 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 0.72rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.09em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.55);
 }
@@ -58,7 +58,7 @@
   background-color: var(--color-surface);
   color: var(--color-text-primary);
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: var(--text-caption);
   font-weight: 600;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
@@ -80,10 +80,10 @@
 
 .reservas-banner-title {
   margin: 0 0 var(--space-5);
-  font-size: 2rem;
+  font-size: var(--text-display);
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
   text-wrap: balance;
 }
 
@@ -104,17 +104,17 @@
 .reservas-banner-stat-value {
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: 1.8rem;
+  font-size: var(--text-display);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
 }
 
 .reservas-banner-stat-value--success { color: var(--status-success-on-dark); }
 .reservas-banner-stat-value--warning { color: var(--status-warning-on-dark); }
 
 .reservas-banner-stat-label {
-  font-size: 0.78rem;
+  font-size: var(--text-caption);
   color: rgba(255, 255, 255, 0.55);
 }
 
@@ -126,7 +126,7 @@
 
 @media (max-width: 480px) {
   .reservas-banner-title {
-    font-size: 1.65rem;
+    font-size: var(--text-title);
   }
 }
 
@@ -146,7 +146,7 @@
   background-color: var(--color-surface);
   color: var(--color-text-secondary);
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: var(--text-caption);
   font-weight: 600;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
@@ -208,7 +208,7 @@
 
 .reserva-fecha,
 .reserva-horario {
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   color: var(--color-text-secondary);
 }
 
@@ -222,9 +222,9 @@
 .reserva-tag {
   align-self: flex-start;
   margin-top: var(--space-1);
-  font-size: 0.68rem;
+  font-size: var(--text-label);
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   padding: 0.25em 0.65em;
   border-radius: var(--radius-sm);
@@ -242,7 +242,7 @@
   background-color: transparent;
   color: var(--status-danger-border);
   font-family: inherit;
-  font-size: 0.78rem;
+  font-size: var(--text-caption);
   font-weight: 600;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
@@ -255,7 +255,7 @@
   background-color: var(--color-text-primary);
   color: var(--color-surface);
   font-family: inherit;
-  font-size: 0.78rem;
+  font-size: var(--text-caption);
   font-weight: 600;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-full);
@@ -299,7 +299,7 @@
   flex: 1;
   border: none;
   font-family: inherit;
-  font-size: 0.88rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   padding: var(--space-3);
   border-radius: var(--radius-full);
