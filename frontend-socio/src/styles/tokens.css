@@ -30,6 +30,10 @@
   /* Scrim de modales (material sobre el contenido). */
   --color-scrim: rgba(0, 0, 0, 0.38);
   --scrim-blur: blur(4px);
+  /* Materiales translúcidos (header, bottom nav). Tope de blur 12px: Android de gama baja. */
+  --material-header-bg: rgba(255, 255, 255, 0.88);
+  --material-nav-bg: rgba(255, 255, 255, 0.85);
+  --material-blur: blur(12px) saturate(160%);
 
   /* Texto fijo sobre botones de color sólido (ej. danger) */
   --color-on-accent: #ffffff;
@@ -114,7 +118,13 @@
 
 /* Preferencias de accesibilidad del sistema operativo. */
 @media (prefers-reduced-transparency: reduce) {
-  :root { --scrim-blur: none; --color-scrim: rgba(0, 0, 0, 0.55); }
+  :root {
+    --scrim-blur: none;
+    --color-scrim: rgba(0, 0, 0, 0.55);
+    --material-header-bg: #ffffff;
+    --material-nav-bg: #ffffff;
+    --material-blur: none;
+  }
 }
 @media (prefers-contrast: more) {
   :root { --color-border: #9a9a9a; --color-border-medium: #7a7a7a; --color-border-light: #b0b0b0; --color-text-secondary: #2e2e2e; --color-text-placeholder: #4a4a4a; }

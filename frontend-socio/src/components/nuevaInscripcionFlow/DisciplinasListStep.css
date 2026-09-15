@@ -146,3 +146,7 @@
   flex-shrink: 0;
   color: var(--color-text-secondary);
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  .disciplinas-banner-texture { display: none; }
+}

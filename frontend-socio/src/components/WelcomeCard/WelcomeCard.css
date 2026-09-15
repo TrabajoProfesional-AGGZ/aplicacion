@@ -123,3 +123,7 @@
     font-size: 1.4rem;
   }
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  .welcome-card-texture { display: none; }
+}

@@ -128,3 +128,6 @@
 .pago-resultado-btn:active {
   transform: scale(0.96);
 }
+@media (prefers-reduced-transparency: reduce) {
+  .pago-resultado-texture { display: none; }
+}

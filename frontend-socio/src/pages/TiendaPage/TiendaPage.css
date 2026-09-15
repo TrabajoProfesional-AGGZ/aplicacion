@@ -214,3 +214,6 @@
 /* ── Utils ── */
 .tienda-empty { text-align: center; color: var(--color-text-secondary); padding: var(--space-8) 0; }
 .tienda-error { color: var(--status-danger-border); text-align: center; margin-bottom: var(--space-4); }
+@media (prefers-reduced-transparency: reduce) {
+  .tienda-banner-texture { display: none; }
+}

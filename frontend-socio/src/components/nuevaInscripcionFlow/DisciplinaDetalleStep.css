@@ -217,3 +217,7 @@
   margin: 0;
   color: var(--color-text-secondary);
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  .disciplina-banner-texture { display: none; }
+}

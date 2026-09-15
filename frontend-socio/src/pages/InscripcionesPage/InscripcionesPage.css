@@ -441,3 +441,8 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  .inscripciones-banner-texture,
+  .inscripcion-detalle-banner-texture { display: none; }
+}

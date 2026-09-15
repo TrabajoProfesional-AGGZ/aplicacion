@@ -200,3 +200,7 @@
   }
 }
 
+
+@media (prefers-reduced-transparency: reduce) {
+  .entradas-banner-texture { display: none; }
+}

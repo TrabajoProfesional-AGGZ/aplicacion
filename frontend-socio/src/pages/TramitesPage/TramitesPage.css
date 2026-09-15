@@ -202,3 +202,7 @@
 .tramites-error {
   color: var(--status-danger-border);
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  .tramites-banner-texture { display: none; }
+}

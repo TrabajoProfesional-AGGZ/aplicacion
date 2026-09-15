@@ -321,3 +321,7 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  .reservas-banner-texture { display: none; }
+}

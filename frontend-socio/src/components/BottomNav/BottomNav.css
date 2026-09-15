@@ -8,7 +8,9 @@
   padding-bottom: env(safe-area-inset-bottom);
   display: flex;
   overflow: visible;
-  background-color: var(--color-surface);
+  background-color: var(--material-nav-bg);
+  backdrop-filter: var(--material-blur);
+  -webkit-backdrop-filter: var(--material-blur);
   border-top: 1px solid var(--color-border);
   box-shadow: 0 -6px 16px -12px rgba(17, 17, 17, 0.25);
 }

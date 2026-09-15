@@ -248,3 +248,7 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  .resumen-banner-texture { display: none; }
+}

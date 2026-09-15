@@ -215,3 +215,7 @@
   font-size: 0.85rem;
   margin: 0;
 }
+
+@media (prefers-reduced-transparency: reduce) {
+  .evento-banner-texture { display: none; }
+}
