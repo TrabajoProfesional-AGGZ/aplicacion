@@ -16,12 +16,11 @@ const ACCESOS_RAPIDOS = [
 
 /**
  * Grilla de accesos rápidos del Home: un ítem destacado (Cuotas y pagos) más
- * una lista agrupada del resto. Un ítem sin handler dedicado cae en
- * `onProximamente`. Debajo de "Noticias" agrega una extensión con la última
- * noticia publicada, si hay alguna.
+ * una lista agrupada del resto. Debajo de "Noticias" agrega una extensión con
+ * la última noticia publicada, si hay alguna.
  */
 export function QuickAccessGrid({
-  onProximamente, onPagos, onTramites, onReservas, onInscripciones, onEventos, onNoticias, onTienda,
+  onPagos, onTramites, onReservas, onInscripciones, onEventos, onNoticias, onTienda,
   onVerNoticia = () => {},
 }) {
   const [destacado, ...resto] = ACCESOS_RAPIDOS;
@@ -35,7 +34,7 @@ export function QuickAccessGrid({
     return () => { cancelled = true; };
   }, []);
 
-  function resolverOnClick(id, titulo) {
+  function resolverOnClick(id) {
     if (id === 'pagos') return onPagos;
     if (id === 'tramites') return onTramites;
     if (id === 'reservas') return onReservas;
@@ -43,7 +42,7 @@ export function QuickAccessGrid({
     if (id === 'eventos') return onEventos;
     if (id === 'noticias') return onNoticias;
     if (id === 'tienda') return onTienda;
-    return () => onProximamente(titulo);
+    return undefined;
   }
 
   return (
@@ -54,7 +53,7 @@ export function QuickAccessGrid({
         titulo={destacado.titulo}
         desc={destacado.desc}
         variant="featured"
-        onClick={resolverOnClick(destacado.id, destacado.titulo)}
+        onClick={resolverOnClick(destacado.id)}
       />
 
       <div className="quick-access-list">
@@ -65,7 +64,7 @@ export function QuickAccessGrid({
               titulo={titulo}
               desc={desc}
               variant="row"
-              onClick={resolverOnClick(id, titulo)}
+              onClick={resolverOnClick(id)}
             />
             {id === 'noticias' && ultimaNoticia && (
               <button

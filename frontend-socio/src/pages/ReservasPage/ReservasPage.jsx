@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Calendar, MapPin, Plus } from 'lucide-react';
 import { getReservasPorSocio, getReservasHistoricasPorSocio, cancelReserva } from '../../services/reservasService';
 import { getInstalaciones } from '../../services/instalacionesService';
@@ -209,32 +210,34 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
         </section>
       )}
 
-      {reservaAConfirmarCancelacion && (
-        <ModalOverlay onClose={() => setReservaAConfirmarCancelacion(null)}>
-          <div className="reserva-confirmar-card">
-            <p>¿Seguro que querés cancelar esta reserva?</p>
-            {errorCancelacion && <p className="reservas-error">{errorCancelacion}</p>}
-            <div className="reserva-confirmar-acciones">
-              <button
-                type="button"
-                className="reserva-confirmar-btn-no"
-                onClick={() => setReservaAConfirmarCancelacion(null)}
-                disabled={cancelandoId === reservaAConfirmarCancelacion.id}
-              >
-                Volver
-              </button>
-              <button
-                type="button"
-                className="reserva-confirmar-btn-si"
-                onClick={() => confirmarCancelacion(reservaAConfirmarCancelacion)}
-                disabled={cancelandoId === reservaAConfirmarCancelacion.id}
-              >
-                {cancelandoId === reservaAConfirmarCancelacion.id ? 'Cancelando...' : 'Sí, cancelar'}
-              </button>
+      <AnimatePresence>
+        {reservaAConfirmarCancelacion && (
+          <ModalOverlay key="confirmar-cancelacion" onClose={() => setReservaAConfirmarCancelacion(null)}>
+            <div className="reserva-confirmar-card">
+              <p>¿Seguro que querés cancelar esta reserva?</p>
+              {errorCancelacion && <p className="reservas-error">{errorCancelacion}</p>}
+              <div className="reserva-confirmar-acciones">
+                <button
+                  type="button"
+                  className="reserva-confirmar-btn-no"
+                  onClick={() => setReservaAConfirmarCancelacion(null)}
+                  disabled={cancelandoId === reservaAConfirmarCancelacion.id}
+                >
+                  Volver
+                </button>
+                <button
+                  type="button"
+                  className="reserva-confirmar-btn-si"
+                  onClick={() => confirmarCancelacion(reservaAConfirmarCancelacion)}
+                  disabled={cancelandoId === reservaAConfirmarCancelacion.id}
+                >
+                  {cancelandoId === reservaAConfirmarCancelacion.id ? 'Cancelando...' : 'Sí, cancelar'}
+                </button>
+              </div>
             </div>
-          </div>
-        </ModalOverlay>
-      )}
+          </ModalOverlay>
+        )}
+      </AnimatePresence>
     </>
   );
 }

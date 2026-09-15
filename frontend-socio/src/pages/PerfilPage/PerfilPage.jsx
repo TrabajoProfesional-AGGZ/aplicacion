@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import {
   Hash, Layers, IdCard, Cake, Mail, Phone, Lock, Eye, EyeOff, AlertCircle, LogOut,
   Plus, Upload, Camera, Loader2, CheckCircle2, XCircle,
@@ -412,28 +413,36 @@ export function PerfilPage({ socio, cerrarSesion }) {
         Cerrar sesión
       </button>
 
-      {modalAbierto && (
-        <CambiarContraseniaModal cerrarSesion={cerrarSesion} onClose={() => setModalAbierto(false)} />
-      )}
+      <AnimatePresence>
+        {modalAbierto && (
+          <CambiarContraseniaModal key="cambiar-contrasenia" cerrarSesion={cerrarSesion} onClose={() => setModalAbierto(false)} />
+        )}
+      </AnimatePresence>
 
-      {fotoModalAbierto && (
-        <FotoPerfilModal
-          socio={socio}
-          onClose={() => setFotoModalAbierto(false)}
-          onFotoActualizada={(foto_url) => setSocio({ ...socio, foto_url })}
-        />
-      )}
+      <AnimatePresence>
+        {fotoModalAbierto && (
+          <FotoPerfilModal
+            key="foto-perfil"
+            socio={socio}
+            onClose={() => setFotoModalAbierto(false)}
+            onFotoActualizada={(foto_url) => setSocio({ ...socio, foto_url })}
+          />
+        )}
+      </AnimatePresence>
 
-      {fotoAmpliadaAbierta && socio.foto_url && (
-        <FotoAmpliadaModal
-          socio={socio}
-          onClose={() => setFotoAmpliadaAbierta(false)}
-          onCambiarFoto={() => {
-            setFotoAmpliadaAbierta(false);
-            setFotoModalAbierto(true);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {fotoAmpliadaAbierta && socio.foto_url && (
+          <FotoAmpliadaModal
+            key="foto-ampliada"
+            socio={socio}
+            onClose={() => setFotoAmpliadaAbierta(false)}
+            onCambiarFoto={() => {
+              setFotoAmpliadaAbierta(false);
+              setFotoModalAbierto(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

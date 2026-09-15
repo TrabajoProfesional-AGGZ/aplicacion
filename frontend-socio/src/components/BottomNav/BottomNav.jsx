@@ -10,10 +10,10 @@ const ITEMS = [
 ];
 
 /**
- * Barra de navegación inferior de 5 ítems. Un ítem sin handler dedicado cae en
- * `onProximamente`. "Mi Carnet" se renderiza destacado como botón circular flotante.
+ * Barra de navegación inferior de 5 ítems. "Mi Carnet" se renderiza destacado
+ * como botón circular flotante.
  */
-export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripciones, onMisEntradas, onCarnet, vistaActual }) {
+export function BottomNav({ onInicio, onReservas, onMisInscripciones, onMisEntradas, onCarnet, vistaActual }) {
   const handlersPorId = {
     inicio: onInicio,
     reservas: onReservas,
@@ -27,7 +27,7 @@ export function BottomNav({ onProximamente, onInicio, onReservas, onMisInscripci
       {ITEMS.map(({ id, icon: Icon, label, vista }) => {
         const esCarnet = id === 'carnet';
         const activo = vistaActual === vista;
-        const onClick = handlersPorId[id] ?? (() => onProximamente(label));
+        const onClick = handlersPorId[id];
         return (
           <button
             key={id}

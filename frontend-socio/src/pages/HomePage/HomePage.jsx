@@ -3,7 +3,6 @@ import { Header } from '../../components/Header/Header';
 import { WelcomeCard } from '../../components/WelcomeCard/WelcomeCard';
 import { QuickAccessGrid } from '../../components/QuickAccessGrid/QuickAccessGrid';
 import { BottomNav } from '../../components/BottomNav/BottomNav';
-import { ProximamenteOverlay } from '../../components/ProximamenteOverlay/ProximamenteOverlay';
 import { PerfilPage } from '../PerfilPage/PerfilPage';
 import { FinanzasPage } from '../FinanzasPage/FinanzasPage';
 import { TramitesPage } from '../TramitesPage/TramitesPage';
@@ -32,7 +31,6 @@ import { PagoResultado } from '../../components/PagoResultado/PagoResultado';
  * de una redirección de Mercado Pago para mostrar el resultado del pago.
  */
 export function HomePage({ socio, cerrarSesion }) {
-  const [proximamente, setProximamente] = useState(null);
   const [itemAPagarId, setItemAPagarId] = useState(null);
   const [noticiaSeleccionadaId, setNoticiaSeleccionadaId] = useState(null);
   // Si la URL trae estos params, la app se abrió de vuelta desde la redirección de MP.
@@ -164,7 +162,6 @@ export function HomePage({ socio, cerrarSesion }) {
             <WelcomeCard socio={socio} />
             <CertificadoVencidoBanner socio={socio} onClick={() => setVista('tramites')} />
             <QuickAccessGrid
-              onProximamente={setProximamente}
               onPagos={() => setVista('pagos')}
               onTramites={() => setVista('tramites')}
               onReservas={() => setVista('nueva-reserva')}
@@ -180,7 +177,6 @@ export function HomePage({ socio, cerrarSesion }) {
       </main>
       
       <BottomNav
-        onProximamente={setProximamente}
         onInicio={() => setVista('inicio')}
         onReservas={() => setVista('reservas')}
         onMisInscripciones={() => setVista('inscripciones')}
@@ -188,10 +184,6 @@ export function HomePage({ socio, cerrarSesion }) {
         onCarnet={() => setVista('carnet')}
         vistaActual={vista}
       />
-
-      {proximamente && (
-        <ProximamenteOverlay titulo={proximamente} onClose={() => setProximamente(null)} />
-      )}
 
       {vista === 'inicio' && <BotinButton />}
     </div>

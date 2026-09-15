@@ -70,9 +70,6 @@ export function MultiStepFormShell({
         ) : (
           <motion.div
             key="form"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
             className="csf-outer-card"
           >
             <div className="csf-header">

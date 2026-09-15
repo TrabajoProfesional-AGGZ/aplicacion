@@ -213,7 +213,9 @@ describe('ReservasPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
     fireEvent.click(screen.getByRole('button', { name: 'Volver' }));
 
-    expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    });
     expect(cancelReserva).not.toHaveBeenCalled();
   });
 
@@ -228,7 +230,9 @@ describe('ReservasPage', () => {
 
     fireEvent.click(mensaje.closest('.csf-overlay'));
 
-    expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    });
     expect(cancelReserva).not.toHaveBeenCalled();
   });
 

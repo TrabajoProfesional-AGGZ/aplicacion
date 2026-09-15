@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { FileText, Plus } from 'lucide-react';
 import { getTramitesPorSocio } from '../../services/tramitesService';
 import { SubirTramiteForm } from '../../components/subirTramiteForm/SubirTramiteForm';
@@ -117,13 +118,16 @@ export function TramitesPage({ socio }) {
         </section>
       )}
 
-      {formAbierto && (
-        <SubirTramiteForm
-          idSocio={socio.id}
-          onClose={() => setFormAbierto(false)}
-          onCreado={handleCreado}
-        />
-      )}
+      <AnimatePresence>
+        {formAbierto && (
+          <SubirTramiteForm
+            key="subir-tramite"
+            idSocio={socio.id}
+            onClose={() => setFormAbierto(false)}
+            onCreado={handleCreado}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

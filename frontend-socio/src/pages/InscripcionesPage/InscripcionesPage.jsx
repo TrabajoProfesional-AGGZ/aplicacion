@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ClipboardList, MapPin, Plus, Tag } from 'lucide-react';
 import { getDisciplinasPorSocio, darDeBajaInscripcion } from '../../services/disciplinasService';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
@@ -122,35 +123,37 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
           </button>
         )}
 
-        {confirmarBaja && (
-          <ModalOverlay onClose={() => setConfirmarBaja(false)}>
-            <div className="inscripcion-confirmar-card">
-              <p>¿Seguro que querés darte de baja de {detalle.nombre}?</p>
-              <p className="inscripcion-confirmar-aviso">
-                No se realizará el reintegro de la cuota paga de este mes.
-              </p>
-              {errorBaja && <p className="inscripciones-error">{errorBaja}</p>}
-              <div className="inscripcion-confirmar-acciones">
-                <button
-                  type="button"
-                  className="inscripcion-confirmar-btn-no"
-                  onClick={() => setConfirmarBaja(false)}
-                  disabled={dandoBaja}
-                >
-                  Volver
-                </button>
-                <button
-                  type="button"
-                  className="inscripcion-confirmar-btn-si"
-                  onClick={confirmarBajaInscripcion}
-                  disabled={dandoBaja}
-                >
-                  {dandoBaja ? 'Dando de baja...' : 'Sí, dar de baja'}
-                </button>
+        <AnimatePresence>
+          {confirmarBaja && (
+            <ModalOverlay key="confirmar-baja" onClose={() => setConfirmarBaja(false)}>
+              <div className="inscripcion-confirmar-card">
+                <p>¿Seguro que querés darte de baja de {detalle.nombre}?</p>
+                <p className="inscripcion-confirmar-aviso">
+                  No se realizará el reintegro de la cuota paga de este mes.
+                </p>
+                {errorBaja && <p className="inscripciones-error">{errorBaja}</p>}
+                <div className="inscripcion-confirmar-acciones">
+                  <button
+                    type="button"
+                    className="inscripcion-confirmar-btn-no"
+                    onClick={() => setConfirmarBaja(false)}
+                    disabled={dandoBaja}
+                  >
+                    Volver
+                  </button>
+                  <button
+                    type="button"
+                    className="inscripcion-confirmar-btn-si"
+                    onClick={confirmarBajaInscripcion}
+                    disabled={dandoBaja}
+                  >
+                    {dandoBaja ? 'Dando de baja...' : 'Sí, dar de baja'}
+                  </button>
+                </div>
               </div>
-            </div>
-          </ModalOverlay>
-        )}
+            </ModalOverlay>
+          )}
+        </AnimatePresence>
       </div>
     );
   }
