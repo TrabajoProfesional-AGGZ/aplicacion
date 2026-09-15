@@ -41,13 +41,33 @@ export default function App() {
   }, [cargandoAuth, socio]);
 
   const mostrarDashboard = vista === 'app' && Boolean(socio);
+  // Mientras LoginSocio corre su animación de salida (login exitoso, sesión
+  // ya resuelta, todavía en vista 'auth'), el dashboard real ya se monta
+  // debajo suyo — LoginSocio es un overlay (position: fixed) que se
+  // desvanece revelándolo, en vez de cortar a un HomePage recién montado.
+  const mostrarDashboardDebajoDelLogin = vista === 'auth' && Boolean(socio) && !mostrarRegistro;
 
   if (cargandoAuth) {
     return <div style={{ height: '100dvh', backgroundColor: '#111111' }} />;
   }
 
-  if (!mostrarDashboard) {
+  if (mostrarDashboard) {
     return (
+      <HomePage
+        socio={socio}
+        cerrarSesion={cerrarSesion}
+      />
+    );
+  }
+
+  return (
+    <>
+      {mostrarDashboardDebajoDelLogin && (
+        <HomePage
+          socio={socio}
+          cerrarSesion={cerrarSesion}
+        />
+      )}
       <AnimatePresence mode="wait">
         {mostrarRegistro ? (
           <RegistroSocioForm
@@ -63,13 +83,6 @@ export default function App() {
           />
         )}
       </AnimatePresence>
-    );
-  }
-
-  return (
-    <HomePage
-      socio={socio}
-      cerrarSesion={cerrarSesion}
-    />
+    </>
   );
 }
