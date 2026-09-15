@@ -7,7 +7,7 @@ import './FinanzasPage.css';
 
 const RESUMEN_CONFIG = {
   Activo: { tono: 'success', copy: 'Estás al día con tus cuotas.' },
-  Moroso: { tono: 'danger', copy: 'Por pagar.' },
+  Moroso: { tono: 'danger', copy: 'Tenés cuotas pendientes. Podés pagarlas desde acá.' },
 };
 
 const CUOTA_ESTADO_TAG = {

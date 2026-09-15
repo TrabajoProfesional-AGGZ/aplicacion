@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1.5rem;
-  min-height: calc(100vh - var(--bottom-nav-height) - 70px);
+  min-height: calc(100dvh - var(--bottom-nav-height) - 70px);
   background-color: var(--color-bg);
   animation: fadeIn 0.3s ease-out;
 }
@@ -43,11 +43,11 @@
 .carnet-card::after {
   content: '';
   position: absolute;
-  top: 0; left: -100%;
+  top: 0; left: 0;
   width: 50%; height: 100%;
   background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
-  transform: skewX(-20deg);
-  animation: shine 6s infinite;
+  transform: translateX(-200%) skewX(-20deg);
+  animation: shine 1.2s var(--ease-out, ease-out) 0.3s 1 forwards;
   pointer-events: none;
 }
 
@@ -243,7 +243,5 @@
 }
 
 @keyframes shine {
-  0% { left: -100%; }
-  20% { left: 200%; }
-  100% { left: 200%; }
+  to { transform: translateX(300%) skewX(-20deg); }
 }

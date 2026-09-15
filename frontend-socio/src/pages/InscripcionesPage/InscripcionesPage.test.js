@@ -86,13 +86,13 @@ describe('InscripcionesPage', () => {
     expect(screen.queryByText('Ajedrez')).not.toBeInTheDocument();
   });
 
-  test('el botón "Nueva Inscripcion" del banner llama a onNuevaInscripcion', async () => {
+  test('el botón "Nueva inscripción" del banner llama a onNuevaInscripcion', async () => {
     getDisciplinasPorSocio.mockResolvedValue([]);
     const onNuevaInscripcion = jest.fn();
     render(<InscripcionesPage socio={socioFixture} onNuevaInscripcion={onNuevaInscripcion} />);
     await screen.findByRole('heading', { name: 'Mis inscripciones' });
 
-    fireEvent.click(screen.getByRole('button', { name: /nueva inscripcion/i }));
+    fireEvent.click(screen.getByRole('button', { name: /nueva inscripción/i }));
     expect(onNuevaInscripcion).toHaveBeenCalled();
   });
 

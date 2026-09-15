@@ -172,7 +172,7 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
               </span>
               <button type="button" className="inscripciones-banner-nueva-btn" onClick={onNuevaInscripcion}>
                 <Plus size={15} />
-                Nueva Inscripcion
+                Nueva inscripción
               </button>
             </div>
             <h2 className="inscripciones-banner-title">Mis inscripciones</h2>

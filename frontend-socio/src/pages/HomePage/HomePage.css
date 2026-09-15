@@ -11,6 +11,17 @@
   background-repeat: no-repeat;
 }
 
+.offline-banner {
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--status-warning-bg);
+  border-bottom: 1px solid var(--status-warning-border);
+  color: var(--status-warning-border);
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
 @media (min-width: 768px) {
   .home-page {
     max-width: 960px;

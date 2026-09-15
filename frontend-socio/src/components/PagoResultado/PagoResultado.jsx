@@ -6,7 +6,7 @@ const CONFIG_RESULTADO = {
     clase: 'approved',
     icon: CheckCircle2,
     titulo: '¡Pago aprobado!',
-    desc: 'Tu pago se acreditó correctamente!'
+    desc: '¡Tu pago se acreditó correctamente!'
   },
   rejected: {
     clase: 'rejected',

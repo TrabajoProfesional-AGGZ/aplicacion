@@ -81,10 +81,10 @@ export function HomePage({ socio, cerrarSesion }) {
     console.warn("Estás sin conexión. Mostrando el pase de acceso offline.");
     return (
       <div className="offline-fullscreen-container" style={{ minHeight: '100dvh', backgroundColor: 'var(--color-surface)', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ backgroundColor: '#ff9800', color: 'white', textAlign: 'center', padding: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+        <p className="offline-banner">
           Conexión perdida. Mostrando credencial offline.
-        </div>
-        
+        </p>
+
         <Carnet socio={socio} />
       </div>
     );
