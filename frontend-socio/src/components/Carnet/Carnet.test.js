@@ -71,6 +71,7 @@ describe('Carnet', () => {
 
     beforeEach(() => {
       jest.useFakeTimers();
+      Object.defineProperty(navigator, 'vibrate', { value: jest.fn(), configurable: true });
     });
 
     afterEach(() => {
@@ -96,7 +97,8 @@ describe('Carnet', () => {
       });
 
       expect(screen.getByText('Acceso permitido. Molinete liberado.')).toBeInTheDocument();
-      expect(screen.getByRole('status')).toHaveClass('carnet-resultado-overlay--exito');
+      expect(screen.getByRole('alert')).toHaveClass('carnet-resultado-overlay--exito');
+      expect(navigator.vibrate).toHaveBeenCalledWith(40);
     });
 
     test('aparece overlay rojo cuando el polling detecta un acceso rechazado', async () => {
@@ -118,7 +120,8 @@ describe('Carnet', () => {
 
       expect(screen.getByText('Código QR inválido o expirado')).toBeInTheDocument();
       expect(screen.getByText('Estado financiero: Moroso')).toBeInTheDocument();
-      expect(screen.getByRole('status')).toHaveClass('carnet-resultado-overlay--error');
+      expect(screen.getByRole('alert')).toHaveClass('carnet-resultado-overlay--error');
+      expect(navigator.vibrate).toHaveBeenCalledWith([40, 60, 40]);
     });
 
     test('"Ok" descarta el resultado y no reaparece con el mismo id', async () => {

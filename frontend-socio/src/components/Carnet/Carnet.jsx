@@ -140,6 +140,9 @@ export function Carnet({ socio }) {
 
       ultimoIdMostradoRef.current = resultado.id;
       setResultadoAcceso(resultado);
+      if (typeof navigator.vibrate === 'function') {
+        navigator.vibrate(resultado.aprobado ? 40 : [40, 60, 40]);
+      }
 
       if (resultado.aprobado) {
         pedirSecretoNuevo().catch(() => {});
@@ -174,7 +177,7 @@ export function Carnet({ socio }) {
           {resultadoAcceso && (
             <div
               className={`carnet-resultado-overlay carnet-resultado-overlay--${resultadoAcceso.aprobado ? 'exito' : 'error'}`}
-              role="status"
+              role="alert"
             >
               {resultadoAcceso.aprobado ? (
                 <CheckCircle2 size={40} className="carnet-resultado-icono" />
