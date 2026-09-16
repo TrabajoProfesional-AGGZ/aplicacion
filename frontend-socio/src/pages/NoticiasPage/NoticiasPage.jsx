@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Newspaper } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { getNoticiasVigentes, getNoticia } from '../../services/noticiasService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
 import './NoticiasPage.css';
 
 /**
@@ -82,19 +83,11 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
   // ─── Lista ───
   return (
     <div className="noticias-page">
-      <div className="noticias-banner">
-        <div className="noticias-banner-texture" />
-        <div className="noticias-banner-top">
-          <span className="noticias-banner-eyebrow"><Newspaper size={14} /> NOVEDADES DEL CLUB</span>
-        </div>
-        <h2 className="noticias-banner-title">Noticias del Club</h2>
-        <div className="noticias-banner-stats">
-          <div className="noticias-banner-stat">
-            <span className="noticias-banner-stat-value">{loading ? '—' : noticias.length}</span>
-            <span className="noticias-banner-stat-label">Vigentes</span>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Novedades del club"
+        titulo="Noticias del Club"
+        stats={[{ label: 'Vigentes', value: loading ? '—' : noticias.length }]}
+      />
 
       {loading && <SkeletonRows n={4} altura={64} />}
 

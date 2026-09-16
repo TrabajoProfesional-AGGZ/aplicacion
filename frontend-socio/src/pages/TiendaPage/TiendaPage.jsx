@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { ShoppingBag, Package, Minus, Plus, Receipt } from 'lucide-react';
+import { Package, Minus, Plus, Receipt } from 'lucide-react';
 import { getProductosDisponibles, getProducto, comprarProducto, getComprasPorSocio } from '../../services/tiendaService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
 import './TiendaPage.css';
 
 const MENSAJES_ERROR_COMPRA = {
@@ -258,19 +259,11 @@ export function TiendaPage({ socio }) {
   // ─── Lista ───
   return (
     <div className="tienda-page">
-      <div className="tienda-banner">
-        <div className="tienda-banner-texture" />
-        <div className="tienda-banner-top">
-          <span className="tienda-banner-eyebrow"><ShoppingBag size={14} /> TIENDA DEL CLUB</span>
-        </div>
-        <h2 className="tienda-banner-title">Explorá nuestros productos</h2>
-        <div className="tienda-banner-stats">
-          <div className="tienda-banner-stat">
-            <span className="tienda-banner-stat-value">{loading ? '—' : productos.length}</span>
-            <span className="tienda-banner-stat-label">Disponibles</span>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Tienda del club"
+        titulo="Explorá nuestros productos"
+        stats={[{ label: 'Disponibles', value: loading ? '—' : productos.length }]}
+      />
 
       <button type="button" className="tienda-mis-compras-btn" onClick={abrirMisCompras}>
         <Receipt size={16} /> Mis compras

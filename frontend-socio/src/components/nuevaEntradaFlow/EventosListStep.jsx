@@ -1,5 +1,6 @@
 import { Users, Calendar, ChevronRight } from 'lucide-react';
 import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './EventosListStep.css';
 
 function formatearFecha(fechaIso) {
@@ -14,11 +15,7 @@ function formatearMonto(monto) {
 export function EventosListStep({ eventos, cargando, error, onSeleccionar }) {
   return (
     <section className="eventos-lista">
-      <section className="eventos-banner">
-        <div className="eventos-banner-texture" aria-hidden="true" />
-        <span className="eventos-banner-eyebrow">Eventos del club</span>
-        <h2 className="eventos-banner-title">Comprá tu entrada</h2>
-      </section>
+      <PageHeader eyebrow="Eventos del club" titulo="Comprá tu entrada" />
 
       {cargando && <SkeletonRows n={4} altura={76} />}
 

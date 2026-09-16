@@ -71,8 +71,8 @@ describe('InscripcionesPage', () => {
   test('muestra la cantidad de inscripciones aranceladas y sin costo en el banner', async () => {
     getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA, INSCRIPCION_SIN_COSTO]);
     render(<InscripcionesPage socio={socioFixture} />);
-    expect(await screen.findByLabelText('Inscripciones aranceladas: 1')).toBeInTheDocument();
-    expect(screen.getByLabelText('Inscripciones sin costo: 1')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Aranceladas: 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Sin costo: 1')).toBeInTheDocument();
   });
 
   test('el filtro "Aranceladas" oculta las inscripciones sin costo', async () => {
@@ -99,7 +99,7 @@ describe('InscripcionesPage', () => {
   test('muestra la cantidad de inscripciones en espera en el banner', async () => {
     getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA, INSCRIPCION_EN_ESPERA]);
     render(<InscripcionesPage socio={socioFixture} />);
-    expect(await screen.findByLabelText('Inscripciones en espera: 1')).toBeInTheDocument();
+    expect(await screen.findByLabelText('En espera: 1')).toBeInTheDocument();
   });
 
   test('el filtro "En espera" muestra solo las inscripciones en lista de espera', async () => {

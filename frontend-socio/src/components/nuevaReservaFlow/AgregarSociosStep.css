@@ -3,62 +3,6 @@
   flex-direction: column;
 }
 
-/* Banner: mismo lenguaje visual que el resto del flujo de reserva. */
-.agregar-socios-banner {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  border-radius: var(--radius-xl);
-  padding: var(--space-6);
-  margin-bottom: var(--space-6);
-  background:
-    radial-gradient(120% 140% at 12% -10%, #3a3a3a 0%, transparent 55%),
-    linear-gradient(155deg, #1c1c1c 0%, #111111 42%, #0a0a0a 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-.agregar-socios-banner-texture {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-.agregar-socios-banner-content {
-  position: relative;
-  z-index: 1;
-}
-
-.agregar-socios-banner-eyebrow {
-  display: block;
-  font-size: var(--text-label);
-  font-weight: 700;
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  margin-bottom: var(--space-2);
-}
-
-.agregar-socios-banner-title {
-  margin: 0 0 var(--space-2);
-  font-size: var(--text-title);
-  font-weight: 700;
-  letter-spacing: var(--tracking-title);
-  line-height: var(--leading-title);
-  color: var(--color-surface);
-  text-wrap: balance;
-}
-
-.agregar-socios-banner-subtitulo {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: var(--text-secondary);
-}
-
 .agregar-socios-input-row {
   display: flex;
   gap: var(--space-2);
@@ -203,8 +147,4 @@
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-full);
   cursor: pointer;
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .agregar-socios-banner-texture { display: none; }
 }

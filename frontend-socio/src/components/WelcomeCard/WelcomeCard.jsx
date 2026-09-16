@@ -1,4 +1,5 @@
 import { PartyPopper } from 'lucide-react';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './WelcomeCard.css';
 
 // RGB (no hex) para variar la opacidad de texto/borde/glow del pill de estado
@@ -32,8 +33,7 @@ export function WelcomeCard({ socio }) {
   const esCumpleanios = esCumpleaniosHoy(socio.fecha_nacimiento);
 
   return (
-    <section className="welcome-card">
-      <div className="welcome-card-texture" aria-hidden="true" />
+    <PageHeader variant="hero">
       <div className="welcome-card-top">
         <p className="welcome-card-fecha">{fechaFormateada}</p>
         <p className="welcome-card-estado" style={{ '--estado-rgb': ESTADO_RGB[socio.estado?.nombre] }}>
@@ -48,6 +48,6 @@ export function WelcomeCard({ socio }) {
         </p>
       )}
       <p className="welcome-card-membresia">{socio.nro_socio} - {socio.categoria?.nombre}</p>
-    </section>
+    </PageHeader>
   );
 }

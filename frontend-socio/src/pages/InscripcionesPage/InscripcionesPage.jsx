@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { ClipboardList, MapPin, Plus, Tag } from 'lucide-react';
+import { MapPin, Plus, Tag } from 'lucide-react';
 import { getDisciplinasPorSocio, darDeBajaInscripcion } from '../../services/disciplinasService';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
 import './InscripcionesPage.css';
 
 const FILTROS = [
@@ -79,35 +80,17 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
   if (detalle) {
     return (
       <div className="inscripciones-lista">
-        <section className="inscripcion-detalle-banner">
-          <div className="inscripcion-detalle-banner-texture" aria-hidden="true" />
-          {detalle.estado_suscripcion === 'en_espera' && (
-            <span className="inscripcion-detalle-banner-badge">En espera</span>
+        <PageHeader
+          accion={detalle.estado_suscripcion === 'en_espera' && (
+            <span className="inscripcion-detalle-badge">En espera</span>
           )}
-          <div className="inscripcion-detalle-banner-content">
-            <h2 className="inscripcion-detalle-banner-title">{detalle.nombre}</h2>
-            <div className="inscripcion-detalle-banner-stats">
-              <div className="inscripcion-detalle-banner-stat">
-                <span className="inscripcion-detalle-banner-stat-label">Categoría</span>
-                <span className="inscripcion-detalle-banner-stat-valor">
-                  {detalle.categoria_socio?.nombre ?? 'Todas'}
-                </span>
-              </div>
-              <div className="inscripcion-detalle-banner-divider" aria-hidden="true" />
-              <div className="inscripcion-detalle-banner-stat">
-                <span className="inscripcion-detalle-banner-stat-label">Sede</span>
-                <span className="inscripcion-detalle-banner-stat-valor">{detalle.sede.nombre}</span>
-              </div>
-              <div className="inscripcion-detalle-banner-divider" aria-hidden="true" />
-              <div className="inscripcion-detalle-banner-stat">
-                <span className="inscripcion-detalle-banner-stat-label">Arancel por mes</span>
-                <span className="inscripcion-detalle-banner-stat-valor">
-                  {detalle.arancelada ? formatearMonto(detalle.monto_mensual) : 'Sin costo'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
+          titulo={detalle.nombre}
+          stats={[
+            { label: 'Categoría', value: detalle.categoria_socio?.nombre ?? 'Todas' },
+            { label: 'Sede', value: detalle.sede.nombre },
+            { label: 'Arancel por mes', value: detalle.arancelada ? formatearMonto(detalle.monto_mensual) : 'Sin costo' },
+          ]}
+        />
 
         {detalle.estado_suscripcion !== 'en_espera' && (
           <button
@@ -157,36 +140,21 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
   return (
     <>
       <section className="inscripciones-lista">
-        <section className="inscripciones-banner">
-          <div className="inscripciones-banner-texture" aria-hidden="true" />
-          <div className="inscripciones-banner-top">
-            <span className="inscripciones-banner-eyebrow">
-              <ClipboardList size={13} />
-              Actividades del club
-            </span>
-            <button type="button" className="inscripciones-banner-nueva-btn" onClick={onNuevaInscripcion}>
+        <PageHeader
+          eyebrow="Actividades del club"
+          titulo="Mis inscripciones"
+          accion={(
+            <button type="button" className="inscripciones-nueva-btn" onClick={onNuevaInscripcion}>
               <Plus size={15} />
               Nueva inscripción
             </button>
-          </div>
-          <h2 className="inscripciones-banner-title">Mis inscripciones</h2>
-          <div className="inscripciones-banner-stats">
-            <div className="inscripciones-banner-stat" aria-label={`Inscripciones aranceladas: ${cargando ? '—' : cantidadAranceladas}`}>
-              <span className="inscripciones-banner-stat-value">{cargando ? '—' : cantidadAranceladas}</span>
-              <span className="inscripciones-banner-stat-label">Aranceladas</span>
-            </div>
-            <div className="inscripciones-banner-stat-divider" aria-hidden="true" />
-            <div className="inscripciones-banner-stat" aria-label={`Inscripciones sin costo: ${cargando ? '—' : cantidadSinCosto}`}>
-              <span className="inscripciones-banner-stat-value">{cargando ? '—' : cantidadSinCosto}</span>
-              <span className="inscripciones-banner-stat-label">Sin costo</span>
-            </div>
-            <div className="inscripciones-banner-stat-divider" aria-hidden="true" />
-            <div className="inscripciones-banner-stat" aria-label={`Inscripciones en espera: ${cargando ? '—' : cantidadEnEspera}`}>
-              <span className="inscripciones-banner-stat-value">{cargando ? '—' : cantidadEnEspera}</span>
-              <span className="inscripciones-banner-stat-label">En espera</span>
-            </div>
-          </div>
-        </section>
+          )}
+          stats={[
+            { label: 'Aranceladas', value: cargando ? '—' : cantidadAranceladas },
+            { label: 'Sin costo', value: cargando ? '—' : cantidadSinCosto },
+            { label: 'En espera', value: cargando ? '—' : cantidadEnEspera },
+          ]}
+        />
 
         <fieldset className="inscripciones-filtros" aria-label="Filtrar inscripciones">
           {FILTROS.map((f) => (

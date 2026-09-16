@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { FileText, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { getTramitesPorSocio } from '../../services/tramitesService';
 import { SubirTramiteForm } from '../../components/subirTramiteForm/SubirTramiteForm';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
 import './TramitesPage.css';
 
 const ESTADO_TAG = {
@@ -57,38 +58,22 @@ export function TramitesPage({ socio }) {
   return (
     <>
       <section className="tramites-lista">
-        <section className="tramites-banner">
-          <div className="tramites-banner-texture" aria-hidden="true" />
-          <div className="tramites-banner-top">
-            <span className="tramites-banner-eyebrow">
-              <FileText size={13} />
-              Documentación del socio
-            </span>
-            <button type="button" className="tramites-banner-cargar-btn" onClick={() => setFormAbierto(true)}>
+        <PageHeader
+          eyebrow="Documentación del socio"
+          titulo="Mis trámites"
+          accion={(
+            <button type="button" className="tramites-cargar-btn" onClick={() => setFormAbierto(true)}>
               <Plus size={16} />
               Cargar trámite
             </button>
-          </div>
-          <h2 className="tramites-banner-title">Mis trámites</h2>
-          <div className="tramites-banner-stats">
-            <div className="tramites-banner-stat" aria-label={`Trámites cargados: ${cargando ? '—' : cantidadCargados}`}>
-              <span className="tramites-banner-stat-value">{cargando ? '—' : cantidadCargados}</span>
-              <span className="tramites-banner-stat-label">Cargados</span>
-            </div>
-            <div className="tramites-banner-stat" aria-label={`Trámites aprobados: ${cargando ? '—' : cantidadAprobados}`}>
-              <span className="tramites-banner-stat-value tramites-banner-stat-value--success">{cargando ? '—' : cantidadAprobados}</span>
-              <span className="tramites-banner-stat-label">Aprobados</span>
-            </div>
-            <div className="tramites-banner-stat" aria-label={`Trámites en revisión: ${cargando ? '—' : cantidadEnRevision}`}>
-              <span className="tramites-banner-stat-value tramites-banner-stat-value--warning">{cargando ? '—' : cantidadEnRevision}</span>
-              <span className="tramites-banner-stat-label">En revisión</span>
-            </div>
-            <div className="tramites-banner-stat" aria-label={`Trámites rechazados: ${cargando ? '—' : cantidadRechazados}`}>
-              <span className="tramites-banner-stat-value tramites-banner-stat-value--danger">{cargando ? '—' : cantidadRechazados}</span>
-              <span className="tramites-banner-stat-label">Rechazados</span>
-            </div>
-          </div>
-        </section>
+          )}
+          stats={[
+            { label: 'Cargados', value: cargando ? '—' : cantidadCargados },
+            { label: 'Aprobados', value: cargando ? '—' : cantidadAprobados, tono: 'success' },
+            { label: 'En revisión', value: cargando ? '—' : cantidadEnRevision, tono: 'warning' },
+            { label: 'Rechazados', value: cargando ? '—' : cantidadRechazados, tono: 'danger' },
+          ]}
+        />
 
         {cargando && <SkeletonRows n={3} altura={72} />}
 

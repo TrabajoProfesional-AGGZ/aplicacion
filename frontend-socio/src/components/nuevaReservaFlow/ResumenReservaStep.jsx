@@ -1,4 +1,5 @@
 import { CheckCircle2, AlertCircle, UserRound } from 'lucide-react';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './ResumenReservaStep.css';
 
 function formatearMonto(monto) {
@@ -56,30 +57,15 @@ export function ResumenReservaStep({
   return (
     <section className="resumen-reserva">
 
-      <section className="resumen-banner">
-        <div className="resumen-banner-texture" aria-hidden="true" />
-        <div className="resumen-banner-content">
-          <span className="resumen-banner-eyebrow">Nueva reserva</span>
-          <h2 className="resumen-banner-title">Confirmá tu reserva</h2>
-
-          <div className="resumen-banner-stats">
-            <div className="resumen-banner-stat">
-              <span className="resumen-banner-stat-label">Instalación</span>
-              <span className="resumen-banner-stat-valor">{instalacion.nombre}</span>
-            </div>
-            <div className="resumen-banner-divider" aria-hidden="true" />
-            <div className="resumen-banner-stat">
-              <span className="resumen-banner-stat-label">Turno</span>
-              <span className="resumen-banner-stat-valor">{formatearFecha(fecha)} · {turno.slice(0, 5)}</span>
-            </div>
-            <div className="resumen-banner-divider" aria-hidden="true" />
-            <div className="resumen-banner-stat">
-              <span className="resumen-banner-stat-label">Valor del turno</span>
-              <span className="resumen-banner-stat-valor">{formatearMonto(instalacion.valor_turno)}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow="Nueva reserva"
+        titulo="Confirmá tu reserva"
+        stats={[
+          { label: 'Instalación', value: instalacion.nombre },
+          { label: 'Turno', value: `${formatearFecha(fecha)} · ${turno.slice(0, 5)}` },
+          { label: 'Valor del turno', value: formatearMonto(instalacion.valor_turno) },
+        ]}
+      />
 
       <h3 className="resumen-socios-titulo">Socios</h3>
       <ul className="resumen-socios-lista">

@@ -67,8 +67,8 @@ describe('ReservasPage', () => {
     getReservasPorSocio.mockResolvedValue([RESERVA_PENDIENTE, RESERVA_CONFIRMADA]);
     getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
     render(<ReservasPage socio={socioFixture} />);
-    expect(await screen.findByLabelText('Reservas confirmadas: 1')).toBeInTheDocument();
-    expect(screen.getByLabelText('Reservas pendientes: 1')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Confirmadas: 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Pendientes: 1')).toBeInTheDocument();
   });
 
   test('cambiar de filtro muestra solo las reservas de ese estado', async () => {

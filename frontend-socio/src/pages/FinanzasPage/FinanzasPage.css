@@ -1,53 +1,5 @@
-/* Tarjeta de estado — mismo lenguaje visual que WelcomeCard (radial gradient + grano),
-   tinta el gradiente con el color del estado en vez del negro plano */
-.finanzas-resumen {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  border-radius: var(--radius-xl);
-  padding: var(--space-8) var(--space-6);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 16px 32px -16px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.25);
-}
-
-.finanzas-resumen--success {
-  background:
-    radial-gradient(130% 150% at 15% -10%, rgba(13, 110, 13, 0.4) 0%, transparent 55%),
-    linear-gradient(155deg, #16341c 0%, #101c12 45%, #0a0a0a 100%);
-}
-
-.finanzas-resumen--danger {
-  background:
-    radial-gradient(130% 150% at 15% -10%, rgba(160, 20, 20, 0.45) 0%, transparent 55%),
-    linear-gradient(155deg, #3a1512 0%, #200e0d 45%, #0a0a0a 100%);
-}
-
-.finanzas-resumen--warning {
-  background:
-    radial-gradient(130% 150% at 15% -10%, rgba(154, 98, 0, 0.4) 0%, transparent 55%),
-    linear-gradient(155deg, #362a12 0%, #1c160b 45%, #0a0a0a 100%);
-}
-
-.finanzas-resumen-texture {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-.finanzas-resumen-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
 .finanzas-resumen-tag {
-  align-self: flex-start;
+  display: inline-block;
   font-size: var(--text-label);
   font-weight: 700;
   letter-spacing: var(--tracking-label);
@@ -205,8 +157,4 @@
   .finanzas-resumen-deuda {
     font-size: var(--text-display);
   }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .finanzas-resumen-texture { display: none; }
 }

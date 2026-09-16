@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, Plus } from 'lucide-react';
+import { MapPin, Plus } from 'lucide-react';
 import { getReservasPorSocio, getReservasHistoricasPorSocio, cancelReserva } from '../../services/reservasService';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
 import './ReservasPage.css';
 
 const FILTROS = [
@@ -119,31 +120,20 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
   return (
     <>
       <section className="reservas-lista">
-        <section className="reservas-banner">
-          <div className="reservas-banner-texture" aria-hidden="true" />
-          <div className="reservas-banner-top">
-            <span className="reservas-banner-eyebrow">
-              <Calendar size={13} />
-              Instalaciones del club
-            </span>
-            <button type="button" className="reservas-banner-nueva-btn" onClick={onNuevaReserva}>
+        <PageHeader
+          eyebrow="Instalaciones del club"
+          titulo="Mis Reservas"
+          accion={(
+            <button type="button" className="reservas-nueva-btn" onClick={onNuevaReserva}>
               <Plus size={15} />
               Nueva reserva
             </button>
-          </div>
-          <h2 className="reservas-banner-title">Mis Reservas</h2>
-          <div className="reservas-banner-stats">
-            <div className="reservas-banner-stat" aria-label={`Reservas confirmadas: ${cargando ? '—' : cantidadConfirmadas}`}>
-              <span className="reservas-banner-stat-value reservas-banner-stat-value--success">{cargando ? '—' : cantidadConfirmadas}</span>
-              <span className="reservas-banner-stat-label">Confirmadas</span>
-            </div>
-            <div className="reservas-banner-stat-divider" aria-hidden="true" />
-            <div className="reservas-banner-stat" aria-label={`Reservas pendientes: ${cargando ? '—' : cantidadPendientes}`}>
-              <span className="reservas-banner-stat-value reservas-banner-stat-value--warning">{cargando ? '—' : cantidadPendientes}</span>
-              <span className="reservas-banner-stat-label">Pendientes</span>
-            </div>
-          </div>
-        </section>
+          )}
+          stats={[
+            { label: 'Confirmadas', value: cargando ? '—' : cantidadConfirmadas, tono: 'success' },
+            { label: 'Pendientes', value: cargando ? '—' : cantidadPendientes, tono: 'warning' },
+          ]}
+        />
 
         <fieldset className="reservas-filtros" aria-label="Filtrar reservas por estado">
           {FILTROS.map((f) => (

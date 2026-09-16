@@ -4,6 +4,7 @@ import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
 import { useAuth } from '../../hooks/useAuth';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
 import './FinanzasPage.css';
 
 const RESUMEN_CONFIG = {
@@ -102,16 +103,13 @@ export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar 
           {(() => {
             const config = RESUMEN_CONFIG[resumen.estado_financiero] ?? { tono: 'warning', copy: '' };
             return (
-              <section className={`finanzas-resumen finanzas-resumen--${config.tono}`}>
-                <div className="finanzas-resumen-texture" aria-hidden="true" />
-                <div className="finanzas-resumen-content">
-                  <span className={`finanzas-resumen-tag finanzas-resumen-tag--${config.tono}`}>
-                    {resumen.estado_financiero}
-                  </span>
-                  <p className="finanzas-resumen-deuda">{formatearMonto(resumen.deuda_total)}</p>
-                  <p className="finanzas-resumen-copy">{config.copy}</p>
-                </div>
-              </section>
+              <PageHeader variant="hero" tono={config.tono}>
+                <span className={`finanzas-resumen-tag finanzas-resumen-tag--${config.tono}`}>
+                  {resumen.estado_financiero}
+                </span>
+                <p className="finanzas-resumen-deuda">{formatearMonto(resumen.deuda_total)}</p>
+                <p className="finanzas-resumen-copy">{config.copy}</p>
+              </PageHeader>
             );
           })()}
 

@@ -1,5 +1,6 @@
 import { Users, ChevronRight, MapPin, Tag } from 'lucide-react';
 import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './DisciplinasListStep.css';
 
 function textoCupos(disciplina) {
@@ -11,11 +12,7 @@ function textoCupos(disciplina) {
 export function DisciplinasListStep({ disciplinas, cargando, error, onSeleccionar }) {
   return (
     <section className="disciplinas-lista">
-      <section className="disciplinas-banner">
-        <div className="disciplinas-banner-texture" aria-hidden="true" />
-        <span className="disciplinas-banner-eyebrow">Actividades del club</span>
-        <h2 className="disciplinas-banner-title">Inscribite a una actividad</h2>
-      </section>
+      <PageHeader eyebrow="Actividades del club" titulo="Inscribite a una actividad" />
 
       {cargando && <SkeletonRows n={4} altura={76} />}
 

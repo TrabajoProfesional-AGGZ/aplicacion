@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { QrCode, Calendar } from 'lucide-react';
+import { QrCode } from 'lucide-react';
 import { getEntradasActivas, getEntradasHistoricas, getEntradasPendientes } from '../../services/eventosService';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
 import './MisEntradasPage.css';
 
 const ESTADO_TAG = {
@@ -61,14 +62,7 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet 
   return (
     <>
       <section className="entradas-lista">
-        <section className="entradas-banner">
-          <div className="entradas-banner-texture" aria-hidden="true" />
-          <span className="entradas-banner-eyebrow">
-            <Calendar size={13} />
-            Eventos del club
-          </span>
-          <h2 className="entradas-banner-title">Mis Entradas</h2>
-        </section>
+        <PageHeader eyebrow="Eventos del club" titulo="Mis Entradas" />
 
         <fieldset className="entradas-toggle" aria-label="Alternar entradas activas o históricas">
           <button

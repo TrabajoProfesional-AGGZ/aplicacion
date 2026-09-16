@@ -1,4 +1,5 @@
 import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './DisciplinaDetalleStep.css';
 
 function formatearMonto(monto) {
@@ -52,39 +53,18 @@ export function DisciplinaDetalleStep({
 
   return (
     <section className="detalle-disciplina">
-      <section className="disciplina-banner">
-        <div className="disciplina-banner-texture" aria-hidden="true" />
-        {yaInscripto && (
+      <PageHeader
+        accion={yaInscripto && (
           <span className="disciplina-banner-badge">Ya estás inscripto a esta disciplina</span>
         )}
-        <div className="disciplina-banner-content">
-          <h2 className="disciplina-banner-nombre">{disciplina.nombre}</h2>
-
-          <div className="disciplina-banner-stats">
-            <div className="disciplina-banner-stat">
-              <span className="disciplina-banner-stat-label">Cupos</span>
-              <span className="disciplina-banner-stat-valor">{textoCupos(disciplina)}</span>
-            </div>
-            <div className="disciplina-banner-divider" aria-hidden="true" />
-            <div className="disciplina-banner-stat">
-              <span className="disciplina-banner-stat-label">Categoría de socio</span>
-              <span className="disciplina-banner-stat-valor">{disciplina.categoria_socio?.nombre ?? 'Todas'}</span>
-            </div>
-            <div className="disciplina-banner-divider" aria-hidden="true" />
-            <div className="disciplina-banner-stat">
-              <span className="disciplina-banner-stat-label">Sede</span>
-              <span className="disciplina-banner-stat-valor">{disciplina.sede.nombre}</span>
-            </div>
-            <div className="disciplina-banner-divider" aria-hidden="true" />
-            <div className="disciplina-banner-stat">
-              <span className="disciplina-banner-stat-label">Arancel por mes</span>
-              <span className="disciplina-banner-stat-valor">
-                {disciplina.arancelada ? formatearMonto(disciplina.monto_mensual) : 'Sin costo'}
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+        titulo={disciplina.nombre}
+        stats={[
+          { label: 'Cupos', value: textoCupos(disciplina) },
+          { label: 'Categoría de socio', value: disciplina.categoria_socio?.nombre ?? 'Todas' },
+          { label: 'Sede', value: disciplina.sede.nombre },
+          { label: 'Arancel por mes', value: disciplina.arancelada ? formatearMonto(disciplina.monto_mensual) : 'Sin costo' },
+        ]}
+      />
 
       {submitError && (
         <div className="detalle-error-box">
