@@ -6,6 +6,7 @@ import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
 import './InscripcionesPage.css';
 
 const FILTROS = [
@@ -77,8 +78,12 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
     }
   }
 
+  const screenKey = detalle ? 'detalle' : 'lista';
+  const direccion = detalle ? 1 : -1;
+
   if (detalle) {
     return (
+      <ScreenTransition screenKey={screenKey} direction={direccion}>
       <div className="inscripciones-lista">
         <PageHeader
           accion={detalle.estado_suscripcion === 'en_espera' && (
@@ -134,11 +139,12 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
           )}
         </AnimatePresence>
       </div>
+      </ScreenTransition>
     );
   }
 
   return (
-    <>
+    <ScreenTransition screenKey={screenKey} direction={direccion}>
       <section className="inscripciones-lista">
         <PageHeader
           eyebrow="Actividades del club"
@@ -201,6 +207,6 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
           </button>
         ))}
       </section>
-    </>
+    </ScreenTransition>
   );
 }

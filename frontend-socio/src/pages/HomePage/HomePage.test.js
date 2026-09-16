@@ -182,6 +182,7 @@ describe('HomePage', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Reservar instalación'));
     await screen.findByText('Cancha de fútbol');
+    await waitFor(() => expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument());
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
     // El gesto de atrás desde el paso de detalle aterriza en la lista de
@@ -189,7 +190,8 @@ describe('HomePage', () => {
     await screen.findByText('08:00');
     simularGestoDeAtras();
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
-    expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('08:00')).not.toBeInTheDocument());
 
     // Avanzando dos pasos (detalle -> socios), el gesto de atrás también
     // aterriza directo en la lista de instalaciones, no un paso atrás
@@ -202,6 +204,7 @@ describe('HomePage', () => {
     simularGestoDeAtras();
 
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Agregar socios')).not.toBeInTheDocument());
     expect(screen.getByText('Cancha de fútbol')).toBeInTheDocument();
     expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument();
 
@@ -269,11 +272,11 @@ describe('HomePage', () => {
     expect(screen.getByText('Bienvenido Ana')).toBeInTheDocument();
   });
 
-  test('click en el botón de perfil del header navega a la página de perfil, sin flecha de volver', () => {
+  test('click en el botón de perfil del header navega a la página de perfil, sin flecha de volver', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByLabelText('Mi perfil'));
     expect(screen.getByText('Cerrar sesión')).toBeInTheDocument();
-    expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument());
     expect(screen.queryByLabelText('Volver')).not.toBeInTheDocument();
   });
 

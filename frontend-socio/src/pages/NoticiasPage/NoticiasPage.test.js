@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { NoticiasPage } from './NoticiasPage';
 import { getNoticiasVigentes, getNoticia } from '../../services/noticiasService';
 
@@ -80,6 +80,7 @@ describe('NoticiasPage', () => {
       act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
 
       expect(await screen.findByText('Noticia uno')).toBeInTheDocument();
+      await waitFor(() => expect(screen.queryByText('Cuerpo de la noticia dos.')).not.toBeInTheDocument());
       expect(screen.getByText('Noticia dos')).toBeInTheDocument();
     });
   });

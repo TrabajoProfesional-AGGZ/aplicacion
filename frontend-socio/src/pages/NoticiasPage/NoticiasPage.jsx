@@ -4,6 +4,7 @@ import { getNoticiasVigentes, getNoticia } from '../../services/noticiasService'
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
 import './NoticiasPage.css';
 
 /**
@@ -61,9 +62,13 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
     abrirDetalle(id);
   }
 
+  const screenKey = detalle ? 'detalle' : 'lista';
+  const direccion = detalle ? 1 : -1;
+
   // ─── Detalle ───
   if (detalle) {
     return (
+      <ScreenTransition screenKey={screenKey} direction={direccion}>
       <div className="noticias-page">
         <article className="noticias-detalle-card">
           {detalle.imagen && <img src={detalle.imagen} alt={detalle.titulo} className="noticias-detalle-img" />}
@@ -77,11 +82,13 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
           </div>
         </article>
       </div>
+      </ScreenTransition>
     );
   }
 
   // ─── Lista ───
   return (
+    <ScreenTransition screenKey={screenKey} direction={direccion}>
     <div className="noticias-page">
       <PageHeader
         eyebrow="Novedades del club"
@@ -115,5 +122,6 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
 
       {loadingDetalle && <SkeletonRows n={1} altura={220} />}
     </div>
+    </ScreenTransition>
   );
 }

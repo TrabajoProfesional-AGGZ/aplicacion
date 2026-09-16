@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { TiendaPage } from './TiendaPage';
 import { getProductosDisponibles, getProducto, comprarProducto, getComprasPorSocio } from '../../services/tiendaService';
 
@@ -90,6 +90,7 @@ describe('TiendaPage', () => {
 
     fireEvent.click(await screen.findByText('Remera oficial'));
     fireEvent.click(await screen.findByText('Comprar'));
+    await waitFor(() => expect(screen.queryByText('Explorá nuestros productos')).not.toBeInTheDocument());
 
     expect(screen.getByText('Confirmar compra')).toBeInTheDocument();
     expect(screen.getByText('1')).toBeInTheDocument();
@@ -126,6 +127,7 @@ describe('TiendaPage', () => {
     fireEvent.click(await screen.findByText('Buzo campera'));
 
     expect(await screen.findByText('Buzo oficial del club.')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Explorá nuestros productos')).not.toBeInTheDocument());
     expect(screen.queryByText('Comprar')).not.toBeInTheDocument();
     expect(screen.getByText('Agotado')).toBeInTheDocument();
   });

@@ -8,6 +8,9 @@ import {
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { DisciplinasListStep } from '../../components/nuevaInscripcionFlow/DisciplinasListStep';
 import { DisciplinaDetalleStep } from '../../components/nuevaInscripcionFlow/DisciplinaDetalleStep';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
+
+const ORDEN_STEP = { lista: 0, detalle: 1 };
 
 const MENSAJES_ERROR_INSCRIPCION = {
   'no-encontrado': 'No se pudo procesar la inscripción. Volvé a intentarlo.',
@@ -50,6 +53,14 @@ export function NuevaInscripcionPage({ socio, onExito = () => {}, onIrATramites 
   const successTimeoutRef = useRef(null);
 
   useBackToRoot(step, 'lista', volverALista);
+
+  const [stepAnterior, setStepAnterior] = useState(step);
+  const [direccion, setDireccion] = useState(0);
+  if (step !== stepAnterior) {
+    const diferenciaStep = ORDEN_STEP[step] - ORDEN_STEP[stepAnterior];
+    setDireccion(diferenciaStep > 0 ? 1 : diferenciaStep < 0 ? -1 : 0);
+    setStepAnterior(step);
+  }
 
   useEffect(() => () => {
     if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
@@ -129,29 +140,33 @@ export function NuevaInscripcionPage({ socio, onExito = () => {}, onIrATramites 
 
   if (step === 'detalle') {
     return (
-      <DisciplinaDetalleStep
-        disciplina={disciplinaSeleccionada}
-        yaInscripto={yaInscripto}
-        onInscribirme={handleInscribirme}
-        enviando={enviando}
-        submitted={submitted}
-        enEspera={enEspera}
-        sinCupo={sinCupo}
-        submitError={errorTipo ? mensajeError(errorTipo, categoriaRequerida) : ''}
-        onSumarseListaEspera={handleSumarseListaEspera}
-        mostrarBotonTramites={errorTipo === 'apto-medico'}
-        onIrATramites={onIrATramites}
-        onVerInscripciones={verMisInscripciones}
-      />
+      <ScreenTransition screenKey={step} direction={direccion}>
+        <DisciplinaDetalleStep
+          disciplina={disciplinaSeleccionada}
+          yaInscripto={yaInscripto}
+          onInscribirme={handleInscribirme}
+          enviando={enviando}
+          submitted={submitted}
+          enEspera={enEspera}
+          sinCupo={sinCupo}
+          submitError={errorTipo ? mensajeError(errorTipo, categoriaRequerida) : ''}
+          onSumarseListaEspera={handleSumarseListaEspera}
+          mostrarBotonTramites={errorTipo === 'apto-medico'}
+          onIrATramites={onIrATramites}
+          onVerInscripciones={verMisInscripciones}
+        />
+      </ScreenTransition>
     );
   }
 
   return (
-    <DisciplinasListStep
-      disciplinas={disciplinas}
-      cargando={cargando}
-      error={error}
-      onSeleccionar={irADetalle}
-    />
+    <ScreenTransition screenKey={step} direction={direccion}>
+      <DisciplinasListStep
+        disciplinas={disciplinas}
+        cargando={cargando}
+        error={error}
+        onSeleccionar={irADetalle}
+      />
+    </ScreenTransition>
   );
 }

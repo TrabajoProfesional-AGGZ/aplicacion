@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
 import { Header } from '../../components/Header/Header';
 import { WelcomeCard } from '../../components/WelcomeCard/WelcomeCard';
 import { QuickAccessGrid } from '../../components/QuickAccessGrid/QuickAccessGrid';
@@ -39,6 +40,13 @@ export function HomePage({ socio, cerrarSesion }) {
   const externalReferenceMP = searchParams.get('external_reference');
   const [vista, setVista] = useState(statusMP && externalReferenceMP ? 'pago-resultado' : 'inicio');
   const [estadoPagoMP, setEstadoPagoMP] = useState(statusMP);
+
+  const [vistaAnterior, setVistaAnterior] = useState(vista);
+  const [direccion, setDireccion] = useState(0);
+  if (vista !== vistaAnterior) {
+    setDireccion(vista === 'inicio' ? -1 : vistaAnterior === 'inicio' ? 1 : 0);
+    setVistaAnterior(vista);
+  }
 
   useBackToRoot(vista, 'inicio', () => setVista('inicio'));
 
@@ -95,6 +103,7 @@ export function HomePage({ socio, cerrarSesion }) {
       />
 
       <main className="home-page">
+       <ScreenTransition screenKey={vista} direction={direccion}>
         {vista === 'pago-resultado' && (
           <PagoResultado 
             status={estadoPagoMP} 
@@ -171,6 +180,7 @@ export function HomePage({ socio, cerrarSesion }) {
           </>
         )}
         {vista === 'carnet' && <Carnet socio={socio} />}
+       </ScreenTransition>
       </main>
       
       <BottomNav

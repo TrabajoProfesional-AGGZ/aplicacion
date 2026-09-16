@@ -10,6 +10,9 @@ import { EventosListStep } from '../../components/nuevaEntradaFlow/EventosListSt
 import { EventoDetalleStep } from '../../components/nuevaEntradaFlow/EventoDetalleStep';
 import { EntradaExitoStep } from '../../components/nuevaEntradaFlow/EntradaExitoStep';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
+
+const ORDEN_STEP = { lista: 0, detalle: 1, pago: 2, exito: 2 };
 
 const MENSAJES_ERROR_COMPRA = {
   'evento-no-encontrado': 'No se pudo procesar la compra. Volvé a intentarlo.',
@@ -56,6 +59,14 @@ export function NuevaEntradaPage({ socio, onExito = () => {} }) {
   }
 
   useBackToRoot(step, 'lista', manejarVolver);
+
+  const [stepAnterior, setStepAnterior] = useState(step);
+  const [direccion, setDireccion] = useState(0);
+  if (step !== stepAnterior) {
+    const diferenciaStep = ORDEN_STEP[step] - ORDEN_STEP[stepAnterior];
+    setDireccion(diferenciaStep > 0 ? 1 : diferenciaStep < 0 ? -1 : 0);
+    setStepAnterior(step);
+  }
 
   useEffect(() => () => {
     if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
@@ -115,7 +126,11 @@ export function NuevaEntradaPage({ socio, onExito = () => {} }) {
   }
 
   if (step === 'exito' && entradaPendiente) {
-    return <EntradaExitoStep nombreEvento={entradaPendiente.evento.nombre} onVerEntradas={verMisEntradas} />;
+    return (
+      <ScreenTransition screenKey={step} direction={direccion}>
+        <EntradaExitoStep nombreEvento={entradaPendiente.evento.nombre} onVerEntradas={verMisEntradas} />
+      </ScreenTransition>
+    );
   }
 
   if (step === 'pago' && entradaPendiente) {
@@ -134,22 +149,26 @@ export function NuevaEntradaPage({ socio, onExito = () => {} }) {
 
   if (step === 'detalle') {
     return (
-      <EventoDetalleStep
-        evento={eventoSeleccionado}
-        yaTieneEntrada={yaTieneEntrada}
-        onPagarEntrada={handlePagarEntrada}
-        enviando={enviando}
-        submitError={errorCompra ? mensajeError(errorCompra) : ''}
-      />
+      <ScreenTransition screenKey={step} direction={direccion}>
+        <EventoDetalleStep
+          evento={eventoSeleccionado}
+          yaTieneEntrada={yaTieneEntrada}
+          onPagarEntrada={handlePagarEntrada}
+          enviando={enviando}
+          submitError={errorCompra ? mensajeError(errorCompra) : ''}
+        />
+      </ScreenTransition>
     );
   }
 
   return (
-    <EventosListStep
-      eventos={eventos}
-      cargando={cargando}
-      error={error}
-      onSeleccionar={irADetalle}
-    />
+    <ScreenTransition screenKey={step} direction={direccion}>
+      <EventosListStep
+        eventos={eventos}
+        cargando={cargando}
+        error={error}
+        onSeleccionar={irADetalle}
+      />
+    </ScreenTransition>
   );
 }

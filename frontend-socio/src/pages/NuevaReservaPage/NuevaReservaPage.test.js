@@ -40,6 +40,7 @@ async function irHastaResumen() {
   fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
 
   await screen.findByText('Confirmá tu reserva');
+  await waitFor(() => expect(screen.queryByText('Agregar socios')).not.toBeInTheDocument());
 }
 
 const RealDate = global.Date;
@@ -168,6 +169,7 @@ describe('NuevaReservaPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
 
     await screen.findByText('Confirmá tu reserva');
+    await waitFor(() => expect(screen.queryByPlaceholderText('Número de socio')).not.toBeInTheDocument());
     expect(screen.getByText('Luis Gómez')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
 
@@ -182,6 +184,7 @@ describe('NuevaReservaPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
 
     await screen.findByText('Realizá tu reserva');
+    await waitFor(() => expect(screen.queryByText('Confirmá tu reserva')).not.toBeInTheDocument());
     expect(screen.getByText('Cancha de fútbol')).toBeInTheDocument();
   });
 
@@ -299,6 +302,7 @@ describe('NuevaReservaPage', () => {
     window.history.replaceState({ otraEntrada: true }, '');
     window.dispatchEvent(new PopStateEvent('popstate'));
     expect(await screen.findByText('Realizá tu reserva')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('08:00')).not.toBeInTheDocument());
 
     fireEvent.click(screen.getByText('Cancha de fútbol'));
     await screen.findByText('08:00');
@@ -346,6 +350,7 @@ describe('NuevaReservaPage', () => {
     window.dispatchEvent(new PopStateEvent('popstate'));
 
     await screen.findByText('Realizá tu reserva');
+    await waitFor(() => expect(screen.queryByText('Confirmá tu reserva')).not.toBeInTheDocument());
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
     await screen.findByText('08:00');

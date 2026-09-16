@@ -5,7 +5,10 @@ import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
 import './TiendaPage.css';
+
+const ORDEN_VISTA = { lista: 0, detalle: 1, 'mis-compras': 1, pago: 2 };
 
 const MENSAJES_ERROR_COMPRA = {
   'producto-no-encontrado': 'No se pudo procesar la compra. Volvé a intentarlo.',
@@ -65,6 +68,14 @@ export function TiendaPage({ socio }) {
   }
 
   useBackToRoot(vistaInterna, 'lista', manejarVolver);
+
+  const [vistaAnterior, setVistaAnterior] = useState(vistaInterna);
+  const [direccion, setDireccion] = useState(0);
+  if (vistaInterna !== vistaAnterior) {
+    const diferencia = ORDEN_VISTA[vistaInterna] - ORDEN_VISTA[vistaAnterior];
+    setDireccion(diferencia > 0 ? 1 : diferencia < 0 ? -1 : 0);
+    setVistaAnterior(vistaInterna);
+  }
 
   async function cargarProductos() {
     try {
@@ -147,6 +158,7 @@ export function TiendaPage({ socio }) {
   // ─── Mis compras ───
   if (vistaInterna === 'mis-compras') {
     return (
+      <ScreenTransition screenKey={vistaInterna} direction={direccion}>
       <div className="tienda-page">
         <h2 className="tienda-detalle-nombre" style={{ padding: 0, marginBottom: 'var(--space-4)' }}>Mis compras</h2>
 
@@ -180,6 +192,7 @@ export function TiendaPage({ socio }) {
           </div>
         )}
       </div>
+      </ScreenTransition>
     );
   }
 
@@ -187,6 +200,7 @@ export function TiendaPage({ socio }) {
   if (vistaInterna === 'detalle' && detalle) {
     const sinStock = Number(detalle.stock) <= 0;
     return (
+      <ScreenTransition screenKey={vistaInterna} direction={direccion}>
       <div className="tienda-page">
         <div className="tienda-detalle-card">
           <div className="tienda-detalle-media">
@@ -253,11 +267,13 @@ export function TiendaPage({ socio }) {
           )}
         </div>
       </div>
+      </ScreenTransition>
     );
   }
 
   // ─── Lista ───
   return (
+    <ScreenTransition screenKey={vistaInterna} direction={direccion}>
     <div className="tienda-page">
       <PageHeader
         eyebrow="Tienda del club"
@@ -308,5 +324,6 @@ export function TiendaPage({ socio }) {
 
       {loadingDetalle && <SkeletonRows n={1} altura={220} />}
     </div>
+    </ScreenTransition>
   );
 }

@@ -164,13 +164,14 @@ describe('InscripcionesPage', () => {
     darDeBajaInscripcion.mockResolvedValue({ estado_suscripcion: 'inactiva' });
     render(<InscripcionesPage socio={socioFixture} />);
     fireEvent.click(await screen.findByText('Natación'));
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Mis inscripciones' })).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole('button', { name: 'Dar de Baja' }));
 
     fireEvent.click(screen.getByRole('button', { name: /sí, dar de baja/i }));
 
     await waitFor(() => expect(darDeBajaInscripcion).toHaveBeenCalledWith('disc-1', 'socio-1'));
     expect(await screen.findByRole('heading', { name: 'Mis inscripciones' })).toBeInTheDocument();
-    expect(screen.queryByText('Natación')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Natación')).not.toBeInTheDocument());
   });
 
   test('si la baja falla, muestra un error y no cierra el detalle', async () => {
@@ -178,6 +179,7 @@ describe('InscripcionesPage', () => {
     darDeBajaInscripcion.mockRejectedValue(new Error('servicio-no-disponible'));
     render(<InscripcionesPage socio={socioFixture} />);
     fireEvent.click(await screen.findByText('Natación'));
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Mis inscripciones' })).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole('button', { name: 'Dar de Baja' }));
 
     fireEvent.click(screen.getByRole('button', { name: /sí, dar de baja/i }));
