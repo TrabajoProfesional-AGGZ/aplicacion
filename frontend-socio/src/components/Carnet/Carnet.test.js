@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { Carnet } from './Carnet';
 import { enrolarYGuardarSecreto, obtenerUltimoAcceso } from '../../services/accesosService';
 
@@ -17,6 +17,12 @@ describe('Carnet', () => {
   beforeEach(() => {
     obtenerUltimoAcceso.mockReset();
     obtenerUltimoAcceso.mockResolvedValue(null);
+    enrolarYGuardarSecreto.mockReset();
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   test('renderiza la estructura básica de la credencial', () => {
@@ -58,55 +64,6 @@ describe('Carnet', () => {
     expect(screen.getByText('---')).toBeInTheDocument();
 
     expect(screen.getByText('#---')).toBeInTheDocument();
-  });
-
-  test('sin socio.id no muestra el botón de recargar QR', () => {
-    render(<Carnet socio={{ nombre: 'Lautaro Ghosn', nro_socio: '12345' }} />);
-    expect(screen.queryByRole('button', { name: /recargar qr/i })).not.toBeInTheDocument();
-  });
-
-  describe('recargar QR', () => {
-    const socioMock = { id: 'socio-1', nombre: 'Lautaro Ghosn', nro_socio: '12345' };
-
-    beforeEach(() => {
-      enrolarYGuardarSecreto.mockClear();
-    });
-
-    test('pide un secreto nuevo y remonta AccesoQR al tener éxito', async () => {
-      enrolarYGuardarSecreto.mockResolvedValueOnce('SECRETO_NUEVO');
-
-      render(<Carnet socio={socioMock} />);
-      fireEvent.click(screen.getByRole('button', { name: /recargar qr/i }));
-
-      expect(screen.getByRole('button', { name: /recargando/i })).toBeDisabled();
-
-      await waitFor(() => {
-        expect(enrolarYGuardarSecreto).toHaveBeenCalledWith(socioMock);
-      });
-
-      await waitFor(() => {
-        expect(screen.getByRole('button', { name: /recargar qr/i })).not.toBeDisabled();
-      });
-      expect(screen.queryByText(/no se pudo recargar/i)).not.toBeInTheDocument();
-    });
-
-    test('muestra un error si el servicio no devuelve un secreto válido', async () => {
-      enrolarYGuardarSecreto.mockResolvedValueOnce(null);
-
-      render(<Carnet socio={socioMock} />);
-      fireEvent.click(screen.getByRole('button', { name: /recargar qr/i }));
-
-      expect(await screen.findByText(/no se pudo recargar el qr/i)).toBeInTheDocument();
-    });
-
-    test('muestra un error si el pedido de enrolamiento falla', async () => {
-      enrolarYGuardarSecreto.mockRejectedValueOnce(new Error('network error'));
-
-      render(<Carnet socio={socioMock} />);
-      fireEvent.click(screen.getByRole('button', { name: /recargar qr/i }));
-
-      expect(await screen.findByText(/no se pudo recargar el qr/i)).toBeInTheDocument();
-    });
   });
 
   describe('feedback de acceso (polling)', () => {
@@ -225,31 +182,65 @@ describe('Carnet', () => {
 
       Object.defineProperty(navigator, 'onLine', { configurable: true, value: true });
     });
+  });
 
-    test('"Recargar QR" limpia un resultado ya mostrado', async () => {
-      obtenerUltimoAcceso.mockResolvedValue({
-        id: 1,
-        aprobado: false,
-        mensaje: 'Código QR inválido o expirado',
-        creado_en: new Date(Date.now() + 1000).toISOString(),
-      });
-      enrolarYGuardarSecreto.mockResolvedValue('SECRETO_NUEVO');
+  describe('reintento automático de enrolamiento', () => {
+    const socioMock = { id: 'socio-1', nombre: 'Lautaro Ghosn', nro_socio: '12345' };
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    test('sin secreto en localStorage, reintenta el enrolamiento a los 2 s y a los 4 s', async () => {
+      enrolarYGuardarSecreto.mockResolvedValue(null);
 
       render(<Carnet socio={socioMock} />);
 
       await act(async () => {
         jest.advanceTimersByTime(2000);
         await Promise.resolve();
+      });
+      expect(enrolarYGuardarSecreto).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        jest.advanceTimersByTime(4000);
+        await Promise.resolve();
+      });
+      expect(enrolarYGuardarSecreto).toHaveBeenCalledTimes(2);
+    });
+
+    test('sin secreto y offline, no llama al servicio y muestra el aviso', async () => {
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+
+      render(<Carnet socio={socioMock} />);
+
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
         await Promise.resolve();
       });
 
-      expect(screen.getByText('Código QR inválido o expirado')).toBeInTheDocument();
+      expect(enrolarYGuardarSecreto).not.toHaveBeenCalled();
+      expect(screen.getByText('Sin conexión. El pase se activará al reconectar.')).toBeInTheDocument();
 
-      fireEvent.click(screen.getByRole('button', { name: /recargar qr/i }));
+      Object.defineProperty(navigator, 'onLine', { configurable: true, value: true });
+    });
 
-      await waitFor(() => {
-        expect(screen.queryByText('Código QR inválido o expirado')).not.toBeInTheDocument();
+    test('con secreto presente, no reintenta', async () => {
+      localStorage.setItem('socio_totp_secret', 'SECRETO_EXISTENTE');
+
+      render(<Carnet socio={socioMock} />);
+
+      await act(async () => {
+        jest.advanceTimersByTime(10000);
+        await Promise.resolve();
       });
+
+      expect(enrolarYGuardarSecreto).not.toHaveBeenCalled();
+      expect(screen.queryByText(/sin conexión/i)).not.toBeInTheDocument();
     });
   });
 });
