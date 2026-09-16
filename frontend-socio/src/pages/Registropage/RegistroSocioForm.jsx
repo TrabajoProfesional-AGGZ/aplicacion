@@ -8,7 +8,7 @@ import { MultiStepFormShell } from '../../components/createForm/MultiStepFormShe
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 import { useEffect, useRef, useState } from 'react';
 import { fetchTo } from '../../utils/utils';
-import { validarSocio, reclamarCuentaSocio } from '../../services/sociosService';
+import { validarSocio, reclamarCuentaSocio, asignarPagoSimuladoClaim } from '../../services/sociosService';
 import { asignarTipoClaim } from '../../services/authClaimsService';
 
 import { auth } from '../../firebase';
@@ -143,6 +143,16 @@ const {
         await reclamarCuentaSocio(data.nroDocumento, tokenValidacionRef.current);
       } catch (reclamarErr) {
         console.error('No se pudo marcar la cuenta como reclamada:', reclamarErr);
+      }
+
+      // Rama demo: auto-otorga pago_simulado a toda
+      // cuenta nueva. No fatal — si falla, el tester puede pedirlo manualmente.
+      try {
+        await asignarPagoSimuladoClaim(tokenJWT);
+        // Los custom claims no se reflejan en la sesión hasta el próximo refresh.
+        await getIdToken(userCredential.user, true);
+      } catch (permisoErr) {
+        console.error('No se pudo asignar el permiso de pago simulado:', permisoErr);
       }
 
       localStorage.setItem('socioToken', tokenJWT);

@@ -37,7 +37,7 @@ describe('marcarPagoDemo (pago simulado, rama demo)', () => {
     jest.clearAllMocks();
   });
 
-  test('llama a fetchTo con id_item, tipo_item y el secreto de demo, y devuelve el JSON', async () => {
+  test('llama a fetchTo con id_item y tipo_item, sin secreto, y devuelve el JSON', async () => {
     const respuesta = { mensaje: 'Cuota marcada como pagada correctamente', estado: 'Pagada' };
     fetchTo.mockResolvedValue({ ok: true, json: () => Promise.resolve(respuesta) });
 
@@ -46,13 +46,12 @@ describe('marcarPagoDemo (pago simulado, rama demo)', () => {
     expect(fetchTo).toHaveBeenCalledWith('/api/v1/demo/marcar-pagado', 'POST', {
       id_item: 'cuota-1',
       tipo_item: 'cuota',
-      demo_secreto: undefined,
     });
     expect(resultado).toEqual(respuesta);
   });
 
   test('lanza pago-demo-fallido si la respuesta no es ok', async () => {
-    fetchTo.mockResolvedValue({ ok: false, status: 403, json: () => Promise.resolve({ detail: 'Secreto de demo inválido' }) });
+    fetchTo.mockResolvedValue({ ok: false, status: 403, json: () => Promise.resolve({ detail: 'El ítem no pertenece al socio autenticado' }) });
 
     await expect(marcarPagoDemo('cuota-1', 'cuota')).rejects.toThrow('pago-demo-fallido');
   });
