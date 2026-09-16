@@ -51,8 +51,8 @@
 .page-header--title .page-header-stat-value {
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: var(--text-caption);
-  font-weight: 500;
+  font-size: var(--text-title);
+  font-weight: 700;
   color: var(--color-text-secondary);
 }
 
@@ -177,8 +177,8 @@
 .page-header--hero .page-header-stat-value {
   font-family: var(--font-numeric);
   font-variant-numeric: tabular-nums;
-  font-size: var(--text-caption);
-  font-weight: 500;
+  font-size: var(--text-title);
+  font-weight: 700;
   color: rgba(255, 255, 255, 0.55);
 }
 

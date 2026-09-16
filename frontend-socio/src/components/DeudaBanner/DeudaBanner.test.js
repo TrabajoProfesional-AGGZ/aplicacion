@@ -14,20 +14,44 @@ describe('DeudaBanner', () => {
     __resetCacheDeudaParaTests();
   });
 
-  test('no muestra nada si no tiene cuotas pendientes', async () => {
+  test('no muestra nada si no tiene cuotas pendientes ni vencidas', async () => {
     getEstadoFinanciero.mockResolvedValue({ cuotas: [{ id: 'c-1', estado: 'Pagada' }] });
     const { container } = render(<DeudaBanner socio={socioFixture} onClick={jest.fn()} />);
     await waitFor(() => expect(getEstadoFinanciero).toHaveBeenCalledWith('socio-1'));
     expect(container.firstChild).toBeNull();
   });
 
-  test('muestra el mensaje en singular si debe una sola cuota', async () => {
+  test('no muestra nada si solo tiene cuotas pendientes, sin ninguna vencida', async () => {
+    getEstadoFinanciero.mockResolvedValue({
+      cuotas: [
+        { id: 'c-1', estado: 'Pendiente' },
+        { id: 'c-2', estado: 'Pagada' },
+      ],
+    });
+    const { container } = render(<DeudaBanner socio={socioFixture} onClick={jest.fn()} />);
+    await waitFor(() => expect(getEstadoFinanciero).toHaveBeenCalledWith('socio-1'));
+    expect(container.firstChild).toBeNull();
+  });
+
+  test('muestra el mensaje en singular si debe una sola cuota vencida', async () => {
     getEstadoFinanciero.mockResolvedValue({ cuotas: [{ id: 'c-1', estado: 'Vencida' }] });
     render(<DeudaBanner socio={socioFixture} onClick={jest.fn()} />);
     expect(await screen.findByText('Debés 1 cuota, tocá acá para ponerte al día.')).toBeInTheDocument();
   });
 
-  test('muestra el mensaje en plural con la cantidad de cuotas pendientes', async () => {
+  test('muestra el mensaje en plural con la cantidad de cuotas vencidas si todas están vencidas', async () => {
+    getEstadoFinanciero.mockResolvedValue({
+      cuotas: [
+        { id: 'c-1', estado: 'Vencida' },
+        { id: 'c-2', estado: 'Vencida' },
+        { id: 'c-3', estado: 'Pagada' },
+      ],
+    });
+    render(<DeudaBanner socio={socioFixture} onClick={jest.fn()} />);
+    expect(await screen.findByText('Debés 2 cuotas, tocá acá para ponerte al día.')).toBeInTheDocument();
+  });
+
+  test('muestra el mensaje mixto si hay al menos una vencida y al menos una pendiente', async () => {
     getEstadoFinanciero.mockResolvedValue({
       cuotas: [
         { id: 'c-1', estado: 'Vencida' },
@@ -36,7 +60,9 @@ describe('DeudaBanner', () => {
       ],
     });
     render(<DeudaBanner socio={socioFixture} onClick={jest.fn()} />);
-    expect(await screen.findByText('Debés 2 cuotas, tocá acá para ponerte al día.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Tenés 2 cuotas vencidas y/o pendientes, tocá acá para ponerte al día.')
+    ).toBeInTheDocument();
   });
 
   test('llama a onClick al tocar el banner', async () => {
