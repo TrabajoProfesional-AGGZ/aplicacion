@@ -9,7 +9,7 @@ import './DeudaBanner.css';
 // a Inicio y el banner parpadea (desaparece hasta que el fetch resuelve).
 // Por socio, para no mostrarle a uno la deuda cacheada de otro si
 // `cerrarSesion` no recarga la página.
-const cacheDeuda = new Map(); // socioId -> cantidadPendientes
+const cacheDeuda = new Map(); // socioId -> { vencidas, pendientes }
 
 /** Solo para tests: limpia la caché en memoria entre casos. */
 export function __resetCacheDeudaParaTests() {
@@ -17,12 +17,13 @@ export function __resetCacheDeudaParaTests() {
 }
 
 /**
- * Banner persistente en el Home que avisa si el socio tiene cuotas sin pagar
- * (mismo patrón que `CertificadoVencidoBanner`); no renderiza nada si no debe
- * ninguna.
+ * Banner persistente en el Home que avisa si el socio tiene cuotas vencidas
+ * (mismo patrón que `CertificadoVencidoBanner`); no renderiza nada si no
+ * tiene ninguna cuota vencida (una pendiente sin vencer todavía no amerita
+ * el aviso).
  */
 export function DeudaBanner({ socio, onClick }) {
-  const [cantidadPendientes, setCantidadPendientes] = useState(
+  const [conteo, setConteo] = useState(
     () => (socio?.id ? cacheDeuda.get(socio.id) ?? null : null)
   );
 
@@ -32,19 +33,26 @@ export function DeudaBanner({ socio, onClick }) {
     getEstadoFinanciero(socio.id)
       .then((data) => {
         if (cancelled) return;
-        const pendientes = (data.cuotas ?? []).filter((c) => c.estado !== 'Pagada');
-        cacheDeuda.set(socio.id, pendientes.length);
-        setCantidadPendientes(pendientes.length);
+        const cuotas = data.cuotas ?? [];
+        const nuevoConteo = {
+          vencidas: cuotas.filter((c) => c.estado === 'Vencida').length,
+          pendientes: cuotas.filter((c) => c.estado === 'Pendiente').length,
+        };
+        cacheDeuda.set(socio.id, nuevoConteo);
+        setConteo(nuevoConteo);
       })
-      .catch(() => { if (!cancelled) setCantidadPendientes(null); });
+      .catch(() => { if (!cancelled) setConteo(null); });
     return () => { cancelled = true; };
   }, [socio?.id]);
 
-  if (!cantidadPendientes) return null;
+  if (!conteo || conteo.vencidas === 0) return null;
 
-  const mensaje = cantidadPendientes === 1
-    ? 'Debés 1 cuota, tocá acá para ponerte al día.'
-    : `Debés ${cantidadPendientes} cuotas, tocá acá para ponerte al día.`;
+  const { vencidas, pendientes } = conteo;
+  const mensaje = pendientes === 0
+    ? (vencidas === 1
+      ? 'Debés 1 cuota, tocá acá para ponerte al día.'
+      : `Debés ${vencidas} cuotas, tocá acá para ponerte al día.`)
+    : `Tenés ${vencidas + pendientes} cuotas vencidas y/o pendientes, tocá acá para ponerte al día.`;
 
   return (
     <button type="button" className="deuda-banner" onClick={onClick}>
