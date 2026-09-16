@@ -9,6 +9,7 @@ import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 import { useEffect, useRef, useState } from 'react';
 import { fetchTo } from '../../utils/utils';
 import { validarSocio, reclamarCuentaSocio } from '../../services/sociosService';
+import { asignarTipoClaim } from '../../services/authClaimsService';
 
 import { auth } from '../../firebase';
 import { createUserWithEmailAndPassword, getIdToken, deleteUser } from 'firebase/auth';
@@ -45,6 +46,10 @@ const {
 
   const [validandoPaso, setValidandoPaso] = useState(false);
   const montadoRef = useRef(true);
+  // Token de un solo uso que devuelve /socios/validar en el paso 1 y que consume
+  // /reclamar al final: ata el reclamo a esta validación puntual (issue #249/A-01).
+  // Va en un ref y no en estado porque no se renderiza: cambiarlo no debe re-renderizar.
+  const tokenValidacionRef = useRef(null);
 
   useEffect(() => {
     return () => {
@@ -67,7 +72,8 @@ const {
       try {
         const { nroSocio, nroDocumento, email } = getValues();
 
-        await validarSocio(nroSocio, nroDocumento, email);
+        const { token } = await validarSocio(nroSocio, nroDocumento, email);
+        tokenValidacionRef.current = token ?? null;
 
         goNext();
       } catch (error) {
@@ -75,6 +81,8 @@ const {
           setFormError('Este socio ya tiene una cuenta registrada. Iniciá sesión en su lugar.');
         } else if (error.message === 'socio-no-encontrado') {
           setFormError('No pudimos validar tu identidad. Por favor, revisá los datos completados.');
+        } else if (error.message === 'demasiados-intentos') {
+          setFormError('Demasiados intentos de validación. Esperá unos minutos antes de volver a probar.');
         } else {
           console.error('Error al validar el socio:', error);
           setFormError('Error de conexión al validar el socio.');
@@ -94,7 +102,17 @@ const {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
       usuarioCreado = userCredential.user;
-      const tokenJWT = await getIdToken(userCredential.user);
+      const tokenPrevioAlClaim = await getIdToken(userCredential.user);
+
+      // El claim `tipo:"socio"` tiene que quedar seteado (y el token refrescado)
+      // antes de cualquier llamada que el gateway gatee por tipo de cuenta —
+      // PATCH /socios/por-dni/{dni} más abajo ya lo exige.
+      try {
+        await asignarTipoClaim(tokenPrevioAlClaim, 'socio');
+      } catch (claimErr) {
+        throw new Error('error-actualizacion');
+      }
+      const tokenJWT = await getIdToken(userCredential.user, true);
 
       // No se manda "email": ya quedó validado contra el de la base en el paso 1,
       // reenviarlo acá lo pisaría innecesariamente.
@@ -115,7 +133,7 @@ const {
       }
 
       try {
-        await reclamarCuentaSocio(data.nroDocumento);
+        await reclamarCuentaSocio(data.nroDocumento, tokenValidacionRef.current);
       } catch (reclamarErr) {
         console.error('No se pudo marcar la cuenta como reclamada:', reclamarErr);
       }

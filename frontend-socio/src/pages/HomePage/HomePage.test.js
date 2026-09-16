@@ -297,7 +297,7 @@ describe('HomePage', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     
     await waitFor(() => {
-      expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/enrolar', 'POST', { socio_id: 'socio-1' });
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/enrolar', 'POST', {});
     });
     
     expect(localStorage.getItem('socio_totp_secret')).toBe('SECRETOVALIDO123');
