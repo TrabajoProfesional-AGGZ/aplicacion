@@ -3,7 +3,13 @@ import { QrCode } from 'lucide-react';
 import { getEntradasActivas, getEntradasHistoricas, getEntradasPendientes } from '../../services/eventosService';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
 import './MisEntradasPage.css';
+
+const VISTA_OPCIONES = [
+  { id: 'activas', label: 'Activas' },
+  { id: 'historicas', label: 'Históricas' },
+];
 
 const ESTADO_TAG = {
   Pagada: 'success',
@@ -64,22 +70,12 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet 
       <section className="entradas-lista">
         <PageHeader eyebrow="Eventos del club" titulo="Mis Entradas" />
 
-        <fieldset className="entradas-toggle" aria-label="Alternar entradas activas o históricas">
-          <button
-            type="button"
-            className={`entradas-toggle-btn${vista === 'activas' ? ' entradas-toggle-btn--activo' : ''}`}
-            onClick={() => setVista('activas')}
-          >
-            Activas
-          </button>
-          <button
-            type="button"
-            className={`entradas-toggle-btn${vista === 'historicas' ? ' entradas-toggle-btn--activo' : ''}`}
-            onClick={() => setVista('historicas')}
-          >
-            Históricas
-          </button>
-        </fieldset>
+        <SegmentedControl
+          opciones={VISTA_OPCIONES}
+          valor={vista}
+          onChange={setVista}
+          ariaLabel="Alternar entradas activas o históricas"
+        />
 
         {(cargandoActivas || cargandoHistoricas) && <SkeletonRows n={3} altura={76} />}
 

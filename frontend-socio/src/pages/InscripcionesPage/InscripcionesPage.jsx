@@ -7,6 +7,7 @@ import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
+import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
 import './InscripcionesPage.css';
 
 const FILTROS = [
@@ -162,18 +163,13 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
           ]}
         />
 
-        <fieldset className="inscripciones-filtros" aria-label="Filtrar inscripciones">
-          {FILTROS.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              className={`inscripciones-filtro-btn${filtro === f.id ? ' inscripciones-filtro-btn--activo' : ''}`}
-              onClick={() => setFiltro(f.id)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </fieldset>
+        <SegmentedControl
+          opciones={FILTROS}
+          valor={filtro}
+          onChange={setFiltro}
+          ariaLabel="Filtrar inscripciones"
+          denso
+        />
 
         {cargando && <SkeletonRows n={3} altura={72} />}
 

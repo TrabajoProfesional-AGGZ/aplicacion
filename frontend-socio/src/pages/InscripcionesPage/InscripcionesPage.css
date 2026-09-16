@@ -26,56 +26,8 @@
   transform: scale(0.96);
 }
 
-.inscripciones-filtros {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: var(--space-2);
+.inscripciones-lista .segmented-control {
   margin: 0 0 var(--space-5);
-  padding: 0 var(--space-1);
-  border: none;
-  min-width: 0;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
-  scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
-  mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
-}
-
-.inscripciones-filtros::-webkit-scrollbar {
-  display: none;
-}
-
-.inscripciones-filtro-btn {
-  flex-shrink: 0;
-  scroll-snap-align: start;
-  border: 1px solid var(--color-border-medium);
-  background-color: var(--color-surface);
-  color: var(--color-text-secondary);
-  font-family: inherit;
-  font-size: var(--text-caption);
-  font-weight: 600;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-.inscripciones-filtro-btn:active {
-  background-color: var(--color-row-hover);
-}
-
-@media (hover: hover) {
-  .inscripciones-filtro-btn:hover {
-    background-color: var(--color-row-hover);
-  }
-}
-
-.inscripciones-filtro-btn--activo {
-  background-color: var(--color-text-primary);
-  border-color: var(--color-text-primary);
-  color: var(--color-surface);
 }
 
 .inscripciones-empty {

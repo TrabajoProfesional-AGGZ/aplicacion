@@ -80,7 +80,7 @@ describe('InscripcionesPage', () => {
     render(<InscripcionesPage socio={socioFixture} />);
     await screen.findByText('Natación');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Aranceladas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Aranceladas' }));
 
     expect(screen.getByText('Natación')).toBeInTheDocument();
     expect(screen.queryByText('Ajedrez')).not.toBeInTheDocument();
@@ -107,7 +107,7 @@ describe('InscripcionesPage', () => {
     render(<InscripcionesPage socio={socioFixture} />);
     await screen.findByText('Natación');
 
-    fireEvent.click(screen.getByRole('button', { name: 'En espera' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'En espera' }));
 
     expect(screen.queryByText('Natación')).not.toBeInTheDocument();
     expect(screen.getByText('Básquet')).toBeInTheDocument();

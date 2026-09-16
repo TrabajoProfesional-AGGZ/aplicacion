@@ -6,13 +6,12 @@ import { getInstalaciones } from '../../services/instalacionesService';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
 import './ReservasPage.css';
 
 const FILTROS = [
   { id: 'Pendiente', label: 'Pendientes' },
   { id: 'Confirmada', label: 'Confirmadas' },
-  { id: 'Cancelada', label: 'Canceladas' },
-  { id: 'Finalizada', label: 'Finalizadas' },
   { id: 'Todas', label: 'Todas' },
 ];
 
@@ -71,7 +70,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
   }, [socio.nro_socio]);
 
   useEffect(() => {
-    if (filtro !== 'Finalizada' && filtro !== 'Todas') return;
+    if (filtro !== 'Todas') return;
     if (historicas !== null) return;
     let cancelled = false;
     setCargandoHistoricas(true);
@@ -109,7 +108,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
     }
   }
 
-  const fuente = filtro === 'Todas' || filtro === 'Finalizada' ? historicas : reservas;
+  const fuente = filtro === 'Todas' ? historicas : reservas;
   const reservasVisibles = filtro === 'Todas'
     ? (fuente ?? [])
     : (fuente ?? []).filter((r) => r.estado === filtro);
@@ -135,35 +134,29 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
           ]}
         />
 
-        <fieldset className="reservas-filtros" aria-label="Filtrar reservas por estado">
-          {FILTROS.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              className={`reservas-filtro-btn${filtro === f.id ? ' reservas-filtro-btn--activo' : ''}`}
-              onClick={() => setFiltro(f.id)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </fieldset>
+        <SegmentedControl
+          opciones={FILTROS}
+          valor={filtro}
+          onChange={setFiltro}
+          ariaLabel="Filtrar reservas por estado"
+        />
 
         {cargando && <SkeletonRows n={3} altura={88} />}
 
         {!cargando && error && <p className="reservas-error">No se pudieron cargar tus reservas.</p>}
 
-        {!cargando && !error && (filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas && (
+        {!cargando && !error && filtro === 'Todas' && cargandoHistoricas && (
           <SkeletonRows n={2} altura={88} />
         )}
 
         {!cargando && !error
-          && !((filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas)
+          && !(filtro === 'Todas' && cargandoHistoricas)
           && reservasVisibles.length === 0 && (
             <p className="reservas-empty">No tenés reservas en este estado.</p>
         )}
 
         {!cargando && !error
-          && !((filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas)
+          && !(filtro === 'Todas' && cargandoHistoricas)
           && reservasVisibles.map((r) => {
             const tono = ESTADO_TAG[r.estado] ?? 'neutral';
             return (
