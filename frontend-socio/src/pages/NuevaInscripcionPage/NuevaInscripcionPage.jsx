@@ -30,7 +30,7 @@ function mensajeError(codigo, categoriaRequerida) {
  * Flujo de inscripción a una disciplina: lista → detalle, con inscripción
  * directa o suma a lista de espera si no hay cupo.
  */
-export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrATramites = () => {} }) {
+export function NuevaInscripcionPage({ socio, onExito = () => {}, onIrATramites = () => {} }) {
   const [step, setStep] = useState('lista');
 
   const [disciplinas, setDisciplinas] = useState([]);
@@ -133,7 +133,6 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
         disciplina={disciplinaSeleccionada}
         yaInscripto={yaInscripto}
         onInscribirme={handleInscribirme}
-        onVolver={volverALista}
         enviando={enviando}
         submitted={submitted}
         enEspera={enEspera}
@@ -153,7 +152,6 @@ export function NuevaInscripcionPage({ socio, onSalir, onExito = () => {}, onIrA
       cargando={cargando}
       error={error}
       onSeleccionar={irADetalle}
-      onVolver={onSalir}
     />
   );
 }

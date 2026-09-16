@@ -1,4 +1,4 @@
-import { ArrowLeft, Clock, ChevronRight, AlertCircle } from 'lucide-react';
+import { Clock, ChevronRight, AlertCircle } from 'lucide-react';
 import { DatePicker } from '../createForm/DatePicker';
 import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
 import './InstalacionDetalleStep.css';
@@ -24,17 +24,11 @@ export function InstalacionDetalleStep({
   cargandoTurnos,
   errorTurnos,
   onSeleccionarTurno,
-  onVolver,
 }) {
   const tolerancia = instalacion.tiempo_minimo_cancelacion ?? 60;
 
   return (
     <section className="detalle-instalacion">
-      <button type="button" className="detalle-volver-btn" onClick={onVolver}>
-        <ArrowLeft size={18} />
-        Volver
-      </button>
-
       <section className="instalacion-banner">
         <div className="instalacion-banner-texture" aria-hidden="true" />
         <div className="instalacion-banner-content">

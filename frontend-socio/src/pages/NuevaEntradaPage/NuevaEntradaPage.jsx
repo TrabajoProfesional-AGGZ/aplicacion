@@ -30,7 +30,7 @@ function mensajeError(codigo) {
  * Flujo de compra de entrada a un evento: lista → detalle → pago (o pantalla
  * de éxito directa si el evento es gratuito).
  */
-export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
+export function NuevaEntradaPage({ socio, onExito = () => {} }) {
   const [step, setStep] = useState('lista');
 
   const [eventos, setEventos] = useState([]);
@@ -45,7 +45,17 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
   const [errorCompra, setErrorCompra] = useState('');
   const successTimeoutRef = useRef(null);
 
-  useBackToRoot(step, 'lista', volverALista);
+  // El paso 'pago' ya creó la entrada Pendiente en el backend: no reinicia la
+  // selección del evento como 'detalle' — el gesto de atrás va a "mis entradas".
+  function manejarVolver() {
+    if (step === 'pago') {
+      onExito();
+      return;
+    }
+    volverALista();
+  }
+
+  useBackToRoot(step, 'lista', manejarVolver);
 
   useEffect(() => () => {
     if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
@@ -118,7 +128,6 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
         }}
         tipoItem="entrada"
         socio={socio}
-        onVolver={onExito}
       />
     );
   }
@@ -129,7 +138,6 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
         evento={eventoSeleccionado}
         yaTieneEntrada={yaTieneEntrada}
         onPagarEntrada={handlePagarEntrada}
-        onVolver={volverALista}
         enviando={enviando}
         submitError={errorCompra ? mensajeError(errorCompra) : ''}
       />
@@ -142,7 +150,6 @@ export function NuevaEntradaPage({ socio, onSalir, onExito = () => {} }) {
       cargando={cargando}
       error={error}
       onSeleccionar={irADetalle}
-      onVolver={onSalir}
     />
   );
 }

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { HomePage } from './HomePage';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles } from '../../services/reservasService';
@@ -142,7 +142,19 @@ describe('HomePage', () => {
     expect(await screen.findByRole('heading', { name: 'Inscribite a una actividad' })).toBeInTheDocument();
   });
 
-  test('el botón "Volver" dentro del flujo de nueva reserva vuelve directo a la lista de instalaciones, no sale a Home', async () => {
+  test('el gesto de atrás dentro del flujo de nueva reserva vuelve directo a la lista de instalaciones, no sale a Home', async () => {
+    // Simula dónde aterriza un back real del celular: exactamente la entrada
+    // anterior a la que el paso actual pusheó (un solo nivel), no un objeto
+    // sin id — si no, el useBackToRoot de HomePage (que envuelve a todo el
+    // flujo) también se cree abandonado y salta directo a Home. Ver el mismo
+    // patrón en useBackToRoot.test.js ("consumidor externo por DEBAJO").
+    const pushStateSpy = jest.spyOn(window.history, 'pushState');
+    function simularGestoDeAtras() {
+      const ultimoId = pushStateSpy.mock.calls.at(-1)[0].id;
+      window.history.replaceState({ id: ultimoId - 1 }, '');
+      act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
+    }
+
     // Fija la hora "actual" a la madrugada para que el turno mockeado (08:00)
     // no quede filtrado por el chequeo de "turno ya pasado" según cuándo corra el test.
     const RealDate = global.Date;
@@ -172,27 +184,28 @@ describe('HomePage', () => {
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
-    // "Volver" desde el paso de detalle aterriza en la lista de
+    // El gesto de atrás desde el paso de detalle aterriza en la lista de
     // instalaciones, no en Home.
     await screen.findByText('08:00');
-    fireEvent.click(screen.getAllByText('Volver')[0]);
+    simularGestoDeAtras();
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
     expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument();
 
-    // Avanzando dos pasos (detalle -> socios), "Volver" también aterriza
-    // directo en la lista de instalaciones, no un paso atrás (detalle) ni
-    // en Home — ya no hay retroceso paso a paso dentro del flujo.
+    // Avanzando dos pasos (detalle -> socios), el gesto de atrás también
+    // aterriza directo en la lista de instalaciones, no un paso atrás
+    // (detalle) ni en Home — ya no hay retroceso paso a paso dentro del flujo.
     fireEvent.click(screen.getByText('Cancha de fútbol'));
     await screen.findByText('08:00');
     fireEvent.click(screen.getByText('08:00'));
 
     await screen.findByText('Agregar socios');
-    fireEvent.click(screen.getAllByText('Volver')[0]);
+    simularGestoDeAtras();
 
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
     expect(screen.getByText('Cancha de fútbol')).toBeInTheDocument();
     expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument();
 
+    pushStateSpy.mockRestore();
     global.Date = RealDate;
   });
 

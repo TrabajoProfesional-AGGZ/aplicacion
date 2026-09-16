@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ShoppingBag, Package, Minus, Plus, Receipt } from 'lucide-react';
+import { ShoppingBag, Package, Minus, Plus, Receipt } from 'lucide-react';
 import { getProductosDisponibles, getProducto, comprarProducto, getComprasPorSocio } from '../../services/tiendaService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
@@ -56,7 +56,14 @@ export function TiendaPage({ socio }) {
     setVistaInterna('lista');
   }
 
-  useBackToRoot(vistaInterna, 'lista', volverALista);
+  // El paso 'pago' ya creó la compra "Iniciada" en el backend: el gesto de
+  // atrás aterriza en "Mis compras", no reinicia la selección como 'detalle'.
+  function manejarVolver() {
+    volverALista();
+    if (vistaInterna === 'pago') setVistaInterna('mis-compras');
+  }
+
+  useBackToRoot(vistaInterna, 'lista', manejarVolver);
 
   async function cargarProductos() {
     try {
@@ -132,7 +139,6 @@ export function TiendaPage({ socio }) {
         }}
         tipoItem="compra"
         socio={socio}
-        onVolver={() => { volverALista(); setVistaInterna('mis-compras'); }}
       />
     );
   }
@@ -141,10 +147,6 @@ export function TiendaPage({ socio }) {
   if (vistaInterna === 'mis-compras') {
     return (
       <div className="tienda-page">
-        <button type="button" className="tienda-volver" onClick={volverALista}>
-          <ArrowLeft size={20} /> Volver
-        </button>
-
         <h2 className="tienda-detalle-nombre" style={{ padding: 0, marginBottom: 'var(--space-4)' }}>Mis compras</h2>
 
         {cargandoMisCompras && <SkeletonRows n={3} altura={76} />}
@@ -185,10 +187,6 @@ export function TiendaPage({ socio }) {
     const sinStock = Number(detalle.stock) <= 0;
     return (
       <div className="tienda-page">
-        <button type="button" className="tienda-volver" onClick={volverALista}>
-          <ArrowLeft size={20} /> Volver
-        </button>
-
         <div className="tienda-detalle-card">
           <div className="tienda-detalle-media">
             <div className="tienda-detalle-foto-wrap">

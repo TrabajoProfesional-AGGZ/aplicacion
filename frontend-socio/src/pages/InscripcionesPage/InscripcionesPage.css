@@ -244,20 +244,6 @@
   color: var(--status-danger-border);
 }
 
-.inscripciones-volver {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: none;
-  border: none;
-  color: var(--color-text-secondary);
-  font-size: var(--text-secondary);
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: var(--space-4);
-}
-
 .inscripcion-detalle-banner {
   position: relative;
   overflow: hidden;

@@ -29,7 +29,7 @@ const INSTALACION = {
 };
 
 async function irHastaResumen() {
-  render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+  render(<NuevaReservaPage socio={SOCIO} onExito={jest.fn()} />);
   await screen.findByText('Cancha de fútbol');
   fireEvent.click(screen.getByText('Cancha de fútbol'));
 
@@ -78,7 +78,7 @@ describe('NuevaReservaPage', () => {
   test('recorre el flujo completo hasta confirmar la reserva', async () => {
     createReserva.mockResolvedValue({ id: 'reserva-1', estado: 'Pendiente' });
     const onExito = jest.fn();
-    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={onExito} />);
+    render(<NuevaReservaPage socio={SOCIO} onExito={onExito} />);
 
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
@@ -107,7 +107,7 @@ describe('NuevaReservaPage', () => {
   test('tocar "Ver mis reservas" en el resumen de éxito llama a onExito antes del timer', async () => {
     createReserva.mockResolvedValue({ id: 'reserva-1', estado: 'Pendiente' });
     const onExito = jest.fn();
-    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={onExito} />);
+    render(<NuevaReservaPage socio={SOCIO} onExito={onExito} />);
 
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
@@ -130,7 +130,7 @@ describe('NuevaReservaPage', () => {
   test('si la instalación es gratuita, la reserva queda confirmada y lo muestra en el resumen', async () => {
     createReserva.mockResolvedValue({ id: 'reserva-1', estado: 'Confirmada' });
     const onExito = jest.fn();
-    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={onExito} />);
+    render(<NuevaReservaPage socio={SOCIO} onExito={onExito} />);
 
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
@@ -154,7 +154,7 @@ describe('NuevaReservaPage', () => {
   test('incluye a los socios agregados en el resumen y en el envío', async () => {
     getSocioByNroSocio.mockResolvedValue(OTRO_SOCIO);
     createReserva.mockResolvedValue({ id: 'reserva-1', estado: 'Pendiente' });
-    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+    render(<NuevaReservaPage socio={SOCIO} onExito={jest.fn()} />);
 
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
@@ -222,7 +222,7 @@ describe('NuevaReservaPage', () => {
   test('en "Agregar socios", deshabilita agregar más al llegar al cupo disponible del turno', async () => {
     getTurnosDisponibles.mockResolvedValue([{ hora_inicio: '08:00:00', cupos_disponibles: 2 }]);
     getSocioByNroSocio.mockResolvedValue(OTRO_SOCIO);
-    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+    render(<NuevaReservaPage socio={SOCIO} onExito={jest.fn()} />);
 
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
@@ -262,7 +262,7 @@ describe('NuevaReservaPage', () => {
       { hora_inicio: '15:00:00', cupos_disponibles: 10 },
     ]);
 
-    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+    render(<NuevaReservaPage socio={SOCIO} onExito={jest.fn()} />);
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
@@ -279,7 +279,7 @@ describe('NuevaReservaPage', () => {
       { hora_inicio: '10:00:00', cupos_disponibles: 10 },
     ]);
 
-    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+    render(<NuevaReservaPage socio={SOCIO} onExito={jest.fn()} />);
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
@@ -290,22 +290,14 @@ describe('NuevaReservaPage', () => {
     expect(screen.getByText('10:00')).toBeInTheDocument();
   });
 
-  test('el botón de volver en la lista de instalaciones llama a onSalir', async () => {
-    const onSalir = jest.fn();
-    render(<NuevaReservaPage socio={SOCIO} onSalir={onSalir} onExito={jest.fn()} />);
-    await screen.findByText('Cancha de fútbol');
-
-    fireEvent.click(screen.getByLabelText('Volver'));
-    expect(onSalir).toHaveBeenCalled();
-  });
-
-  test('el botón "Volver" en cualquier paso del flujo vuelve directo a la lista de instalaciones', async () => {
-    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+  test('el gesto de atrás en cualquier paso del flujo vuelve directo a la lista de instalaciones', async () => {
+    render(<NuevaReservaPage socio={SOCIO} onExito={jest.fn()} />);
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
     await screen.findByText('08:00');
-    fireEvent.click(screen.getAllByText('Volver')[0]);
+    window.history.replaceState({ otraEntrada: true }, '');
+    window.dispatchEvent(new PopStateEvent('popstate'));
     expect(await screen.findByText('Realizá tu reserva')).toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Cancha de fútbol'));
@@ -313,13 +305,13 @@ describe('NuevaReservaPage', () => {
     fireEvent.click(screen.getByText('08:00'));
 
     await screen.findByText('Agregar socios');
-    fireEvent.click(screen.getAllByText('Volver')[0]);
+    window.history.replaceState({ otraEntrada: true }, '');
+    window.dispatchEvent(new PopStateEvent('popstate'));
     expect(await screen.findByText('Realizá tu reserva')).toBeInTheDocument();
   });
 
   test('el gesto de atrás del celular no cierra el flujo: vuelve a la lista de instalaciones', async () => {
-    const onSalir = jest.fn();
-    render(<NuevaReservaPage socio={SOCIO} onSalir={onSalir} onExito={jest.fn()} />);
+    render(<NuevaReservaPage socio={SOCIO} onExito={jest.fn()} />);
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
@@ -331,13 +323,12 @@ describe('NuevaReservaPage', () => {
     window.dispatchEvent(new PopStateEvent('popstate'));
 
     await screen.findByText('Realizá tu reserva');
-    expect(onSalir).not.toHaveBeenCalled();
   });
 
   test('volver desde el resumen no deja memoria "vieja" para el siguiente intento de reserva', async () => {
     getSocioByNroSocio.mockResolvedValue(OTRO_SOCIO);
     createReserva.mockResolvedValue({ id: 'reserva-1', estado: 'Pendiente' });
-    render(<NuevaReservaPage socio={SOCIO} onSalir={jest.fn()} onExito={jest.fn()} />);
+    render(<NuevaReservaPage socio={SOCIO} onExito={jest.fn()} />);
 
     await screen.findByText('Cancha de fútbol');
     fireEvent.click(screen.getByText('Cancha de fútbol'));
@@ -351,7 +342,8 @@ describe('NuevaReservaPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
 
     await screen.findByText('Confirmá tu reserva');
-    fireEvent.click(screen.getAllByText('Volver')[0]);
+    window.history.replaceState({ otraEntrada: true }, '');
+    window.dispatchEvent(new PopStateEvent('popstate'));
 
     await screen.findByText('Realizá tu reserva');
     fireEvent.click(screen.getByText('Cancha de fútbol'));

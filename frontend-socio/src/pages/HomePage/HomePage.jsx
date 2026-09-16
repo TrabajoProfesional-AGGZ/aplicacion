@@ -121,7 +121,6 @@ export function HomePage({ socio, cerrarSesion }) {
         {vista === 'nueva-reserva' && (
           <NuevaReservaPage
             socio={socio}
-            onSalir={() => setVista('inicio')}
             onExito={() => setVista('reservas')}
           />
         )}
@@ -131,7 +130,6 @@ export function HomePage({ socio, cerrarSesion }) {
         {vista === 'nueva-inscripcion' && (
           <NuevaInscripcionPage
             socio={socio}
-            onSalir={() => setVista('inicio')}
             onExito={() => setVista('inscripciones')}
             onIrATramites={() => setVista('tramites')}
           />
@@ -146,7 +144,6 @@ export function HomePage({ socio, cerrarSesion }) {
         {vista === 'nueva-entrada' && (
           <NuevaEntradaPage
             socio={socio}
-            onSalir={() => setVista('inicio')}
             onExito={() => setVista('mis-entradas')}
           />
         )}

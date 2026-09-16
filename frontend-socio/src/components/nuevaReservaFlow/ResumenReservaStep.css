@@ -22,31 +22,7 @@
   color: var(--color-text-secondary);
 }
 
-.resumen-volver-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  align-self: flex-start;
-  border: none;
-  background: none;
-  color: var(--color-text-secondary);
-  font-family: inherit;
-  font-size: var(--text-secondary);
-  font-weight: 600;
-  padding: var(--space-2) 0;
-  margin-bottom: var(--space-4);
-  cursor: pointer;
-}
-
-@media (hover: hover) {
-  .resumen-volver-btn:hover {
-    color: var(--color-text-primary);
-  }
-}
-
-
-/* Banner — mismo lenguaje visual que el resto del flujo de reserva
-   (WelcomeCard/finanzas-resumen: radial gradient + grano) */
+/* Banner: mismo lenguaje visual que el resto del flujo de reserva. */
 .resumen-banner {
   position: relative;
   overflow: hidden;

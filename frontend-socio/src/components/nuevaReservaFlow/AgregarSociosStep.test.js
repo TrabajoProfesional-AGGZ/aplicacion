@@ -17,7 +17,6 @@ function renderStep(props = {}) {
       onAgregar={jest.fn()}
       onQuitar={jest.fn()}
       onContinuar={jest.fn()}
-      onVolver={jest.fn()}
       {...props}
     />
   );
@@ -96,13 +95,6 @@ describe('AgregarSociosStep', () => {
     expect(onContinuar).toHaveBeenCalled();
   });
 
-  test('el botón de volver llama a onVolver', () => {
-    const onVolver = jest.fn();
-    renderStep({ onVolver });
-    fireEvent.click(screen.getByText('Volver'));
-    expect(onVolver).toHaveBeenCalled();
-  });
-
   test('sin cuposDisponibles no limita la cantidad de socios agregables', () => {
     renderStep({ sociosAgregados: [OTRO_SOCIO], cuposDisponibles: null });
     fireEvent.change(screen.getByPlaceholderText('Número de socio'), { target: { value: '3000' } });
@@ -127,10 +119,8 @@ describe('AgregarSociosStep', () => {
   });
 
   test('presionar Enter habiendo alcanzado el cupo también corta antes de buscar el socio', () => {
-    // El botón "Agregar" está disabled al llegar al tope, así que un click no
-    // llega a agregarSocio(); Enter en el input sí (su onKeyDown no chequea
-    // disabled), por lo que es el único camino de UI que ejercita el corte
-    // temprano por topeAlcanzado dentro de agregarSocio().
+    // El botón queda disabled al llegar al tope, así que solo Enter (su onKeyDown
+    // no chequea disabled) ejercita el corte temprano por topeAlcanzado.
     renderStep({ sociosAgregados: [OTRO_SOCIO], cuposDisponibles: 2 });
 
     fireEvent.change(screen.getByPlaceholderText('Número de socio'), { target: { value: '3000' } });

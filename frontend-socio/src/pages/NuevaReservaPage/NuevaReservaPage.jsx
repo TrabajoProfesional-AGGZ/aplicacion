@@ -40,7 +40,7 @@ function filtrarTurnosPasados(turnos, fecha) {
  * Flujo de reserva de una instalación en 4 pasos: instalaciones → detalle
  * (fecha y turno) → agregar socios → resumen y confirmación.
  */
-export function NuevaReservaPage({ socio, onSalir, onExito }) {
+export function NuevaReservaPage({ socio, onExito }) {
   const [step, setStep] = useState('lista');
 
   const [instalaciones, setInstalaciones] = useState([]);
@@ -167,7 +167,6 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
         cargando={cargandoInstalaciones}
         error={errorInstalaciones}
         onSeleccionar={irADetalle}
-        onVolver={onSalir}
       />
     );
   }
@@ -182,7 +181,6 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
         cargandoTurnos={cargandoTurnos}
         errorTurnos={errorTurnos}
         onSeleccionarTurno={irASocios}
-        onVolver={volverAInstalaciones}
       />
     );
   }
@@ -196,7 +194,6 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
         onAgregar={(s) => setSociosAgregados((prev) => [...prev, s])}
         onQuitar={(id) => setSociosAgregados((prev) => prev.filter((s) => s.id !== id))}
         onContinuar={() => setStep('resumen')}
-        onVolver={volverAInstalaciones}
       />
     );
   }
@@ -210,7 +207,6 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
       sociosAgregados={sociosAgregados}
       onConfirmar={confirmarReserva}
       onCancelar={volverAInstalaciones}
-      onVolver={volverAInstalaciones}
       enviando={enviando}
       submitted={submitted}
       reservaConfirmada={reservaConfirmada}

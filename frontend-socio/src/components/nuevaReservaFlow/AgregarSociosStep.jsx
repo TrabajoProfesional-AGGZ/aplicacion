@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { ArrowLeft, Hash, CheckCircle2, AlertCircle, Trash2, UserRound } from 'lucide-react';
+import { Hash, CheckCircle2, AlertCircle, Trash2, UserRound } from 'lucide-react';
 import { getSocioByNroSocio } from '../../services/sociosService';
 import './AgregarSociosStep.css';
 
 /** Paso del flujo de reserva para sumar socios (buscados por número) además del titular. */
-export function AgregarSociosStep({ socioTitular, sociosAgregados, cuposDisponibles, onAgregar, onQuitar, onContinuar, onVolver }) {
+export function AgregarSociosStep({ socioTitular, sociosAgregados, cuposDisponibles, onAgregar, onQuitar, onContinuar }) {
   const [nroSocioInput, setNroSocioInput] = useState('');
   const [buscando, setBuscando] = useState(false);
   const [error, setError] = useState('');
@@ -71,11 +71,6 @@ export function AgregarSociosStep({ socioTitular, sociosAgregados, cuposDisponib
 
   return (
     <section className="agregar-socios">
-      <button type="button" className="agregar-socios-volver-btn" onClick={onVolver}>
-        <ArrowLeft size={18} />
-        Volver
-      </button>
-
       <section className="agregar-socios-banner">
         <div className="agregar-socios-banner-texture" aria-hidden="true" />
         <div className="agregar-socios-banner-content">

@@ -43,16 +43,6 @@ describe('NoticiasPage', () => {
     expect(getNoticia).toHaveBeenCalledWith('n2');
   });
 
-  test('"Volver" desde el detalle abierto por noticiaInicialId muestra la lista completa', async () => {
-    render(<NoticiasPage noticiaInicialId="n2" onConsumirNoticiaInicial={jest.fn()} />);
-
-    await screen.findByText('Cuerpo de la noticia dos.');
-    fireEvent.click(screen.getByText('Volver'));
-
-    expect(await screen.findByText('Noticia uno')).toBeInTheDocument();
-    expect(screen.getByText('Noticia dos')).toBeInTheDocument();
-  });
-
   describe('gesto de atrás del celular', () => {
     let pushStateSpy;
 
@@ -84,9 +74,8 @@ describe('NoticiasPage', () => {
       fireEvent.click(await screen.findByText('Noticia dos'));
       await screen.findByText('Cuerpo de la noticia dos.');
 
-      // Simula dónde aterriza un back real del celular: una entrada distinta
-      // a la que este componente empujó (a diferencia de un popstate
-      // "fantasma" que aterrizaría de vuelta en ella).
+      // Simula un back real: aterriza en una entrada distinta a la que este
+      // componente empujó (no un popstate "fantasma" que vuelve a la misma).
       window.history.replaceState({ otraEntrada: true }, '');
       act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
 

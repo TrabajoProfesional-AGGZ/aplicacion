@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { InscripcionesPage } from './InscripcionesPage';
 import { getDisciplinasPorSocio, darDeBajaInscripcion } from '../../services/disciplinasService';
 
@@ -127,7 +127,6 @@ describe('InscripcionesPage', () => {
     fireEvent.click(await screen.findByText('Natación'));
 
     expect(screen.getByRole('button', { name: 'Dar de Baja' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument();
   });
 
   test('una inscripción en lista de espera no muestra el botón "Dar de Baja" en el detalle', async () => {
@@ -138,12 +137,13 @@ describe('InscripcionesPage', () => {
     expect(screen.queryByRole('button', { name: 'Dar de Baja' })).not.toBeInTheDocument();
   });
 
-  test('"Volver" desde el detalle vuelve a la lista', async () => {
+  test('el gesto de atrás desde el detalle vuelve a la lista', async () => {
     getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA]);
     render(<InscripcionesPage socio={socioFixture} />);
     fireEvent.click(await screen.findByText('Natación'));
 
-    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+    window.history.replaceState({ otraEntrada: true }, '');
+    act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
 
     expect(await screen.findByRole('heading', { name: 'Mis inscripciones' })).toBeInTheDocument();
   });

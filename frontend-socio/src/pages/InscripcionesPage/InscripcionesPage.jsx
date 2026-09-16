@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ClipboardList, MapPin, Plus, Tag } from 'lucide-react';
+import { ClipboardList, MapPin, Plus, Tag } from 'lucide-react';
 import { getDisciplinasPorSocio, darDeBajaInscripcion } from '../../services/disciplinasService';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
@@ -79,10 +79,6 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
   if (detalle) {
     return (
       <div className="inscripciones-lista">
-        <button type="button" className="inscripciones-volver" onClick={() => setDetalle(null)}>
-          <ArrowLeft size={20} /> Volver
-        </button>
-
         <section className="inscripcion-detalle-banner">
           <div className="inscripcion-detalle-banner-texture" aria-hidden="true" />
           {detalle.estado_suscripcion === 'en_espera' && (

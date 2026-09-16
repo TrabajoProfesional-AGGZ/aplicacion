@@ -19,7 +19,6 @@ const baseProps = {
   cargandoTurnos: false,
   errorTurnos: '',
   onSeleccionarTurno: jest.fn(),
-  onVolver: jest.fn(),
 };
 
 describe('InstalacionDetalleStep', () => {
@@ -97,12 +96,5 @@ describe('InstalacionDetalleStep', () => {
     const turnos = [{ hora_inicio: '08:00:00', cupos_disponibles: 3 }];
     render(<InstalacionDetalleStep {...baseProps} turnos={turnos} />);
     expect(screen.getByText('3/10 lugares')).toBeInTheDocument();
-  });
-
-  test('el botón de volver llama a onVolver', () => {
-    const onVolver = jest.fn();
-    render(<InstalacionDetalleStep {...baseProps} onVolver={onVolver} />);
-    fireEvent.click(screen.getByText('Volver'));
-    expect(onVolver).toHaveBeenCalled();
   });
 });

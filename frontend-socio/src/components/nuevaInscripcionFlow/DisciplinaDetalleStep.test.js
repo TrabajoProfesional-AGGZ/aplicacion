@@ -23,7 +23,7 @@ const DISCIPLINA_SIN_COSTO = {
 
 describe('DisciplinaDetalleStep', () => {
   test('muestra nombre, cupos, categoría, sede y arancel mensual', () => {
-    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} onVolver={jest.fn()} />);
+    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} />);
     expect(screen.getByRole('heading', { name: 'Natación' })).toBeInTheDocument();
     expect(screen.getByText('5/20')).toBeInTheDocument();
     expect(screen.getByText('Infantil')).toBeInTheDocument();
@@ -32,7 +32,7 @@ describe('DisciplinaDetalleStep', () => {
   });
 
   test('muestra "Sin costo" cuando la disciplina no es arancelada', () => {
-    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_SIN_COSTO} onInscribirme={jest.fn()} onVolver={jest.fn()} />);
+    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_SIN_COSTO} onInscribirme={jest.fn()} />);
     expect(screen.getByText('Sin costo')).toBeInTheDocument();
     expect(screen.getByText('5 inscriptos')).toBeInTheDocument();
     expect(screen.getByText('Todas')).toBeInTheDocument();
@@ -40,16 +40,9 @@ describe('DisciplinaDetalleStep', () => {
 
   test('click en "Inscribirme" llama a onInscribirme', () => {
     const onInscribirme = jest.fn();
-    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={onInscribirme} onVolver={jest.fn()} />);
+    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={onInscribirme} />);
     fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
     expect(onInscribirme).toHaveBeenCalled();
-  });
-
-  test('click en "Volver" llama a onVolver', () => {
-    const onVolver = jest.fn();
-    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} onVolver={onVolver} />);
-    fireEvent.click(screen.getByText('Volver'));
-    expect(onVolver).toHaveBeenCalled();
   });
 
   test('deshabilita "Inscribirme" mientras enviando', () => {
@@ -57,7 +50,6 @@ describe('DisciplinaDetalleStep', () => {
       <DisciplinaDetalleStep
         disciplina={DISCIPLINA_ARANCELADA}
         onInscribirme={jest.fn()}
-        onVolver={jest.fn()}
         enviando
       />
     );
@@ -70,7 +62,6 @@ describe('DisciplinaDetalleStep', () => {
       <DisciplinaDetalleStep
         disciplina={DISCIPLINA_ARANCELADA}
         onInscribirme={jest.fn()}
-        onVolver={jest.fn()}
         submitError="Necesitás actualizar tu apto médico."
         mostrarBotonTramites
         onIrATramites={onIrATramites}
@@ -87,7 +78,6 @@ describe('DisciplinaDetalleStep', () => {
       <DisciplinaDetalleStep
         disciplina={DISCIPLINA_ARANCELADA}
         onInscribirme={jest.fn()}
-        onVolver={jest.fn()}
         sinCupo
         onSumarseListaEspera={onSumarseListaEspera}
       />
@@ -99,14 +89,14 @@ describe('DisciplinaDetalleStep', () => {
 
   test('muestra la confirmación de inscripción exitosa', () => {
     render(
-      <DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} onVolver={jest.fn()} submitted />
+      <DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} submitted />
     );
     expect(screen.getByText('¡Inscripción confirmada!')).toBeInTheDocument();
   });
 
   test('muestra la confirmación de lista de espera', () => {
     render(
-      <DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} onVolver={jest.fn()} enEspera />
+      <DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} enEspera />
     );
     expect(screen.getByText('¡Te sumaste a la lista de espera!')).toBeInTheDocument();
   });
@@ -116,7 +106,6 @@ describe('DisciplinaDetalleStep', () => {
       <DisciplinaDetalleStep
         disciplina={DISCIPLINA_ARANCELADA}
         onInscribirme={jest.fn()}
-        onVolver={jest.fn()}
         yaInscripto
       />
     );
@@ -126,7 +115,7 @@ describe('DisciplinaDetalleStep', () => {
   });
 
   test('cuando yaInscripto es false, no muestra el badge', () => {
-    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} onVolver={jest.fn()} />);
+    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} />);
     expect(screen.queryByText('Ya estás inscripto a esta disciplina')).not.toBeInTheDocument();
   });
 });

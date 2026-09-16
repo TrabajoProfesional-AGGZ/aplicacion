@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { NuevaEntradaPage } from './NuevaEntradaPage';
 import {
   getEventos,
@@ -52,20 +52,20 @@ describe('NuevaEntradaPage', () => {
 
   test('muestra el banner de eventos', async () => {
     getEventos.mockResolvedValue([]);
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
+    render(<NuevaEntradaPage socio={SOCIO} />);
     expect(await screen.findByRole('heading', { name: 'Comprá tu entrada' })).toBeInTheDocument();
   });
 
   test('lista los eventos con cupo y valor', async () => {
     getEventos.mockResolvedValue([EVENTO]);
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
+    render(<NuevaEntradaPage socio={SOCIO} />);
     expect(await screen.findByText('Fiesta de fin de año')).toBeInTheDocument();
     expect(screen.getByText('10/100')).toBeInTheDocument();
   });
 
   test('click en un evento navega al detalle', async () => {
     getEventos.mockResolvedValue([EVENTO]);
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
+    render(<NuevaEntradaPage socio={SOCIO} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
     expect(screen.getByRole('heading', { name: 'Fiesta de fin de año' })).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe('NuevaEntradaPage', () => {
   test('click en "Reserva tu entrada" con éxito avanza al flujo de pago', async () => {
     getEventos.mockResolvedValue([EVENTO]);
     comprarEntrada.mockResolvedValue(ENTRADA);
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
+    render(<NuevaEntradaPage socio={SOCIO} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
@@ -90,7 +90,7 @@ describe('NuevaEntradaPage', () => {
     getEventos.mockResolvedValue([eventoGratis]);
     comprarEntrada.mockResolvedValue(entradaGratis);
     const onExito = jest.fn();
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} onExito={onExito} />);
+    render(<NuevaEntradaPage socio={SOCIO} onExito={onExito} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
@@ -106,7 +106,7 @@ describe('NuevaEntradaPage', () => {
     getEventos.mockResolvedValue([eventoGratis]);
     comprarEntrada.mockResolvedValue(entradaGratis);
     const onExito = jest.fn();
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} onExito={onExito} />);
+    render(<NuevaEntradaPage socio={SOCIO} onExito={onExito} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
@@ -120,7 +120,7 @@ describe('NuevaEntradaPage', () => {
   test('muestra el error cuando no hay cupo', async () => {
     getEventos.mockResolvedValue([EVENTO]);
     comprarEntrada.mockRejectedValue(new Error('sin-cupo'));
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
+    render(<NuevaEntradaPage socio={SOCIO} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
@@ -131,7 +131,7 @@ describe('NuevaEntradaPage', () => {
   test('muestra el error de deuda (moroso)', async () => {
     getEventos.mockResolvedValue([EVENTO]);
     comprarEntrada.mockRejectedValue(new Error('moroso'));
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
+    render(<NuevaEntradaPage socio={SOCIO} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
@@ -139,32 +139,24 @@ describe('NuevaEntradaPage', () => {
     expect(await screen.findByText(/Tenés pagos pendientes/)).toBeInTheDocument();
   });
 
-  test('"Volver" desde el detalle vuelve a la lista', async () => {
+  test('el gesto de atrás desde el detalle vuelve a la lista', async () => {
     getEventos.mockResolvedValue([EVENTO]);
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
+    render(<NuevaEntradaPage socio={SOCIO} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
-    fireEvent.click(screen.getByText('Volver'));
+    window.history.replaceState({ otraEntrada: true }, '');
+    act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
+
     expect(await screen.findByRole('heading', { name: 'Comprá tu entrada' })).toBeInTheDocument();
   });
 
   test('si el socio ya tiene una entrada para el evento, no muestra el botón y avisa en el banner', async () => {
     getEventos.mockResolvedValue([EVENTO]);
     getEntradasPendientes.mockResolvedValue([ENTRADA]);
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={jest.fn()} />);
+    render(<NuevaEntradaPage socio={SOCIO} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
     expect(await screen.findByText('Ya tenés una entrada para este evento')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Reserva tu entrada' })).not.toBeInTheDocument();
-  });
-
-  test('el botón volver del banner llama a onSalir', async () => {
-    getEventos.mockResolvedValue([]);
-    const onSalir = jest.fn();
-    render(<NuevaEntradaPage socio={SOCIO} onSalir={onSalir} />);
-    await screen.findByRole('heading', { name: 'Comprá tu entrada' });
-
-    fireEvent.click(screen.getByLabelText('Volver'));
-    expect(onSalir).toHaveBeenCalled();
   });
 });

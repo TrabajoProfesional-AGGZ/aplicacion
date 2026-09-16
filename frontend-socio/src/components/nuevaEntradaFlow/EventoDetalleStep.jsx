@@ -1,4 +1,4 @@
-import { ArrowLeft, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import './EventoDetalleStep.css';
 
 function formatearFecha(fechaIso) {
@@ -19,17 +19,11 @@ export function EventoDetalleStep({
   evento,
   yaTieneEntrada = false,
   onPagarEntrada,
-  onVolver,
   enviando = false,
   submitError = '',
 }) {
   return (
     <section className="detalle-evento">
-      <button type="button" className="detalle-volver-btn" onClick={onVolver}>
-        <ArrowLeft size={18} />
-        Volver
-      </button>
-
       <section className="evento-banner">
         <div className="evento-banner-texture" aria-hidden="true" />
         {yaTieneEntrada && (

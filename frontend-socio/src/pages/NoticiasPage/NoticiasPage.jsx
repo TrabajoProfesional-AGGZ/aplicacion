@@ -16,14 +16,12 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
   const [loading, setLoading] = useState(true);
   const [loadingDetalle, setLoadingDetalle] = useState(false);
   const [error, setError] = useState(null);
-  // El detalle abierto por el atajo "Última Noticia" no cuenta como una
-  // navegación real desde la lista (nunca se la llegó a ver) — no debe
-  // empujar su propia entrada de historial, para que un solo gesto de
-  // atrás vuelva directo a Home. Un click real en una card de la lista sí
-  // la empuja, para que atrás vuelva primero a la lista.
+  // El detalle abierto por el atajo "Última Noticia" no empuja su propia entrada
+  // de historial (un gesto de atrás va directo a Home); un click real en la
+  // lista sí, para que atrás vuelva primero a la lista.
   const entradaDesdeListaRef = useRef(!noticiaInicialId);
 
-  useBackToRoot(entradaDesdeListaRef.current ? detalle : null, null, () => setDetalle(null));
+  useBackToRoot(entradaDesdeListaRef.current ? detalle : null, null, () => { setDetalle(null); setError(null); });
 
   useEffect(() => {
     cargarNoticias();
@@ -31,9 +29,7 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
       onConsumirNoticiaInicial();
       abrirDetalle(noticiaInicialId);
     }
-    // Se captura noticiaInicialId solo al montar: HomePage crea una instancia
-    // nueva de esta página en cada navegación, así que no hace falta reaccionar
-    // a cambios posteriores del prop.
+    // Solo se captura al montar: HomePage crea una instancia nueva en cada navegación.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -68,9 +64,6 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
   if (detalle) {
     return (
       <div className="noticias-page">
-        <button type="button" className="noticias-volver" onClick={() => { setDetalle(null); setError(null); }}>
-          <ArrowLeft size={20} /> Volver
-        </button>
         <article className="noticias-detalle-card">
           {detalle.imagen && <img src={detalle.imagen} alt={detalle.titulo} className="noticias-detalle-img" />}
           <div className="noticias-detalle-body">

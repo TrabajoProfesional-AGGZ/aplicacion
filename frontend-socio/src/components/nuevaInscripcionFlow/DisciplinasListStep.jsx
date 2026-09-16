@@ -1,4 +1,4 @@
-import { ArrowLeft, Users, ChevronRight, MapPin, Tag } from 'lucide-react';
+import { Users, ChevronRight, MapPin, Tag } from 'lucide-react';
 import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
 import './DisciplinasListStep.css';
 
@@ -8,14 +8,11 @@ function textoCupos(disciplina) {
 }
 
 /** Grilla de disciplinas disponibles para inscribirse. */
-export function DisciplinasListStep({ disciplinas, cargando, error, onSeleccionar, onVolver }) {
+export function DisciplinasListStep({ disciplinas, cargando, error, onSeleccionar }) {
   return (
     <section className="disciplinas-lista">
       <section className="disciplinas-banner">
         <div className="disciplinas-banner-texture" aria-hidden="true" />
-        <button type="button" className="disciplinas-banner-volver" onClick={onVolver} aria-label="Volver">
-          <ArrowLeft size={18} />
-        </button>
         <span className="disciplinas-banner-eyebrow">Actividades del club</span>
         <h2 className="disciplinas-banner-title">Inscribite a una actividad</h2>
       </section>

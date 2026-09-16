@@ -3,6 +3,7 @@ import { getEstadoFinanciero } from '../../services/finanzasService';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
 import { useAuth } from '../../hooks/useAuth';
+import { useBackToRoot } from '../../hooks/useBackToRoot';
 import './FinanzasPage.css';
 
 const RESUMEN_CONFIG = {
@@ -67,9 +68,8 @@ export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar 
           const item = data.cuotas.find((c) => c.id === idBuscado);
           if (item) setCuotaAPagar(item);
         }
-        // GET /finanzas puede haber transicionado el estado del socio (ej. a "Moroso") en el
-        // backend — refresca el perfil en contexto para que WelcomeCard/PerfilPage no queden
-        // mostrando el estado viejo cargado al loguearse.
+        // GET /finanzas puede haber cambiado el estado del socio (ej. a "Moroso"):
+        // refresca el perfil en contexto para que WelcomeCard/PerfilPage no queden viejos.
         refrescarSocio();
       })
       .catch((err) => { if (!cancelled) setError(err.message); })
@@ -78,6 +78,10 @@ export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar 
   }, [socio.id, recarga, refrescarSocio]);
 
   const volverALista = () => { setCuotaAPagar(null); setRecarga((n) => n + 1); };
+
+  // PagoCuotaFlow ya no tiene su propio botón "Volver" — el gesto nativo de
+  // atrás (ver useBackToRoot/useEdgeSwipeBack) es la única forma de salir.
+  useBackToRoot(cuotaAPagar ? 'pago' : 'lista', 'lista', volverALista);
 
   return (
     <>
@@ -90,7 +94,6 @@ export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar 
           item={cuotaAPagar}
           tipoItem={inferirTipoItem(cuotaAPagar.concepto)}
           socio={socio}
-          onVolver={volverALista}
         />
       )}
 

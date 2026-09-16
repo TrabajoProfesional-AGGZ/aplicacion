@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle2, AlertCircle, UserRound } from 'lucide-react';
+import { CheckCircle2, AlertCircle, UserRound } from 'lucide-react';
 import './ResumenReservaStep.css';
 
 function formatearMonto(monto) {
@@ -23,7 +23,6 @@ export function ResumenReservaStep({
   sociosAgregados,
   onConfirmar,
   onCancelar,
-  onVolver,
   enviando,
   submitted,
   reservaConfirmada = false,
@@ -56,10 +55,6 @@ export function ResumenReservaStep({
 
   return (
     <section className="resumen-reserva">
-      <button type="button" className="resumen-volver-btn" onClick={onVolver}>
-        <ArrowLeft size={18} />
-        Volver
-      </button>
 
       <section className="resumen-banner">
         <div className="resumen-banner-texture" aria-hidden="true" />

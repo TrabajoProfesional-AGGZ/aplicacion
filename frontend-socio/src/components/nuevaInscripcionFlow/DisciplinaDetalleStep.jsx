@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CheckCircle2, AlertCircle } from 'lucide-react';
 import './DisciplinaDetalleStep.css';
 
 function formatearMonto(monto) {
@@ -19,7 +19,6 @@ export function DisciplinaDetalleStep({
   disciplina,
   yaInscripto = false,
   onInscribirme,
-  onVolver,
   enviando = false,
   submitted = false,
   enEspera = false,
@@ -53,11 +52,6 @@ export function DisciplinaDetalleStep({
 
   return (
     <section className="detalle-disciplina">
-      <button type="button" className="detalle-volver-btn" onClick={onVolver}>
-        <ArrowLeft size={18} />
-        Volver
-      </button>
-
       <section className="disciplina-banner">
         <div className="disciplina-banner-texture" aria-hidden="true" />
         {yaInscripto && (
