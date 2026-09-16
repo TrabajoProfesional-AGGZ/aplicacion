@@ -1,0 +1,17 @@
+.deuda-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  border: 1px solid var(--status-danger-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin: var(--space-4) 0;
+  font: inherit;
+  font-weight: 600;
+  font-size: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+  background-color: var(--status-danger-bg);
+  color: var(--status-danger-border);
+}
