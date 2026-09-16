@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { PagoCuotaFlow } from './PagoCuotaFlow';
 import { crearPreferenciaPago } from '../../services/pagosService';
 
@@ -24,7 +24,7 @@ describe('PagoCuotaFlow', () => {
   test('muestra el concepto y carga el botón de Mercado Pago cuando obtiene la preferencia', async () => {
     crearPreferenciaPago.mockResolvedValue({ id_preferencia: 'pref-123' });
     
-    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={jest.fn()} />);
+    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} />);
 
     expect(screen.getByText(/Cuota Social - 07\/2026/i)).toBeInTheDocument();
 
@@ -38,24 +38,12 @@ describe('PagoCuotaFlow', () => {
   test('muestra un mensaje de error si falla la creación de la preferencia', async () => {
     crearPreferenciaPago.mockRejectedValue(new Error('error-al-crear-preferencia'));
     
-    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={jest.fn()} />);
+    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} />);
 
     await waitFor(() => {
       expect(crearPreferenciaPago).toHaveBeenCalled();
     });
 
     expect(screen.queryByTestId('wallet-brick')).not.toBeInTheDocument();
-  });
-
-  test('el botón volver llama a la función onVolver', async () => {
-    crearPreferenciaPago.mockReturnValue(new Promise(() => {}));
-    
-    const onVolverMock = jest.fn();
-    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={onVolverMock} />);
-
-    const btnVolver = screen.getByRole('button', { name: /volver/i });
-    fireEvent.click(btnVolver);
-
-    expect(onVolverMock).toHaveBeenCalledTimes(1);
   });
 });

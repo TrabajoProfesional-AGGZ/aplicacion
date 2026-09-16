@@ -45,4 +45,18 @@ describe('AlertasPage', () => {
     render(<AlertasPage socio={socioFixture} />);
     expect(await screen.findByText('No se pudieron cargar tus alertas.')).toBeInTheDocument();
   });
+
+  test('avisa con la lista cargada vía onAlertasCargadas (E5, badge de la campana)', async () => {
+    getAlertasSocio.mockResolvedValue([ALERTA_MOCK]);
+    const onAlertasCargadas = jest.fn();
+    render(<AlertasPage socio={socioFixture} onAlertasCargadas={onAlertasCargadas} />);
+    await screen.findByText('Recordá renovar tu apto médico');
+    expect(onAlertasCargadas).toHaveBeenCalledWith([ALERTA_MOCK]);
+  });
+
+  test('no rompe si no se pasa onAlertasCargadas', async () => {
+    getAlertasSocio.mockResolvedValue([ALERTA_MOCK]);
+    render(<AlertasPage socio={socioFixture} />);
+    expect(await screen.findByText('Recordá renovar tu apto médico')).toBeInTheDocument();
+  });
 });

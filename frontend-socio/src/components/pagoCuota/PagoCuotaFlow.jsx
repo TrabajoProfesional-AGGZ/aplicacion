@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
 import { Wallet } from '@mercadopago/sdk-react';
 import { inicializarMercadoPago } from '../../utils/mercadopago';
 import { crearPreferenciaPago } from '../../services/pagosService';
@@ -13,7 +12,7 @@ function formatearPrecio(monto) {
  * Flujo de pago genérico (cuota, reserva, entrada o compra): crea la
  * preferencia de pago en el backend y renderiza el botón de Mercado Pago (Wallet Brick).
  */
-export function PagoCuotaFlow({ item, tipoItem, socio, onVolver }) {
+export function PagoCuotaFlow({ item, tipoItem, socio }) {
   const [preferenceId, setPreferenceId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -44,17 +43,6 @@ export function PagoCuotaFlow({ item, tipoItem, socio, onVolver }) {
 
   return (
     <div className="pago-flow-container">
-      <div className="pago-flow-header">
-        <button 
-          type="button" 
-          className="pago-flow-volver-btn"
-          onClick={onVolver}
-          aria-label="Volver atrás"
-        >
-          <ArrowLeft size={20} /> Volver
-        </button>
-      </div>
-
       <div className="pago-flow-resumen">
         <h2 className="pago-flow-titulo">Abonar {item.concepto}</h2>
         <p className="pago-flow-monto">

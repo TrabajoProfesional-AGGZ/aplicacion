@@ -15,9 +15,12 @@
   transition: transform var(--transition-fast);
 }
 
-.botin-fab:hover {
-  transform: scale(1.05);
+@media (hover: hover) {
+  .botin-fab:hover {
+    transform: scale(1.05);
+  }
 }
+
 
 .botin-fab:active {
   transform: scale(0.96);

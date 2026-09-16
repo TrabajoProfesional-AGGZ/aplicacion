@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import { FinanzasPage } from './FinanzasPage';
 import { getEstadoFinanciero } from '../../services/finanzasService';
 
@@ -7,11 +7,10 @@ jest.mock('../../services/finanzasService', () => ({
 }));
 
 jest.mock('../../components/pagoCuota/PagoCuotaFlow', () => ({
-  PagoCuotaFlow: ({ item, tipoItem, onVolver }) => (
+  PagoCuotaFlow: ({ item, tipoItem }) => (
     <div>
       <p>pago-flow-stub {item.concepto}</p>
       <p>tipo-item-stub {tipoItem}</p>
-      <button onClick={onVolver}>Volver al stub</button>
     </div>
   ),
 }));
@@ -48,7 +47,7 @@ describe('FinanzasPage', () => {
 
     render(<FinanzasPage socio={socioFixture} />);
 
-    expect(await screen.findByText('Por pagar.')).toBeInTheDocument();
+    expect(await screen.findByText('Tenés cuotas pendientes. Podés pagarlas desde acá.')).toBeInTheDocument();
     expect(screen.getByText('Moroso')).toBeInTheDocument();
     expect(screen.getByText('Cuota Social - 07/2026')).toBeInTheDocument();
     expect(screen.getByText('Vencida')).toBeInTheDocument();
@@ -79,7 +78,7 @@ describe('FinanzasPage', () => {
     expect(screen.getByText('pago-flow-stub Cuota Social - 07/2026')).toBeInTheDocument();
   });
 
-  test('al volver del flujo de pago, se refetchea el estado financiero y se muestra la lista', async () => {
+  test('con el gesto de atrás desde el flujo de pago, se refetchea el estado financiero y se muestra la lista', async () => {
     getEstadoFinanciero.mockResolvedValue({
       id_socio: 'socio-1',
       estado_financiero: 'Moroso',
@@ -101,8 +100,9 @@ describe('FinanzasPage', () => {
     const botonPagar = await screen.findByRole('button', { name: 'Pagar' });
     fireEvent.click(botonPagar);
 
-    const botonVolver = await screen.findByText('Volver al stub');
-    fireEvent.click(botonVolver);
+    await screen.findByText('pago-flow-stub Cuota Social - 07/2026');
+    window.history.replaceState({ otraEntrada: true }, '');
+    act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
 
     await waitFor(() => expect(getEstadoFinanciero).toHaveBeenCalledTimes(2));
     expect(await screen.findByText('Cuota Social - 07/2026')).toBeInTheDocument();

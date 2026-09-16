@@ -1,5 +1,7 @@
-import { ArrowLeft, Clock, ChevronRight, AlertCircle } from 'lucide-react';
+import { Clock, ChevronRight, AlertCircle } from 'lucide-react';
 import { DatePicker } from '../createForm/DatePicker';
+import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './InstalacionDetalleStep.css';
 
 function formatearMonto(monto) {
@@ -23,42 +25,21 @@ export function InstalacionDetalleStep({
   cargandoTurnos,
   errorTurnos,
   onSeleccionarTurno,
-  onVolver,
 }) {
   const tolerancia = instalacion.tiempo_minimo_cancelacion ?? 60;
 
   return (
     <section className="detalle-instalacion">
-      <button type="button" className="detalle-volver-btn" onClick={onVolver}>
-        <ArrowLeft size={18} />
-        Volver
-      </button>
-
-      <section className="instalacion-banner">
-        <div className="instalacion-banner-texture" aria-hidden="true" />
-        <div className="instalacion-banner-content">
-          <span className="instalacion-banner-tag">{instalacion.tipo}</span>
-          <h2 className="instalacion-banner-nombre">{instalacion.nombre}</h2>
-          <p className="instalacion-banner-subtitulo">{instalacion.tipo} · {instalacion.capacidad_maxima} personas</p>
-
-          <div className="instalacion-banner-stats">
-            <div className="instalacion-banner-stat">
-              <span className="instalacion-banner-stat-label">Cancelación sin cargo</span>
-              <span className="instalacion-banner-stat-valor">hasta {tolerancia} min antes</span>
-            </div>
-            <div className="instalacion-banner-divider" aria-hidden="true" />
-            <div className="instalacion-banner-stat">
-              <span className="instalacion-banner-stat-label">Duración del turno</span>
-              <span className="instalacion-banner-stat-valor">{instalacion.duracion_turno} min</span>
-            </div>
-            <div className="instalacion-banner-divider" aria-hidden="true" />
-            <div className="instalacion-banner-stat">
-              <span className="instalacion-banner-stat-label">Valor del turno</span>
-              <span className="instalacion-banner-stat-valor">{formatearMonto(instalacion.valor_turno)}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow={instalacion.tipo}
+        titulo={instalacion.nombre}
+        subtitulo={`${instalacion.tipo} · ${instalacion.capacidad_maxima} personas`}
+        stats={[
+          { label: 'Cancelación sin cargo', value: `Hasta ${tolerancia} min antes` },
+          { label: 'Duración del turno', value: `${instalacion.duracion_turno} min` },
+          { label: 'Valor del turno', value: formatearMonto(instalacion.valor_turno) },
+        ]}
+      />
 
       <label className="detalle-fecha-label" htmlFor="detalle-fecha-input">Fecha</label>
       <DatePicker
@@ -71,11 +52,7 @@ export function InstalacionDetalleStep({
 
       <h3 className="detalle-turnos-titulo">Turnos disponibles</h3>
 
-      {cargandoTurnos && (
-        <div className="detalle-turnos-skeleton" aria-label="Cargando turnos">
-          {[0, 1, 2].map((i) => <div key={i} className="detalle-turno-skeleton-row" />)}
-        </div>
-      )}
+      {cargandoTurnos && <SkeletonRows n={3} altura={48} label="Cargando turnos" />}
 
       {!cargandoTurnos && errorTurnos && (
         <p className="detalle-turnos-error">

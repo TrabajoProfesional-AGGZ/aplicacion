@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Calendar, MapPin, Plus } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { MapPin, Plus } from 'lucide-react';
 import { getReservasPorSocio, getReservasHistoricasPorSocio, cancelReserva } from '../../services/reservasService';
 import { getInstalaciones } from '../../services/instalacionesService';
-import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
 import './ReservasPage.css';
 
 const FILTROS = [
   { id: 'Pendiente', label: 'Pendientes' },
   { id: 'Confirmada', label: 'Confirmadas' },
-  { id: 'Cancelada', label: 'Canceladas' },
-  { id: 'Finalizada', label: 'Finalizadas' },
   { id: 'Todas', label: 'Todas' },
 ];
 
@@ -69,7 +70,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
   }, [socio.nro_socio]);
 
   useEffect(() => {
-    if (filtro !== 'Finalizada' && filtro !== 'Todas') return;
+    if (filtro !== 'Todas') return;
     if (historicas !== null) return;
     let cancelled = false;
     setCargandoHistoricas(true);
@@ -107,7 +108,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
     }
   }
 
-  const fuente = filtro === 'Todas' || filtro === 'Finalizada' ? historicas : reservas;
+  const fuente = filtro === 'Todas' ? historicas : reservas;
   const reservasVisibles = filtro === 'Todas'
     ? (fuente ?? [])
     : (fuente ?? []).filter((r) => r.estado === filtro);
@@ -117,60 +118,46 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
 
   return (
     <>
-      {cargando && <LoadingScreen />}
-
-      {!cargando && error && <p className="reservas-error">No se pudieron cargar tus reservas.</p>}
-
-      {!cargando && !error && (
-        <section className="reservas-lista">
-          <section className="reservas-banner">
-            <div className="reservas-banner-texture" aria-hidden="true" />
-            <div className="reservas-banner-top">
-              <span className="reservas-banner-eyebrow">
-                <Calendar size={13} />
-                Instalaciones del club
-              </span>
-              <button type="button" className="reservas-banner-nueva-btn" onClick={onNuevaReserva}>
-                <Plus size={15} />
-                Nueva reserva
-              </button>
-            </div>
-            <h2 className="reservas-banner-title">Mis Reservas</h2>
-            <div className="reservas-banner-stats">
-              <div className="reservas-banner-stat" aria-label={`Reservas confirmadas: ${cantidadConfirmadas}`}>
-                <span className="reservas-banner-stat-value reservas-banner-stat-value--success">{cantidadConfirmadas}</span>
-                <span className="reservas-banner-stat-label">Confirmadas</span>
-              </div>
-              <div className="reservas-banner-stat-divider" aria-hidden="true" />
-              <div className="reservas-banner-stat" aria-label={`Reservas pendientes: ${cantidadPendientes}`}>
-                <span className="reservas-banner-stat-value reservas-banner-stat-value--warning">{cantidadPendientes}</span>
-                <span className="reservas-banner-stat-label">Pendientes</span>
-              </div>
-            </div>
-          </section>
-
-          <fieldset className="reservas-filtros" aria-label="Filtrar reservas por estado">
-            {FILTROS.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                className={`reservas-filtro-btn${filtro === f.id ? ' reservas-filtro-btn--activo' : ''}`}
-                onClick={() => setFiltro(f.id)}
-              >
-                {f.label}
-              </button>
-            ))}
-          </fieldset>
-
-          {(filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas && (
-            <p className="reservas-empty">Cargando historial...</p>
+      <section className="reservas-lista">
+        <PageHeader
+          eyebrow="Instalaciones del club"
+          titulo="Mis Reservas"
+          accion={(
+            <button type="button" className="reservas-nueva-btn" onClick={onNuevaReserva}>
+              <Plus size={15} />
+              Nueva reserva
+            </button>
           )}
+          stats={[
+            { label: 'Confirmadas', value: cargando ? '—' : cantidadConfirmadas, tono: 'success' },
+            { label: 'Pendientes', value: cargando ? '—' : cantidadPendientes, tono: 'warning' },
+          ]}
+        />
 
-          {!((filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas) && reservasVisibles.length === 0 && (
+        <SegmentedControl
+          opciones={FILTROS}
+          valor={filtro}
+          onChange={setFiltro}
+          ariaLabel="Filtrar reservas por estado"
+        />
+
+        {cargando && <SkeletonRows n={3} altura={88} />}
+
+        {!cargando && error && <p className="reservas-error">No se pudieron cargar tus reservas.</p>}
+
+        {!cargando && !error && filtro === 'Todas' && cargandoHistoricas && (
+          <SkeletonRows n={2} altura={88} />
+        )}
+
+        {!cargando && !error
+          && !(filtro === 'Todas' && cargandoHistoricas)
+          && reservasVisibles.length === 0 && (
             <p className="reservas-empty">No tenés reservas en este estado.</p>
-          )}
+        )}
 
-          {!((filtro === 'Todas' || filtro === 'Finalizada') && cargandoHistoricas) && reservasVisibles.map((r) => {
+        {!cargando && !error
+          && !(filtro === 'Todas' && cargandoHistoricas)
+          && reservasVisibles.map((r) => {
             const tono = ESTADO_TAG[r.estado] ?? 'neutral';
             return (
               <div className={`reserva-card reserva-card--${tono}`} key={r.id}>
@@ -206,35 +193,36 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
               </div>
             );
           })}
-        </section>
-      )}
+      </section>
 
-      {reservaAConfirmarCancelacion && (
-        <ModalOverlay onClose={() => setReservaAConfirmarCancelacion(null)}>
-          <div className="reserva-confirmar-card">
-            <p>¿Seguro que querés cancelar esta reserva?</p>
-            {errorCancelacion && <p className="reservas-error">{errorCancelacion}</p>}
-            <div className="reserva-confirmar-acciones">
-              <button
-                type="button"
-                className="reserva-confirmar-btn-no"
-                onClick={() => setReservaAConfirmarCancelacion(null)}
-                disabled={cancelandoId === reservaAConfirmarCancelacion.id}
-              >
-                Volver
-              </button>
-              <button
-                type="button"
-                className="reserva-confirmar-btn-si"
-                onClick={() => confirmarCancelacion(reservaAConfirmarCancelacion)}
-                disabled={cancelandoId === reservaAConfirmarCancelacion.id}
-              >
-                {cancelandoId === reservaAConfirmarCancelacion.id ? 'Cancelando...' : 'Sí, cancelar'}
-              </button>
+      <AnimatePresence>
+        {reservaAConfirmarCancelacion && (
+          <ModalOverlay key="confirmar-cancelacion" onClose={() => setReservaAConfirmarCancelacion(null)}>
+            <div className="reserva-confirmar-card">
+              <p>¿Seguro que querés cancelar esta reserva?</p>
+              {errorCancelacion && <p className="reservas-error">{errorCancelacion}</p>}
+              <div className="reserva-confirmar-acciones">
+                <button
+                  type="button"
+                  className="reserva-confirmar-btn-no"
+                  onClick={() => setReservaAConfirmarCancelacion(null)}
+                  disabled={cancelandoId === reservaAConfirmarCancelacion.id}
+                >
+                  Volver
+                </button>
+                <button
+                  type="button"
+                  className="reserva-confirmar-btn-si"
+                  onClick={() => confirmarCancelacion(reservaAConfirmarCancelacion)}
+                  disabled={cancelandoId === reservaAConfirmarCancelacion.id}
+                >
+                  {cancelandoId === reservaAConfirmarCancelacion.id ? 'Cancelando...' : 'Sí, cancelar'}
+                </button>
+              </div>
             </div>
-          </div>
-        </ModalOverlay>
-      )}
+          </ModalOverlay>
+        )}
+      </AnimatePresence>
     </>
   );
 }

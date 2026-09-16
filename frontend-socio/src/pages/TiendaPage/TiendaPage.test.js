@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import { TiendaPage } from './TiendaPage';
 import { getProductosDisponibles, getProducto, comprarProducto, getComprasPorSocio } from '../../services/tiendaService';
 
@@ -90,6 +90,7 @@ describe('TiendaPage', () => {
 
     fireEvent.click(await screen.findByText('Remera oficial'));
     fireEvent.click(await screen.findByText('Comprar'));
+    await waitFor(() => expect(screen.queryByText('Explorá nuestros productos')).not.toBeInTheDocument());
 
     expect(screen.getByText('Confirmar compra')).toBeInTheDocument();
     expect(screen.getByText('1')).toBeInTheDocument();
@@ -126,6 +127,7 @@ describe('TiendaPage', () => {
     fireEvent.click(await screen.findByText('Buzo campera'));
 
     expect(await screen.findByText('Buzo oficial del club.')).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Explorá nuestros productos')).not.toBeInTheDocument());
     expect(screen.queryByText('Comprar')).not.toBeInTheDocument();
     expect(screen.getByText('Agotado')).toBeInTheDocument();
   });
@@ -168,14 +170,15 @@ describe('TiendaPage', () => {
     expect(await screen.findByText('Tenés pagos pendientes. Regularizá tu situación para poder comprar.')).toBeInTheDocument();
   });
 
-  test('"Volver" desde el detalle muestra la lista de nuevo', async () => {
+  test('el gesto de atrás desde el detalle muestra la lista de nuevo', async () => {
     getProducto.mockResolvedValue(detalleConStock);
     render(<TiendaPage socio={SOCIO} />);
 
     fireEvent.click(await screen.findByText('Remera oficial'));
     await screen.findByText('Comprar');
 
-    fireEvent.click(screen.getByText('Volver'));
+    window.history.replaceState({ otraEntrada: true }, '');
+    act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
 
     expect(await screen.findByText('Buzo campera')).toBeInTheDocument();
   });

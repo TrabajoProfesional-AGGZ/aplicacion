@@ -96,6 +96,25 @@ describe('SubirTramiteForm', () => {
     });
   });
 
+  test('tocar "Listo" tras subir el trámite llama a onClose antes del cierre automático', async () => {
+    crearTramite.mockResolvedValue({ id: 't-1', estado: 'en_revision' });
+    render(<SubirTramiteForm idSocio="socio-1" onClose={onClose} onCreado={onCreado} />);
+    await screen.findByRole('option', { name: 'Apto médico' });
+
+    fireEvent.change(screen.getByLabelText('Tipo de trámite'), { target: { value: '1' } });
+    fireEvent.change(screen.getByLabelText('Adjuntar archivo del trámite'), {
+      target: { files: [crearArchivo()] },
+    });
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /enviar/i })).not.toBeDisabled());
+    fireEvent.click(screen.getByRole('button', { name: /enviar/i }));
+
+    await screen.findByText('Trámite cargado, queda en revisión.');
+    fireEvent.click(screen.getByRole('button', { name: 'Listo' }));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
   test('habilita Enviar con un tipo que requiere vencimiento en cuanto se adjunta el archivo (sin pedir fecha)', async () => {
     render(<SubirTramiteForm idSocio="socio-1" onClose={onClose} onCreado={onCreado} />);
     await screen.findByRole('option', { name: 'Apto médico' });

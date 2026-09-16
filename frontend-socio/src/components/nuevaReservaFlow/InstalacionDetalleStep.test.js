@@ -19,7 +19,6 @@ const baseProps = {
   cargandoTurnos: false,
   errorTurnos: '',
   onSeleccionarTurno: jest.fn(),
-  onVolver: jest.fn(),
 };
 
 describe('InstalacionDetalleStep', () => {
@@ -30,11 +29,11 @@ describe('InstalacionDetalleStep', () => {
   });
 
   test.each([
-    ['usa 60 minutos por defecto cuando la instalación no tiene tolerancia definida', {}, 'hasta 60 min antes'],
+    ['usa 60 minutos por defecto cuando la instalación no tiene tolerancia definida', {}, 'Hasta 60 min antes'],
     [
       'muestra la tolerancia de cancelación real de la instalación',
       { instalacion: { ...INSTALACION, tiempo_minimo_cancelacion: 120 } },
-      'hasta 120 min antes',
+      'Hasta 120 min antes',
     ],
     ['muestra el valor del turno', {}, '$ 5.000,00'],
   ])('%s', (_descripcion, propsOverride, textoEsperado) => {
@@ -97,12 +96,5 @@ describe('InstalacionDetalleStep', () => {
     const turnos = [{ hora_inicio: '08:00:00', cupos_disponibles: 3 }];
     render(<InstalacionDetalleStep {...baseProps} turnos={turnos} />);
     expect(screen.getByText('3/10 lugares')).toBeInTheDocument();
-  });
-
-  test('el botón de volver llama a onVolver', () => {
-    const onVolver = jest.fn();
-    render(<InstalacionDetalleStep {...baseProps} onVolver={onVolver} />);
-    fireEvent.click(screen.getByText('Volver'));
-    expect(onVolver).toHaveBeenCalled();
   });
 });

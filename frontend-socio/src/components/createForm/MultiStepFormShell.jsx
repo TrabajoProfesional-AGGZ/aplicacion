@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import logoVerde from '../../assets/logo-verde.png';
 import { ModalOverlay } from './ModalOverlay';
+import { SPRING } from '../../styles/motion';
 
 const STEP_COLORS = {
   bubbleActive: '#111111',
@@ -20,7 +21,8 @@ const STEP_COLORS = {
 export function MultiStepFormShell({
   steps, step, submitted, isSubmitting, title,
   successTitle, successMessage, submitLabel, submitLoadingLabel,
-  onCancel, goBack, goNext, direction, onFormSubmit, children
+  onCancel, goBack, goNext, direction, onFormSubmit, children,
+  onSuccessAction, successActionLabel,
 }) {
   const progress = (step / steps.length) * 100;
   const formRef = useRef(null);
@@ -43,21 +45,21 @@ export function MultiStepFormShell({
             key="success"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: 'spring', stiffness: 180 }}
+            transition={SPRING.default}
             className="csf-outer-card csf-success"
           >
             <motion.div
               className="csf-success-logo-circle"
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 220, delay: 0.1 }}
+              transition={{ ...SPRING.celebrate, delay: 0.1 }}
             >
               <img src={logoVerde} alt="SocioUnido" className="csf-success-logo" />
             </motion.div>
             <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 260, delay: 0.4 }}
+              transition={{ ...SPRING.celebrate, delay: 0.4 }}
             >
               <CheckCircle2 size={48} color={STEP_COLORS.success} strokeWidth={1.5} />
             </motion.div>
@@ -65,13 +67,15 @@ export function MultiStepFormShell({
               <h2>{successTitle}</h2>
               <p>{successMessage}</p>
             </div>
+            {onSuccessAction && (
+              <button type="button" className="csf-btn-submit csf-btn-submit--full" onClick={onSuccessAction}>
+                {successActionLabel}
+              </button>
+            )}
           </motion.div>
         ) : (
           <motion.div
             key="form"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
             className="csf-outer-card"
           >
             <div className="csf-header">
@@ -98,7 +102,7 @@ export function MultiStepFormShell({
                               key="check"
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
-                              transition={{ type: 'spring', stiffness: 300 }}
+                              transition={SPRING.quick}
                             >
                               <CheckCircle2 size={16} color={STEP_COLORS.onBubble} strokeWidth={2.5} />
                             </motion.span>
@@ -117,8 +121,9 @@ export function MultiStepFormShell({
                       <div className="csf-connector">
                         <motion.div
                           className="csf-connector-fill"
-                          animate={{ width: step > s.id ? '100%' : '0%' }}
-                          transition={{ duration: 0.4, ease: 'easeInOut' }}
+                          animate={{ scaleX: step > s.id ? 1 : 0 }}
+                          style={{ transformOrigin: 'left', width: '100%' }}
+                          transition={SPRING.default}
                         />
                       </div>
                     )}
@@ -130,8 +135,9 @@ export function MultiStepFormShell({
             <div className="csf-progress">
               <motion.div
                 className="csf-progress-fill"
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.4, ease: 'easeInOut' }}
+                animate={{ scaleX: progress / 100 }}
+                style={{ transformOrigin: 'left', width: '100%' }}
+                transition={SPRING.default}
               />
             </div>
 

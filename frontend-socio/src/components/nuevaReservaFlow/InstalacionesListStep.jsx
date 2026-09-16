@@ -1,5 +1,6 @@
-import { ArrowLeft, Users, ChevronRight, Dumbbell, Building2 } from 'lucide-react';
-import { LoadingScreen } from '../LoadingScreen/LoadingScreen';
+import { Users, ChevronRight, Dumbbell, Building2 } from 'lucide-react';
+import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './InstalacionesListStep.css';
 
 const ICONO_POR_TIPO = [
@@ -18,19 +19,12 @@ function formatearMonto(monto) {
 }
 
 /** Grilla de instalaciones disponibles para reservar. */
-export function InstalacionesListStep({ instalaciones, cargando, error, onSeleccionar, onVolver }) {
+export function InstalacionesListStep({ instalaciones, cargando, error, onSeleccionar }) {
   return (
     <section className="instalaciones-lista">
-      <section className="instalaciones-banner">
-        <div className="instalaciones-banner-texture" aria-hidden="true" />
-        <button type="button" className="instalaciones-banner-volver" onClick={onVolver} aria-label="Volver">
-          <ArrowLeft size={18} />
-        </button>
-        <span className="instalaciones-banner-eyebrow">Instalaciones del club</span>
-        <h2 className="instalaciones-banner-title">Realizá tu reserva</h2>
-      </section>
+      <PageHeader eyebrow="Instalaciones del club" titulo="Realizá tu reserva" />
 
-      {cargando && <LoadingScreen />}
+      {cargando && <SkeletonRows n={4} altura={76} />}
 
       {!cargando && error && (
         <p className="instalaciones-error">No se pudieron cargar las instalaciones.</p>

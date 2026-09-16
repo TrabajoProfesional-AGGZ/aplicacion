@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Newspaper } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { getNoticiasVigentes, getNoticia } from '../../services/noticiasService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
 import './NoticiasPage.css';
 
 /**
@@ -15,14 +18,12 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
   const [loading, setLoading] = useState(true);
   const [loadingDetalle, setLoadingDetalle] = useState(false);
   const [error, setError] = useState(null);
-  // El detalle abierto por el atajo "Última Noticia" no cuenta como una
-  // navegación real desde la lista (nunca se la llegó a ver) — no debe
-  // empujar su propia entrada de historial, para que un solo gesto de
-  // atrás vuelva directo a Home. Un click real en una card de la lista sí
-  // la empuja, para que atrás vuelva primero a la lista.
+  // El detalle abierto por el atajo "Última Noticia" no empuja su propia entrada
+  // de historial (un gesto de atrás va directo a Home); un click real en la
+  // lista sí, para que atrás vuelva primero a la lista.
   const entradaDesdeListaRef = useRef(!noticiaInicialId);
 
-  useBackToRoot(entradaDesdeListaRef.current ? detalle : null, null, () => setDetalle(null));
+  useBackToRoot(entradaDesdeListaRef.current ? detalle : null, null, () => { setDetalle(null); setError(null); });
 
   useEffect(() => {
     cargarNoticias();
@@ -30,9 +31,7 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
       onConsumirNoticiaInicial();
       abrirDetalle(noticiaInicialId);
     }
-    // Se captura noticiaInicialId solo al montar: HomePage crea una instancia
-    // nueva de esta página en cada navegación, así que no hace falta reaccionar
-    // a cambios posteriores del prop.
+    // Solo se captura al montar: HomePage crea una instancia nueva en cada navegación.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -63,15 +62,14 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
     abrirDetalle(id);
   }
 
-  if (loading) return <p className="noticias-empty">Cargando noticias...</p>;
+  const screenKey = detalle ? 'detalle' : 'lista';
+  const direccion = detalle ? 1 : -1;
 
   // ─── Detalle ───
   if (detalle) {
     return (
+      <ScreenTransition screenKey={screenKey} direction={direccion}>
       <div className="noticias-page">
-        <button type="button" className="noticias-volver" onClick={() => { setDetalle(null); setError(null); }}>
-          <ArrowLeft size={20} /> Volver
-        </button>
         <article className="noticias-detalle-card">
           {detalle.imagen && <img src={detalle.imagen} alt={detalle.titulo} className="noticias-detalle-img" />}
           <div className="noticias-detalle-body">
@@ -84,31 +82,29 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
           </div>
         </article>
       </div>
+      </ScreenTransition>
     );
   }
 
   // ─── Lista ───
   return (
+    <ScreenTransition screenKey={screenKey} direction={direccion}>
     <div className="noticias-page">
-      <div className="noticias-banner">
-        <div className="noticias-banner-texture" />
-        <div className="noticias-banner-top">
-          <span className="noticias-banner-eyebrow"><Newspaper size={14} /> NOVEDADES DEL CLUB</span>
-        </div>
-        <h2 className="noticias-banner-title">Noticias del Club</h2>
-        <div className="noticias-banner-stats">
-          <div className="noticias-banner-stat">
-            <span className="noticias-banner-stat-value">{noticias.length}</span>
-            <span className="noticias-banner-stat-label">Vigentes</span>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Novedades del club"
+        titulo="Noticias del Club"
+        stats={[{ label: 'Vigentes', value: loading ? '—' : noticias.length }]}
+      />
 
-      {error && <p className="noticias-error">{error}</p>}
+      {loading && <SkeletonRows n={4} altura={64} />}
 
-      {noticias.length === 0 ? (
+      {!loading && error && <p className="noticias-error">{error}</p>}
+
+      {!loading && !error && noticias.length === 0 && (
         <p className="noticias-empty">No hay noticias publicadas por el momento.</p>
-      ) : (
+      )}
+
+      {!loading && !error && noticias.length > 0 && (
         <div className="noticias-lista">
           {noticias.map(n => (
             <button key={n.id} type="button" className="noticias-card" onClick={() => abrirDetalleDesdeLista(n.id)}>
@@ -124,7 +120,8 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
         </div>
       )}
 
-      {loadingDetalle && <p className="noticias-empty">Cargando...</p>}
+      {loadingDetalle && <SkeletonRows n={1} altura={220} />}
     </div>
+    </ScreenTransition>
   );
 }

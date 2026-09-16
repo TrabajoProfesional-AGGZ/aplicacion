@@ -1,5 +1,6 @@
-import { ArrowLeft, Users, Calendar, ChevronRight } from 'lucide-react';
-import { LoadingScreen } from '../LoadingScreen/LoadingScreen';
+import { Users, Calendar, ChevronRight } from 'lucide-react';
+import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './EventosListStep.css';
 
 function formatearFecha(fechaIso) {
@@ -11,19 +12,12 @@ function formatearMonto(monto) {
 }
 
 /** Grilla de eventos disponibles para comprar entrada. */
-export function EventosListStep({ eventos, cargando, error, onSeleccionar, onVolver }) {
+export function EventosListStep({ eventos, cargando, error, onSeleccionar }) {
   return (
     <section className="eventos-lista">
-      <section className="eventos-banner">
-        <div className="eventos-banner-texture" aria-hidden="true" />
-        <button type="button" className="eventos-banner-volver" onClick={onVolver} aria-label="Volver">
-          <ArrowLeft size={18} />
-        </button>
-        <span className="eventos-banner-eyebrow">Eventos del club</span>
-        <h2 className="eventos-banner-title">Comprá tu entrada</h2>
-      </section>
+      <PageHeader eyebrow="Eventos del club" titulo="Comprá tu entrada" />
 
-      {cargando && <LoadingScreen />}
+      {cargando && <SkeletonRows n={4} altura={76} />}
 
       {!cargando && error && (
         <p className="eventos-error">No se pudieron cargar los eventos.</p>

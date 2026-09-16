@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles, createReserva } from '../../services/reservasService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
@@ -6,6 +6,9 @@ import { InstalacionesListStep } from '../../components/nuevaReservaFlow/Instala
 import { InstalacionDetalleStep } from '../../components/nuevaReservaFlow/InstalacionDetalleStep';
 import { AgregarSociosStep } from '../../components/nuevaReservaFlow/AgregarSociosStep';
 import { ResumenReservaStep } from '../../components/nuevaReservaFlow/ResumenReservaStep';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
+
+const ORDEN_STEP = { lista: 0, detalle: 1, socios: 2, resumen: 3 };
 
 const MENSAJES_ERROR_SUBMIT = {
   superposicion: 'Ese turno ya no está disponible. Elegí otro horario.',
@@ -40,7 +43,7 @@ function filtrarTurnosPasados(turnos, fecha) {
  * Flujo de reserva de una instalación en 4 pasos: instalaciones → detalle
  * (fecha y turno) → agregar socios → resumen y confirmación.
  */
-export function NuevaReservaPage({ socio, onSalir, onExito }) {
+export function NuevaReservaPage({ socio, onExito }) {
   const [step, setStep] = useState('lista');
 
   const [instalaciones, setInstalaciones] = useState([]);
@@ -62,8 +65,21 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
   const [reservaConfirmada, setReservaConfirmada] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [sociosIncumplen, setSociosIncumplen] = useState([]);
+  const successTimeoutRef = useRef(null);
 
   useBackToRoot(step, 'lista', volverAInstalaciones);
+
+  const [stepAnterior, setStepAnterior] = useState(step);
+  const [direccion, setDireccion] = useState(0);
+  if (step !== stepAnterior) {
+    const diferenciaStep = ORDEN_STEP[step] - ORDEN_STEP[stepAnterior];
+    setDireccion(diferenciaStep > 0 ? 1 : diferenciaStep < 0 ? -1 : 0);
+    setStepAnterior(step);
+  }
+
+  useEffect(() => () => {
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,6 +132,11 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
     setStep(instalacionSeleccionada.capacidad_maxima === 1 ? 'resumen' : 'socios');
   }
 
+  function verMisReservas() {
+    if (successTimeoutRef.current) clearTimeout(successTimeoutRef.current);
+    onExito();
+  }
+
   function volverAInstalaciones() {
     setInstalacionSeleccionada(null);
     setTurnos([]);
@@ -141,7 +162,7 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
       });
       setReservaConfirmada(reserva.estado === 'Confirmada');
       setSubmitted(true);
-      setTimeout(() => onExito(), 1800);
+      successTimeoutRef.current = setTimeout(() => onExito(), 3000);
     } catch (e) {
       setSubmitError(MENSAJES_ERROR_SUBMIT[e.message] || 'No se pudo registrar la reserva. Intentá de nuevo.');
       setSociosIncumplen(e.sociosIncumplen ?? []);
@@ -152,60 +173,65 @@ export function NuevaReservaPage({ socio, onSalir, onExito }) {
 
   if (step === 'lista') {
     return (
-      <InstalacionesListStep
-        instalaciones={instalaciones}
-        cargando={cargandoInstalaciones}
-        error={errorInstalaciones}
-        onSeleccionar={irADetalle}
-        onVolver={onSalir}
-      />
+      <ScreenTransition screenKey={step} direction={direccion}>
+        <InstalacionesListStep
+          instalaciones={instalaciones}
+          cargando={cargandoInstalaciones}
+          error={errorInstalaciones}
+          onSeleccionar={irADetalle}
+        />
+      </ScreenTransition>
     );
   }
 
   if (step === 'detalle') {
     return (
-      <InstalacionDetalleStep
-        instalacion={instalacionSeleccionada}
-        fecha={fecha}
-        onFechaChange={setFecha}
-        turnos={turnos}
-        cargandoTurnos={cargandoTurnos}
-        errorTurnos={errorTurnos}
-        onSeleccionarTurno={irASocios}
-        onVolver={volverAInstalaciones}
-      />
+      <ScreenTransition screenKey={step} direction={direccion}>
+        <InstalacionDetalleStep
+          instalacion={instalacionSeleccionada}
+          fecha={fecha}
+          onFechaChange={setFecha}
+          turnos={turnos}
+          cargandoTurnos={cargandoTurnos}
+          errorTurnos={errorTurnos}
+          onSeleccionarTurno={irASocios}
+        />
+      </ScreenTransition>
     );
   }
 
   if (step === 'socios') {
     return (
-      <AgregarSociosStep
-        socioTitular={socio}
-        sociosAgregados={sociosAgregados}
-        cuposDisponibles={cuposDisponiblesTurno}
-        onAgregar={(s) => setSociosAgregados((prev) => [...prev, s])}
-        onQuitar={(id) => setSociosAgregados((prev) => prev.filter((s) => s.id !== id))}
-        onContinuar={() => setStep('resumen')}
-        onVolver={volverAInstalaciones}
-      />
+      <ScreenTransition screenKey={step} direction={direccion}>
+        <AgregarSociosStep
+          socioTitular={socio}
+          sociosAgregados={sociosAgregados}
+          cuposDisponibles={cuposDisponiblesTurno}
+          onAgregar={(s) => setSociosAgregados((prev) => [...prev, s])}
+          onQuitar={(id) => setSociosAgregados((prev) => prev.filter((s) => s.id !== id))}
+          onContinuar={() => setStep('resumen')}
+        />
+      </ScreenTransition>
     );
   }
 
   return (
-    <ResumenReservaStep
-      instalacion={instalacionSeleccionada}
-      fecha={fecha}
-      turno={turnoSeleccionado}
-      socioTitular={socio}
-      sociosAgregados={sociosAgregados}
-      onConfirmar={confirmarReserva}
-      onCancelar={volverAInstalaciones}
-      onVolver={volverAInstalaciones}
-      enviando={enviando}
-      submitted={submitted}
-      reservaConfirmada={reservaConfirmada}
-      submitError={submitError}
-      sociosIncumplen={sociosIncumplen}
-    />
+    <ScreenTransition screenKey={step} direction={direccion}>
+      <ResumenReservaStep
+        instalacion={instalacionSeleccionada}
+        fecha={fecha}
+        turno={turnoSeleccionado}
+        socioTitular={socio}
+        sociosAgregados={sociosAgregados}
+        onConfirmar={confirmarReserva}
+        onCancelar={volverAInstalaciones}
+        enviando={enviando}
+        submitted={submitted}
+        reservaConfirmada={reservaConfirmada}
+        submitError={submitError}
+        sociosIncumplen={sociosIncumplen}
+        onVerReservas={verMisReservas}
+      />
+    </ScreenTransition>
   );
 }

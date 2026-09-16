@@ -21,17 +21,17 @@ const DISCIPLINA_SIN_LIMITE = {
 
 describe('DisciplinasListStep', () => {
   test('muestra el logo animado de carga', () => {
-    render(<DisciplinasListStep disciplinas={[]} cargando error={false} onSeleccionar={jest.fn()} onVolver={jest.fn()} />);
+    render(<DisciplinasListStep disciplinas={[]} cargando error={false} onSeleccionar={jest.fn()} />);
     expect(screen.getByRole('status', { name: 'Cargando' })).toBeInTheDocument();
   });
 
   test('muestra un mensaje de error', () => {
-    render(<DisciplinasListStep disciplinas={[]} cargando={false} error onSeleccionar={jest.fn()} onVolver={jest.fn()} />);
+    render(<DisciplinasListStep disciplinas={[]} cargando={false} error onSeleccionar={jest.fn()} />);
     expect(screen.getByText('No se pudieron cargar las disciplinas.')).toBeInTheDocument();
   });
 
   test('muestra un mensaje vacío sin disciplinas', () => {
-    render(<DisciplinasListStep disciplinas={[]} cargando={false} error={false} onSeleccionar={jest.fn()} onVolver={jest.fn()} />);
+    render(<DisciplinasListStep disciplinas={[]} cargando={false} error={false} onSeleccionar={jest.fn()} />);
     expect(screen.getByText('No hay disciplinas disponibles en este momento.')).toBeInTheDocument();
   });
 
@@ -42,7 +42,6 @@ describe('DisciplinasListStep', () => {
         cargando={false}
         error={false}
         onSeleccionar={jest.fn()}
-        onVolver={jest.fn()}
       />
     );
     expect(screen.getByText('Natación')).toBeInTheDocument();
@@ -58,7 +57,6 @@ describe('DisciplinasListStep', () => {
         cargando={false}
         error={false}
         onSeleccionar={jest.fn()}
-        onVolver={jest.fn()}
       />
     );
     expect(screen.getByText('3 inscriptos · Sin límite')).toBeInTheDocument();
@@ -73,17 +71,9 @@ describe('DisciplinasListStep', () => {
         cargando={false}
         error={false}
         onSeleccionar={onSeleccionar}
-        onVolver={jest.fn()}
       />
     );
     fireEvent.click(screen.getByText('Natación'));
     expect(onSeleccionar).toHaveBeenCalledWith(DISCIPLINA_CON_LIMITE);
-  });
-
-  test('click en el botón de volver llama a onVolver', () => {
-    const onVolver = jest.fn();
-    render(<DisciplinasListStep disciplinas={[]} cargando={false} error={false} onSeleccionar={jest.fn()} onVolver={onVolver} />);
-    fireEvent.click(screen.getByLabelText('Volver'));
-    expect(onVolver).toHaveBeenCalled();
   });
 });

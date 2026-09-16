@@ -82,7 +82,7 @@ describe('MisEntradasPage', () => {
     render(<MisEntradasPage socio={SOCIO} />);
     await screen.findByText('No tenés entradas activas.');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Históricas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Históricas' }));
 
     expect(await screen.findByText('Fiesta de fin de año')).toBeInTheDocument();
     expect(screen.getByText('Vencida')).toBeInTheDocument();
@@ -96,7 +96,7 @@ describe('MisEntradasPage', () => {
     render(<MisEntradasPage socio={SOCIO} />);
     await screen.findByText('No tenés entradas activas.');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Históricas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Históricas' }));
 
     await screen.findByText('Fiesta de fin de año');
     expect(screen.queryByLabelText('Ver código QR de la entrada')).not.toBeInTheDocument();

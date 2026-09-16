@@ -2,6 +2,7 @@
 
 html {
   scroll-behavior: smooth;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -11,6 +12,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-bg);
   color: var(--color-text-primary);
+  overscroll-behavior-y: none;
 }
 
 input,

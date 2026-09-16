@@ -3,11 +3,13 @@ import { getEstadoFinanciero } from '../../services/finanzasService';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
 import { useAuth } from '../../hooks/useAuth';
+import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
 import './FinanzasPage.css';
 
 const RESUMEN_CONFIG = {
   Activo: { tono: 'success', copy: 'Estás al día con tus cuotas.' },
-  Moroso: { tono: 'danger', copy: 'Por pagar.' },
+  Moroso: { tono: 'danger', copy: 'Tenés cuotas pendientes. Podés pagarlas desde acá.' },
 };
 
 const CUOTA_ESTADO_TAG = {
@@ -67,9 +69,8 @@ export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar 
           const item = data.cuotas.find((c) => c.id === idBuscado);
           if (item) setCuotaAPagar(item);
         }
-        // GET /finanzas puede haber transicionado el estado del socio (ej. a "Moroso") en el
-        // backend — refresca el perfil en contexto para que WelcomeCard/PerfilPage no queden
-        // mostrando el estado viejo cargado al loguearse.
+        // GET /finanzas puede haber cambiado el estado del socio (ej. a "Moroso"):
+        // refresca el perfil en contexto para que WelcomeCard/PerfilPage no queden viejos.
         refrescarSocio();
       })
       .catch((err) => { if (!cancelled) setError(err.message); })
@@ -78,6 +79,10 @@ export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar 
   }, [socio.id, recarga, refrescarSocio]);
 
   const volverALista = () => { setCuotaAPagar(null); setRecarga((n) => n + 1); };
+
+  // PagoCuotaFlow ya no tiene su propio botón "Volver" — el gesto nativo de
+  // atrás (ver useBackToRoot/useEdgeSwipeBack) es la única forma de salir.
+  useBackToRoot(cuotaAPagar ? 'pago' : 'lista', 'lista', volverALista);
 
   return (
     <>
@@ -90,7 +95,6 @@ export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar 
           item={cuotaAPagar}
           tipoItem={inferirTipoItem(cuotaAPagar.concepto)}
           socio={socio}
-          onVolver={volverALista}
         />
       )}
 
@@ -99,16 +103,13 @@ export function FinanzasPage({ socio, itemAPagarId = null, onConsumirItemAPagar 
           {(() => {
             const config = RESUMEN_CONFIG[resumen.estado_financiero] ?? { tono: 'warning', copy: '' };
             return (
-              <section className={`finanzas-resumen finanzas-resumen--${config.tono}`}>
-                <div className="finanzas-resumen-texture" aria-hidden="true" />
-                <div className="finanzas-resumen-content">
-                  <span className={`finanzas-resumen-tag finanzas-resumen-tag--${config.tono}`}>
-                    {resumen.estado_financiero}
-                  </span>
-                  <p className="finanzas-resumen-deuda">{formatearMonto(resumen.deuda_total)}</p>
-                  <p className="finanzas-resumen-copy">{config.copy}</p>
-                </div>
-              </section>
+              <PageHeader variant="hero" tono={config.tono}>
+                <span className={`finanzas-resumen-tag finanzas-resumen-tag--${config.tono}`}>
+                  {resumen.estado_financiero}
+                </span>
+                <p className="finanzas-resumen-deuda">{formatearMonto(resumen.deuda_total)}</p>
+                <p className="finanzas-resumen-copy">{config.copy}</p>
+              </PageHeader>
             );
           })()}
 
