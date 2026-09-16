@@ -17,6 +17,8 @@ import { MisEntradasPage } from '../MisEntradasPage/MisEntradasPage';
 import { NoticiasPage } from '../NoticiasPage/NoticiasPage';
 import { TiendaPage } from '../TiendaPage/TiendaPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
+import { DeudaBanner } from '../../components/DeudaBanner/DeudaBanner';
+import { HoyCard } from '../../components/HoyCard/HoyCard';
 import { BotinButton } from '../../components/BotinButton/BotinButton';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { useAlertasNoLeidas } from '../../hooks/useAlertasNoLeidas';
@@ -170,7 +172,13 @@ export function HomePage({ socio, cerrarSesion }) {
         {vista === 'inicio' && (
           <>
             <WelcomeCard socio={socio} />
+            <DeudaBanner socio={socio} onClick={() => setVista('pagos')} />
             <CertificadoVencidoBanner socio={socio} onClick={() => setVista('tramites')} />
+            <HoyCard
+              socio={socio}
+              onVerReservas={() => setVista('reservas')}
+              onVerEntradas={() => setVista('mis-entradas')}
+            />
             <QuickAccessGrid
               onPagos={() => setVista('pagos')}
               onTramites={() => setVista('tramites')}

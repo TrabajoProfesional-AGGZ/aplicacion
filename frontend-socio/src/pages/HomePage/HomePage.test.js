@@ -349,7 +349,8 @@ describe('HomePage', () => {
   });
 
   test('"Ir a pagar" en una entrada pendiente navega a la página de pagos (onPagarEntrada)', async () => {
-    getEntradasPendientes.mockResolvedValueOnce([entradaPendienteFixture]);
+    // mockResolvedValue (no `Once`): HoyCard también llama a este service al montar Home.
+    getEntradasPendientes.mockResolvedValue([entradaPendienteFixture]);
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Entradas'));
     fireEvent.click(await screen.findByText('Ir a pagar'));
@@ -357,7 +358,8 @@ describe('HomePage', () => {
   });
 
   test('el botón de QR de una entrada pagada navega al carnet (onVerCarnet)', async () => {
-    getEntradasActivas.mockResolvedValueOnce([entradaPagadaFixture]);
+    // mockResolvedValue (no `Once`): HoyCard también llama a este service al montar Home.
+    getEntradasActivas.mockResolvedValue([entradaPagadaFixture]);
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Entradas'));
     fireEvent.click(await screen.findByLabelText('Ver código QR de la entrada'));
