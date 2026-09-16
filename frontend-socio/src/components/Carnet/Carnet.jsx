@@ -5,9 +5,46 @@ import { enrolarYGuardarSecreto, obtenerUltimoAcceso } from '../../services/acce
 import './Carnet.css';
 
 const POLLING_INTERVALO_MS = 2000;
+const PERIODO_TOTP_S = 30;
 
 function nombreCompleto(socio) {
   return [socio?.nombre, socio?.apellido].filter(Boolean).join(' ') || '---';
+}
+
+function segundosRestantes() {
+  return PERIODO_TOTP_S - (Math.floor(Date.now() / 1000) % PERIODO_TOTP_S);
+}
+
+/**
+ * Barra que indica cuánto falta para que `AccesoQR` regenere el token TOTP
+ * (mismo período de 30s que `AccesoQr.jsx`). Avisa a `onCicloNuevo` en el
+ * tick en que el ciclo reinicia, para que el contenedor del QR pulse.
+ */
+function TimerTotp({ onCicloNuevo }) {
+  const [restante, setRestante] = useState(segundosRestantes);
+  const anteriorRef = useRef(restante);
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      const nuevo = segundosRestantes();
+      if (nuevo > anteriorRef.current) onCicloNuevo?.();
+      anteriorRef.current = nuevo;
+      setRestante(nuevo);
+    }, 1000);
+    return () => clearInterval(intervalo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const reiniciando = restante === PERIODO_TOTP_S;
+
+  return (
+    <div className="carnet-timer" role="timer" aria-label={`El código se renueva en ${restante} segundos`}>
+      <div
+        className={`carnet-timer-fill${reiniciando ? ' carnet-timer-fill--reset' : ''}`}
+        style={{ transform: `scaleX(${restante / PERIODO_TOTP_S})` }}
+      />
+    </div>
+  );
 }
 
 /**
@@ -21,9 +58,15 @@ export function Carnet({ socio }) {
   const [recargando, setRecargando] = useState(false);
   const [errorRecarga, setErrorRecarga] = useState(false);
   const [resultadoAcceso, setResultadoAcceso] = useState(null);
+  const [pulsoQr, setPulsoQr] = useState(false);
 
   const ultimoIdMostradoRef = useRef(null);
   const montadoEnRef = useRef(new Date().toISOString());
+
+  const handleCicloNuevo = () => {
+    setPulsoQr(true);
+    setTimeout(() => setPulsoQr(false), 300);
+  };
 
   const pedirSecretoNuevo = async () => {
     const secreto = await enrolarYGuardarSecreto(socio);
@@ -89,8 +132,10 @@ export function Carnet({ socio }) {
           </div>
         </div>
 
+        <TimerTotp onCicloNuevo={handleCicloNuevo} />
+
         {/* Contenedor del QR con zona blanca de seguridad (Quiet Zone) */}
-        <div className="carnet-qr-container">
+        <div className={`carnet-qr-container${pulsoQr ? ' carnet-qr-container--nuevo' : ''}`}>
           <AccesoQR key={refreshKey} />
 
           {resultadoAcceso && (
@@ -149,10 +194,6 @@ export function Carnet({ socio }) {
             <span className="data-label">Nº de Socio</span>
             <span className="data-value">#{socio?.nro_socio || '---'}</span>
           </div>
-        </div>
-
-        <div className="carnet-timer-bar">
-          <div className="timer-progress"></div>
         </div>
       </div>
     </div>

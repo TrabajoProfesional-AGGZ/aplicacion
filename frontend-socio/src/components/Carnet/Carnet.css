@@ -236,6 +236,36 @@
   font-weight: 600;
 }
 
+.carnet-timer {
+  height: 6px;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.carnet-timer-fill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left;
+  background: rgba(255, 255, 255, 0.7);
+  transition: transform 1s linear;
+}
+
+.carnet-timer-fill--reset {
+  transition: none;
+}
+
+.carnet-qr-container--nuevo {
+  animation: carnet-qr-pulso 0.3s ease;
+}
+
+@keyframes carnet-qr-pulso {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.01); }
+  100% { transform: scale(1); }
+}
+
 /* Animaciones */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
