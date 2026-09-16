@@ -11,7 +11,7 @@ const socioFixture = {
 
 describe('WelcomeCard', () => {
   test.each([
-    ['el saludo de bienvenida solo con el nombre', 'Bienvenido Ana'],
+    ['el saludo de bienvenida solo con el nombre', 'Hola, Ana'],
     ['el número de socio junto con la categoría', '1000 - Titular'],
     ['el estado del socio', 'Estado: Activo'],
   ])('muestra %s', (_descripcion, textoEsperado) => {
@@ -26,7 +26,7 @@ describe('WelcomeCard', () => {
 
   test('no rompe si categoria o estado vienen indefinidos', () => {
     render(<WelcomeCard socio={{ nombre: 'Ana', apellido: 'Pérez', nro_socio: '1000' }} />);
-    expect(screen.getByText('Bienvenido Ana')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
   });
 });
 

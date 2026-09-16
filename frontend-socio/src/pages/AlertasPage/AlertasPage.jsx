@@ -22,7 +22,7 @@ function formatearFecha(fechaIso) {
 }
 
 /** Lista de alertas/novedades del club dirigidas al socio. */
-export function AlertasPage({ socio }) {
+export function AlertasPage({ socio, onAlertasCargadas }) {
   const [alertas, setAlertas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -32,10 +32,15 @@ export function AlertasPage({ socio }) {
     setCargando(true);
     setError(null);
     getAlertasSocio(socio.id)
-      .then((data) => { if (!cancelled) setAlertas(data); })
+      .then((data) => {
+        if (cancelled) return;
+        setAlertas(data);
+        onAlertasCargadas?.(data);
+      })
       .catch((err) => { if (!cancelled) setError(err.message); })
       .finally(() => { if (!cancelled) setCargando(false); });
     return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socio.id]);
 
   const sufijoPlural = alertas.length === 1 ? '' : 'es';

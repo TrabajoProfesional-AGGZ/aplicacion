@@ -3,6 +3,7 @@ import { HomePage } from './HomePage';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles } from '../../services/reservasService';
 import { getEntradasActivas, getEntradasPendientes } from '../../services/eventosService';
+import { getAlertasSocio } from '../../services/alertasService';
 import { TextEncoder, TextDecoder } from 'util';
 Object.assign(global, { TextEncoder, TextDecoder });
 
@@ -92,7 +93,7 @@ const entradaPagadaFixture = {
 describe('HomePage', () => {
   test('muestra la tarjeta de bienvenida con los datos del socio', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    expect(screen.getByText('Bienvenido Ana')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
     expect(screen.getByText('1000 - Titular')).toBeInTheDocument();
   });
 
@@ -124,7 +125,7 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByText('Mis trámites'));
     await screen.findByRole('heading', { name: 'Mis trámites' });
     fireEvent.click(screen.getByText('Inicio'));
-    expect(screen.getByText('Bienvenido Ana')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
   });
 
   test('click en "Noticias" abre la vista de noticias', () => {
@@ -182,7 +183,7 @@ describe('HomePage', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Reservar instalación'));
     await screen.findByText('Cancha de fútbol');
-    await waitFor(() => expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('Hola, Ana')).not.toBeInTheDocument());
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
     // El gesto de atrás desde el paso de detalle aterriza en la lista de
@@ -190,7 +191,7 @@ describe('HomePage', () => {
     await screen.findByText('08:00');
     simularGestoDeAtras();
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
-    await waitFor(() => expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('Hola, Ana')).not.toBeInTheDocument());
     await waitFor(() => expect(screen.queryByText('08:00')).not.toBeInTheDocument());
 
     // Avanzando dos pasos (detalle -> socios), el gesto de atrás también
@@ -206,7 +207,7 @@ describe('HomePage', () => {
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
     await waitFor(() => expect(screen.queryByText('Agregar socios')).not.toBeInTheDocument());
     expect(screen.getByText('Cancha de fútbol')).toBeInTheDocument();
-    expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument();
+    expect(screen.queryByText('Hola, Ana')).not.toBeInTheDocument();
 
     pushStateSpy.mockRestore();
     global.Date = RealDate;
@@ -217,7 +218,7 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByText('Reservar instalación'));
     await screen.findByRole('heading', { name: 'Realizá tu reserva' });
     fireEvent.click(screen.getByText('Inicio'));
-    expect(screen.getByText('Bienvenido Ana')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
   });
 
   test('"Nueva reserva" del banner de Mis Reservas navega al flujo de nueva reserva', async () => {
@@ -242,7 +243,7 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByText('Cuotas y pagos'));
     await screen.findByRole('heading', { name: 'Cuotas' });
     fireEvent.click(screen.getByText('Inicio'));
-    expect(screen.getByText('Bienvenido Ana')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
   });
 
   test('muestra el nav inferior con los 5 botones y "Inicio" activo', () => {
@@ -269,14 +270,14 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByLabelText('Notificaciones'));
     await screen.findByRole('heading', { name: 'Mis alertas' });
     fireEvent.click(screen.getByText('Inicio'));
-    expect(screen.getByText('Bienvenido Ana')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
   });
 
   test('click en el botón de perfil del header navega a la página de perfil, sin flecha de volver', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByLabelText('Mi perfil'));
     expect(screen.getByText('Cerrar sesión')).toBeInTheDocument();
-    await waitFor(() => expect(screen.queryByText('Bienvenido Ana')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('Hola, Ana')).not.toBeInTheDocument());
     expect(screen.queryByLabelText('Volver')).not.toBeInTheDocument();
   });
 
@@ -361,5 +362,31 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByText('Entradas'));
     fireEvent.click(await screen.findByLabelText('Ver código QR de la entrada'));
     expect(await screen.findByText('Mi Pase de Acceso')).toBeInTheDocument();
+  });
+});
+
+describe('HomePage - badge de alertas no leídas (E5)', () => {
+  const ALERTA_MOCK = { id: 'a-1', mensaje: 'Novedad del club', creado_en: '2026-07-10T14:30:00Z' };
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  test('muestra el badge en la campana cuando hay alertas sin ver', async () => {
+    getAlertasSocio.mockResolvedValueOnce([ALERTA_MOCK]);
+    const { container } = render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    await waitFor(() => expect(container.querySelector('.app-header-bell-badge')).toBeInTheDocument());
+  });
+
+  test('entrar a Alertas apaga el badge y lo recuerda entre renders', async () => {
+    getAlertasSocio.mockResolvedValue([ALERTA_MOCK]);
+    const { container } = render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    await waitFor(() => expect(container.querySelector('.app-header-bell-badge')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText('Notificaciones'));
+    await screen.findByText('Novedad del club');
+
+    await waitFor(() => expect(container.querySelector('.app-header-bell-badge')).not.toBeInTheDocument());
+    expect(localStorage.getItem('alertas_ultima_vista_socio-1')).toBe(ALERTA_MOCK.creado_en);
   });
 });

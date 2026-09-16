@@ -40,7 +40,7 @@ export function WelcomeCard({ socio }) {
           Estado: {socio.estado?.nombre}
         </p>
       </div>
-      <h1 className="welcome-card-saludo">Bienvenido {socio.nombre}</h1>
+      <h1 className="welcome-card-saludo">Hola, {socio.nombre}</h1>
       {esCumpleanios && (
         <p className="welcome-card-cumpleanios" role="status">
           <PartyPopper size={14} aria-hidden="true" />

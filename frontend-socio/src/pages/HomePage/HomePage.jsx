@@ -19,6 +19,7 @@ import { TiendaPage } from '../TiendaPage/TiendaPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
 import { BotinButton } from '../../components/BotinButton/BotinButton';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { useAlertasNoLeidas } from '../../hooks/useAlertasNoLeidas';
 import '../../socio-theme.css';
 import './HomePage.css';
 import { Carnet } from '../../components/Carnet/Carnet';
@@ -49,6 +50,8 @@ export function HomePage({ socio, cerrarSesion }) {
   }
 
   useBackToRoot(vista, 'inicio', () => setVista('inicio'));
+
+  const { hayNoLeidas: hayAlertasNoLeidas, marcarComoLeidas: marcarAlertasComoLeidas } = useAlertasNoLeidas(socio.id);
 
   useEffect(() => {
     const enrolarDispositivo = async () => {
@@ -100,6 +103,7 @@ export function HomePage({ socio, cerrarSesion }) {
         onPerfil={() => setVista('perfil')}
         onAlertas={() => setVista('alertas')}
         mostrarPerfil={vista !== 'perfil'}
+        hayAlertasNoLeidas={hayAlertasNoLeidas}
       />
 
       <main className="home-page">
@@ -119,7 +123,7 @@ export function HomePage({ socio, cerrarSesion }) {
           />
         )}
         {vista === 'tramites' && <TramitesPage socio={socio} />}
-        {vista === 'alertas' && <AlertasPage socio={socio} />}
+        {vista === 'alertas' && <AlertasPage socio={socio} onAlertasCargadas={marcarAlertasComoLeidas} />}
         {vista === 'reservas' && (
           <ReservasPage
             socio={socio}
