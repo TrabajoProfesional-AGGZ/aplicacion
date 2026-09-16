@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Eye, EyeOff } from 'lucide-react';
 import { login } from '../../utils/authService';
 import { useAuth } from '../../hooks/useAuth';
 import { MAX_LEN, validarCredencialSegura } from '../../utils/formValidators';
 import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
+import { EASE } from '../../styles/motion';
 import logoSocioAlt from '../../assets/logo_socio_login.png';
 import '../../socio-theme.css';
 
@@ -61,6 +62,7 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
   const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
 
   const [animStarted, setAnimStarted] = useState(false);
+  const [bandaCubrio, setBandaCubrio] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const ingresoCompletoLlamado = useRef(false);
 
@@ -93,7 +95,11 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
   }, [authError, cargando, cerrarSesion]);
 
   const manejarBandaCompleta = () => {
-    if (exiting && !ingresoCompletoLlamado.current) {
+    if (exiting) setBandaCubrio(true);
+  };
+
+  const manejarContenedorCompleto = () => {
+    if (exiting && bandaCubrio && !ingresoCompletoLlamado.current) {
       ingresoCompletoLlamado.current = true;
       onIngresoCompleto();
     }
@@ -133,7 +139,9 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
     <motion.div
       className="login-container"
       exit={exitAnimation}
+      animate={exiting && bandaCubrio ? { opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } } : undefined}
       transition={{ duration: 0.45, ease: 'easeIn' }}
+      onAnimationComplete={manejarContenedorCompleto}
     >
       {!shouldReduceMotion && (
         <motion.div
@@ -141,16 +149,13 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
           initial={{ height: '100%' }}
           animate={
             exiting
-              ? { height: '100%', backgroundColor: ['#F7B5CD', '#4A4A4A', '#F5F5F5'] }
+              ? { height: '100%' }
               : { height: animStarted ? '30%' : '100%' }
           }
           transition={
             exiting
-              ? {
-                  height: { duration: 0.5, ease: [0.76, 0, 0.24, 1] },
-                  backgroundColor: { duration: 1, delay: 0.4, times: [0, 0.5, 1] },
-                }
-              : { duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.4 }
+              ? { duration: 0.35, ease: EASE.inOut }
+              : { duration: 0.8, ease: EASE.inOut, delay: 0.4 }
           }
           onAnimationComplete={manejarBandaCompleta}
         >
@@ -245,9 +250,11 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
 
       </motion.div>
 
-      {mostrarRecuperar && (
-        <RecuperarContraseniaModal onClose={() => setMostrarRecuperar(false)} />
-      )}
+      <AnimatePresence>
+        {mostrarRecuperar && (
+          <RecuperarContraseniaModal key="recuperar-contrasenia" onClose={() => setMostrarRecuperar(false)} />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

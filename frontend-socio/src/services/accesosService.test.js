@@ -21,7 +21,7 @@ describe('accesosService', () => {
 
     const secreto = await enrolarYGuardarSecreto(socio);
 
-    expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/enrolar', 'POST', { socio_id: 'socio-1' });
+    expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/enrolar', 'POST', {});
     expect(secreto).toBe('SECRETOVALIDO123');
     expect(localStorage.getItem('socio_totp_secret')).toBe('SECRETOVALIDO123');
     expect(localStorage.getItem('socio_id')).toBe('socio-1');

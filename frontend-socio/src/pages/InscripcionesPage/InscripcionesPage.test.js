@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { InscripcionesPage } from './InscripcionesPage';
 import { getDisciplinasPorSocio, darDeBajaInscripcion } from '../../services/disciplinasService';
 
@@ -71,8 +71,8 @@ describe('InscripcionesPage', () => {
   test('muestra la cantidad de inscripciones aranceladas y sin costo en el banner', async () => {
     getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA, INSCRIPCION_SIN_COSTO]);
     render(<InscripcionesPage socio={socioFixture} />);
-    expect(await screen.findByLabelText('Inscripciones aranceladas: 1')).toBeInTheDocument();
-    expect(screen.getByLabelText('Inscripciones sin costo: 1')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Aranceladas: 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Sin costo: 1')).toBeInTheDocument();
   });
 
   test('el filtro "Aranceladas" oculta las inscripciones sin costo', async () => {
@@ -80,26 +80,26 @@ describe('InscripcionesPage', () => {
     render(<InscripcionesPage socio={socioFixture} />);
     await screen.findByText('Natación');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Aranceladas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Aranceladas' }));
 
     expect(screen.getByText('Natación')).toBeInTheDocument();
     expect(screen.queryByText('Ajedrez')).not.toBeInTheDocument();
   });
 
-  test('el botón "Nueva Inscripcion" del banner llama a onNuevaInscripcion', async () => {
+  test('el botón "Nueva inscripción" del banner llama a onNuevaInscripcion', async () => {
     getDisciplinasPorSocio.mockResolvedValue([]);
     const onNuevaInscripcion = jest.fn();
     render(<InscripcionesPage socio={socioFixture} onNuevaInscripcion={onNuevaInscripcion} />);
     await screen.findByRole('heading', { name: 'Mis inscripciones' });
 
-    fireEvent.click(screen.getByRole('button', { name: /nueva inscripcion/i }));
+    fireEvent.click(screen.getByRole('button', { name: /nueva inscripción/i }));
     expect(onNuevaInscripcion).toHaveBeenCalled();
   });
 
   test('muestra la cantidad de inscripciones en espera en el banner', async () => {
     getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA, INSCRIPCION_EN_ESPERA]);
     render(<InscripcionesPage socio={socioFixture} />);
-    expect(await screen.findByLabelText('Inscripciones en espera: 1')).toBeInTheDocument();
+    expect(await screen.findByLabelText('En espera: 1')).toBeInTheDocument();
   });
 
   test('el filtro "En espera" muestra solo las inscripciones en lista de espera', async () => {
@@ -107,7 +107,7 @@ describe('InscripcionesPage', () => {
     render(<InscripcionesPage socio={socioFixture} />);
     await screen.findByText('Natación');
 
-    fireEvent.click(screen.getByRole('button', { name: 'En espera' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'En espera' }));
 
     expect(screen.queryByText('Natación')).not.toBeInTheDocument();
     expect(screen.getByText('Básquet')).toBeInTheDocument();
@@ -127,7 +127,6 @@ describe('InscripcionesPage', () => {
     fireEvent.click(await screen.findByText('Natación'));
 
     expect(screen.getByRole('button', { name: 'Dar de Baja' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument();
   });
 
   test('una inscripción en lista de espera no muestra el botón "Dar de Baja" en el detalle', async () => {
@@ -138,12 +137,13 @@ describe('InscripcionesPage', () => {
     expect(screen.queryByRole('button', { name: 'Dar de Baja' })).not.toBeInTheDocument();
   });
 
-  test('"Volver" desde el detalle vuelve a la lista', async () => {
+  test('el gesto de atrás desde el detalle vuelve a la lista', async () => {
     getDisciplinasPorSocio.mockResolvedValue([INSCRIPCION_ARANCELADA]);
     render(<InscripcionesPage socio={socioFixture} />);
     fireEvent.click(await screen.findByText('Natación'));
 
-    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+    window.history.replaceState({ otraEntrada: true }, '');
+    act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
 
     expect(await screen.findByRole('heading', { name: 'Mis inscripciones' })).toBeInTheDocument();
   });
@@ -164,13 +164,14 @@ describe('InscripcionesPage', () => {
     darDeBajaInscripcion.mockResolvedValue({ estado_suscripcion: 'inactiva' });
     render(<InscripcionesPage socio={socioFixture} />);
     fireEvent.click(await screen.findByText('Natación'));
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Mis inscripciones' })).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole('button', { name: 'Dar de Baja' }));
 
     fireEvent.click(screen.getByRole('button', { name: /sí, dar de baja/i }));
 
     await waitFor(() => expect(darDeBajaInscripcion).toHaveBeenCalledWith('disc-1', 'socio-1'));
     expect(await screen.findByRole('heading', { name: 'Mis inscripciones' })).toBeInTheDocument();
-    expect(screen.queryByText('Natación')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Natación')).not.toBeInTheDocument());
   });
 
   test('si la baja falla, muestra un error y no cierra el detalle', async () => {
@@ -178,6 +179,7 @@ describe('InscripcionesPage', () => {
     darDeBajaInscripcion.mockRejectedValue(new Error('servicio-no-disponible'));
     render(<InscripcionesPage socio={socioFixture} />);
     fireEvent.click(await screen.findByText('Natación'));
+    await waitFor(() => expect(screen.queryByRole('heading', { name: 'Mis inscripciones' })).not.toBeInTheDocument());
     fireEvent.click(screen.getByRole('button', { name: 'Dar de Baja' }));
 
     fireEvent.click(screen.getByRole('button', { name: /sí, dar de baja/i }));

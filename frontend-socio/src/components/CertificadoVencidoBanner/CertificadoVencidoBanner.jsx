@@ -3,19 +3,38 @@ import { AlertTriangle } from 'lucide-react';
 import { getTramitesPendientes } from '../../services/tramitesService';
 import './CertificadoVencidoBanner.css';
 
+// `ScreenTransition` remonta todo el subárbol de Home en cada cambio de
+// `vista` (key={screenKey} en el AnimatePresence, ver HomePage.jsx), así que
+// sin esta caché el estado arranca en `null` de nuevo cada vez que se vuelve
+// a Inicio y el banner parpadea (desaparece hasta que el fetch resuelve).
+// Por socio, para no mostrarle a uno los trámites cacheados de otro si
+// `cerrarSesion` no recarga la página. Mismo patrón que `DeudaBanner`/`HoyCard`.
+const cachePendientes = new Map(); // socioId -> { vencidos, por_vencer, total }
+
+/** Solo para tests: limpia la caché en memoria entre casos. */
+export function __resetCachePendientesParaTests() {
+  cachePendientes.clear();
+}
+
 /**
  * Banner persistente en el Home que avisa si el socio tiene trámites vencidos
  * (severidad "danger") o por vencer (severidad "warning"); no renderiza nada
  * si no tiene ninguno pendiente.
  */
 export function CertificadoVencidoBanner({ socio, onClick }) {
-  const [pendientes, setPendientes] = useState(null);
+  const [pendientes, setPendientes] = useState(
+    () => (socio?.id ? cachePendientes.get(socio.id) ?? null : null)
+  );
 
   useEffect(() => {
     if (!socio?.id) return;
     let cancelled = false;
     getTramitesPendientes(socio.id)
-      .then((data) => { if (!cancelled) setPendientes(data); })
+      .then((data) => {
+        if (cancelled) return;
+        cachePendientes.set(socio.id, data);
+        setPendientes(data);
+      })
       .catch(() => { if (!cancelled) setPendientes(null); });
     return () => { cancelled = true; };
   }, [socio?.id]);

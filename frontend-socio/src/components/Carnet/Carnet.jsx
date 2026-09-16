@@ -1,55 +1,131 @@
 import { useEffect, useRef, useState } from 'react';
 import AccesoQR from '../AccesoQR/AccesoQr';
-import { ShieldCheck, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, XCircle } from 'lucide-react';
 import { enrolarYGuardarSecreto, obtenerUltimoAcceso } from '../../services/accesosService';
 import './Carnet.css';
 
 const POLLING_INTERVALO_MS = 2000;
+const PERIODO_TOTP_S = 30;
 
 function nombreCompleto(socio) {
   return [socio?.nombre, socio?.apellido].filter(Boolean).join(' ') || '---';
 }
 
+function segundosRestantes() {
+  return PERIODO_TOTP_S - (Math.floor(Date.now() / 1000) % PERIODO_TOTP_S);
+}
+
+/**
+ * Barra que indica cuánto falta para que `AccesoQR` regenere el token TOTP
+ * (mismo período de 30s que `AccesoQr.jsx`). Avisa a `onCicloNuevo` en el
+ * tick en que el ciclo reinicia, para que el contenedor del QR pulse.
+ */
+function TimerTotp({ onCicloNuevo }) {
+  const [restante, setRestante] = useState(segundosRestantes);
+  const anteriorRef = useRef(restante);
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      const nuevo = segundosRestantes();
+      if (nuevo > anteriorRef.current) onCicloNuevo?.();
+      anteriorRef.current = nuevo;
+      setRestante(nuevo);
+    }, 1000);
+    return () => clearInterval(intervalo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const reiniciando = restante === PERIODO_TOTP_S;
+
+  return (
+    <div className="carnet-timer" role="timer" aria-label={`El código se renueva en ${restante} segundos`}>
+      <div
+        className={`carnet-timer-fill${reiniciando ? ' carnet-timer-fill--reset' : ''}`}
+        style={{ transform: `scaleX(${restante / PERIODO_TOTP_S})` }}
+      />
+    </div>
+  );
+}
+
 /**
  * Carnet de socio: tarjeta con el QR de acceso (`AccesoQR`) más nombre/nº de
- * socio, un botón para forzar un nuevo enrolamiento TOTP si el QR falla, y
- * polling del último resultado de escaneo para mostrar feedback de acceso
- * concedido/rechazado.
+ * socio y polling del último resultado de escaneo para mostrar feedback de
+ * acceso concedido/rechazado. El código se renueva solo (cada 30s, o tras un
+ * escaneo aprobado) — no hay acción manual de recarga.
  */
 export function Carnet({ socio }) {
   const [refreshKey, setRefreshKey] = useState(0);
-  const [recargando, setRecargando] = useState(false);
-  const [errorRecarga, setErrorRecarga] = useState(false);
   const [resultadoAcceso, setResultadoAcceso] = useState(null);
+  const [pulsoQr, setPulsoQr] = useState(false);
+  const [online, setOnline] = useState(navigator.onLine);
+  const [tieneSecreto, setTieneSecreto] = useState(() => !!localStorage.getItem('socio_totp_secret'));
 
   const ultimoIdMostradoRef = useRef(null);
   const montadoEnRef = useRef(new Date().toISOString());
+
+  const handleCicloNuevo = () => {
+    setPulsoQr(true);
+    setTimeout(() => setPulsoQr(false), 300);
+  };
 
   const pedirSecretoNuevo = async () => {
     const secreto = await enrolarYGuardarSecreto(socio);
     if (secreto) {
       // Nuevo secreto guardado: remontamos AccesoQR para que lo relea de localStorage.
       setRefreshKey((k) => k + 1);
+      setTieneSecreto(true);
       return true;
     }
     return false;
   };
 
-  const handleRecargar = async () => {
-    setRecargando(true);
-    setErrorRecarga(false);
-    setResultadoAcceso(null);
-    ultimoIdMostradoRef.current = null;
-    montadoEnRef.current = new Date().toISOString();
-    try {
-      const exito = await pedirSecretoNuevo();
-      if (!exito) setErrorRecarga(true);
-    } catch {
-      setErrorRecarga(true);
-    } finally {
-      setRecargando(false);
-    }
-  };
+  useEffect(() => {
+    const alConectar = () => setOnline(true);
+    const alDesconectar = () => setOnline(false);
+    window.addEventListener('online', alConectar);
+    window.addEventListener('offline', alDesconectar);
+    return () => {
+      window.removeEventListener('online', alConectar);
+      window.removeEventListener('offline', alDesconectar);
+    };
+  }, []);
+
+  // Reintento de enrolamiento: si no hay secreto en localStorage y hay red,
+  // se pide uno con backoff (2 s, 4 s, 8 s, luego cada 30 s). Reemplaza al
+  // botón "Recargar QR" como camino de recuperación.
+  useEffect(() => {
+    if (!socio?.id) return undefined;
+    let cancelado = false;
+    let intento = 0;
+    let timer = null;
+
+    const programar = () => {
+      const espera = Math.min(2000 * 2 ** intento, 30000);
+      timer = setTimeout(async () => {
+        if (cancelado) return;
+        if (localStorage.getItem('socio_totp_secret')) { setTieneSecreto(true); return; }
+        if (!navigator.onLine) { programar(); return; }
+        intento += 1;
+        try {
+          const ok = await pedirSecretoNuevo();
+          if (!ok && !cancelado) programar();
+        } catch {
+          if (!cancelado) programar();
+        }
+      }, espera);
+    };
+
+    if (!localStorage.getItem('socio_totp_secret')) programar();
+    const alVolverOnline = () => { if (!localStorage.getItem('socio_totp_secret')) { intento = 0; programar(); } };
+    window.addEventListener('online', alVolverOnline);
+
+    return () => {
+      cancelado = true;
+      clearTimeout(timer);
+      window.removeEventListener('online', alVolverOnline);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socio?.id]);
 
   useEffect(() => {
     if (!socio?.id) return undefined;
@@ -64,6 +140,9 @@ export function Carnet({ socio }) {
 
       ultimoIdMostradoRef.current = resultado.id;
       setResultadoAcceso(resultado);
+      if (typeof navigator.vibrate === 'function') {
+        navigator.vibrate(resultado.aprobado ? 40 : [40, 60, 40]);
+      }
 
       if (resultado.aprobado) {
         pedirSecretoNuevo().catch(() => {});
@@ -89,14 +168,16 @@ export function Carnet({ socio }) {
           </div>
         </div>
 
+        <TimerTotp onCicloNuevo={handleCicloNuevo} />
+
         {/* Contenedor del QR con zona blanca de seguridad (Quiet Zone) */}
-        <div className="carnet-qr-container">
+        <div className={`carnet-qr-container${pulsoQr ? ' carnet-qr-container--nuevo' : ''}`}>
           <AccesoQR key={refreshKey} />
 
           {resultadoAcceso && (
             <div
               className={`carnet-resultado-overlay carnet-resultado-overlay--${resultadoAcceso.aprobado ? 'exito' : 'error'}`}
-              role="status"
+              role="alert"
             >
               {resultadoAcceso.aprobado ? (
                 <CheckCircle2 size={40} className="carnet-resultado-icono" />
@@ -123,21 +204,8 @@ export function Carnet({ socio }) {
           )}
         </div>
 
-        {socio?.id && (
-          <div className="carnet-recargar-container">
-            <button
-              type="button"
-              className="carnet-recargar-btn"
-              onClick={handleRecargar}
-              disabled={recargando}
-            >
-              <RefreshCw size={15} className={recargando ? 'carnet-recargar-icono--girando' : ''} />
-              {recargando ? 'Recargando...' : 'Recargar QR'}
-            </button>
-            {errorRecarga && (
-              <p className="carnet-recargar-error">No se pudo recargar el QR. Probá de nuevo.</p>
-            )}
-          </div>
+        {!tieneSecreto && !online && (
+          <p className="carnet-aviso">Sin conexión. El pase se activará al reconectar.</p>
         )}
 
         <div className="carnet-card-footer">
@@ -149,10 +217,6 @@ export function Carnet({ socio }) {
             <span className="data-label">Nº de Socio</span>
             <span className="data-value">#{socio?.nro_socio || '---'}</span>
           </div>
-        </div>
-
-        <div className="carnet-timer-bar">
-          <div className="timer-progress"></div>
         </div>
       </div>
     </div>

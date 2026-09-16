@@ -9,7 +9,7 @@
   margin: var(--space-4) 0;
   font: inherit;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
   text-align: left;
   cursor: pointer;
 }

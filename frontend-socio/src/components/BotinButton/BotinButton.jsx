@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { ModalOverlay } from '../createForm/ModalOverlay';
 import botinIcon from '../../assets/botin-icon.png';
 import './BotinButton.css';
@@ -28,23 +29,25 @@ export function BotinButton() {
         <img src={botinIcon} alt="" />
       </button>
 
-      {mostrarConfirmacion && (
-        <ModalOverlay onClose={() => setMostrarConfirmacion(false)} wrapperClass="botin-wrapper">
-          <div className="csf-outer-card botin-card">
-            <div className="csf-header">
-              <h1>Iniciar chat con BotIn?</h1>
+      <AnimatePresence>
+        {mostrarConfirmacion && (
+          <ModalOverlay key="botin-confirmacion" onClose={() => setMostrarConfirmacion(false)} wrapperClass="botin-wrapper">
+            <div className="csf-outer-card botin-card">
+              <div className="csf-header">
+                <h1>Iniciar chat con BotIn?</h1>
+              </div>
+              <div className="csf-nav csf-nav--between">
+                <button type="button" className="csf-btn-back" onClick={() => setMostrarConfirmacion(false)}>
+                  Cancelar
+                </button>
+                <button type="button" className="csf-btn-submit" onClick={irAlChat}>
+                  Ir al chat
+                </button>
+              </div>
             </div>
-            <div className="csf-nav csf-nav--between">
-              <button type="button" className="csf-btn-back" onClick={() => setMostrarConfirmacion(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="csf-btn-submit" onClick={irAlChat}>
-                Ir al chat
-              </button>
-            </div>
-          </div>
-        </ModalOverlay>
-      )}
+          </ModalOverlay>
+        )}
+      </AnimatePresence>
     </>
   );
 }

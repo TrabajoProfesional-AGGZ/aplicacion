@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { marcarPagoDemo } from '../../services/pagosService';
 import './PagoCuotaFlow.css';
 
@@ -25,7 +25,7 @@ function formatearPrecio(monto) {
  * el Wallet Brick, el botón "Pagar" marca el item como pagado directamente
  * vía `marcarPagoDemo` (ver pagosService.js) — no hay pasarela de pago real.
  */
-export function PagoCuotaFlow({ item, tipoItem, socio, onVolver }) {
+export function PagoCuotaFlow({ item, tipoItem, socio }) {
   const [estado, setEstado] = useState('idle'); // idle | procesando | exito | error
   const [error, setError] = useState('');
 
@@ -64,7 +64,6 @@ export function PagoCuotaFlow({ item, tipoItem, socio, onVolver }) {
     marcarPagoDemo(item.id, tipoItem)
       .then(() => {
         setEstado('exito');
-        setTimeout(onVolver, 1500);
       })
       .catch(() => {
         setEstado('error');
@@ -74,17 +73,6 @@ export function PagoCuotaFlow({ item, tipoItem, socio, onVolver }) {
 
   return (
     <div className="pago-flow-container">
-      <div className="pago-flow-header">
-        <button
-          type="button"
-          className="pago-flow-volver-btn"
-          onClick={onVolver}
-          aria-label="Volver atrás"
-        >
-          <ArrowLeft size={20} /> Volver
-        </button>
-      </div>
-
       <div className="pago-flow-resumen">
         <h2 className="pago-flow-titulo">Abonar {item.concepto}</h2>
         <p className="pago-flow-monto">

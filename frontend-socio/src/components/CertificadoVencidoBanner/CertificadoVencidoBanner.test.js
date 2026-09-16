@@ -1,5 +1,5 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { CertificadoVencidoBanner } from './CertificadoVencidoBanner';
+import { CertificadoVencidoBanner, __resetCachePendientesParaTests } from './CertificadoVencidoBanner';
 import { getTramitesPendientes } from '../../services/tramitesService';
 
 jest.mock('../../services/tramitesService', () => ({
@@ -11,6 +11,7 @@ const socioFixture = { id: 'socio-1' };
 describe('CertificadoVencidoBanner', () => {
   afterEach(() => {
     jest.clearAllMocks();
+    __resetCachePendientesParaTests();
   });
 
   test('no muestra nada mientras no hay trámites vencidos ni por vencer', async () => {
@@ -58,5 +59,16 @@ describe('CertificadoVencidoBanner', () => {
     const { container } = render(<CertificadoVencidoBanner socio={null} onClick={jest.fn()} />);
     expect(getTramitesPendientes).not.toHaveBeenCalled();
     expect(container.firstChild).toBeNull();
+  });
+
+  test('en un segundo mount del mismo socio, muestra el valor cacheado sin esperar a que resuelva el fetch (evita el parpadeo al volver a Inicio)', async () => {
+    getTramitesPendientes.mockResolvedValue({ vencidos: [{ id: 't-1' }], por_vencer: [], total: 1 });
+    const primerRender = render(<CertificadoVencidoBanner socio={socioFixture} onClick={jest.fn()} />);
+    expect(await screen.findByText(/tenés un trámite vencido/i)).toBeInTheDocument();
+    primerRender.unmount();
+
+    getTramitesPendientes.mockImplementation(() => new Promise(() => {})); // nunca resuelve en este remount
+    render(<CertificadoVencidoBanner socio={socioFixture} onClick={jest.fn()} />);
+    expect(screen.getByText(/tenés un trámite vencido/i)).toBeInTheDocument();
   });
 });

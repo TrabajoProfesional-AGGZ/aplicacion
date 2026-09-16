@@ -1,8 +1,9 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { HomePage } from './HomePage';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles } from '../../services/reservasService';
 import { getEntradasActivas, getEntradasPendientes } from '../../services/eventosService';
+import { getAlertasSocio } from '../../services/alertasService';
 import { TextEncoder, TextDecoder } from 'util';
 Object.assign(global, { TextEncoder, TextDecoder });
 
@@ -92,7 +93,7 @@ const entradaPagadaFixture = {
 describe('HomePage', () => {
   test('muestra la tarjeta de bienvenida con los datos del socio', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
     expect(screen.getByText('1000 - Titular')).toBeInTheDocument();
   });
 
@@ -108,9 +109,9 @@ describe('HomePage', () => {
   test.each([
     ['click en "Mis trámites" navega a la página de trámites (no abre el overlay)', 'Mis trámites', 'Mis trámites'],
     ['click en "Inscribirme a actividad" navega a la grilla de disciplinas (no abre el overlay)', 'Inscribirme a actividad', 'Inscribite a una actividad'],
-    ['"Mis Inscripciones" del nav inferior navega a la página de inscripciones', 'Mis Inscripciones', 'Mis inscripciones'],
+    ['"Mis Inscripciones" del nav inferior navega a la página de inscripciones', 'Inscripciones', 'Mis inscripciones'],
     ['click en "Reservar instalación" navega al flujo de nueva reserva (no abre el overlay ni la lista de reservas)', 'Reservar instalación', 'Realizá tu reserva'],
-    ['"Mis Reservas" del nav inferior navega a la lista de reservas, no al flujo de nueva reserva', 'Mis Reservas', 'Mis Reservas'],
+    ['"Mis Reservas" del nav inferior navega a la lista de reservas, no al flujo de nueva reserva', 'Reservas', 'Mis Reservas'],
     ['click en "Cuotas y pagos" navega a la página de finanzas (no abre el overlay)', 'Cuotas y pagos', 'Cuotas'],
   ])('%s', async (_descripcion, label, heading) => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
@@ -124,25 +125,37 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByText('Mis trámites'));
     await screen.findByRole('heading', { name: 'Mis trámites' });
     fireEvent.click(screen.getByText('Inicio'));
-    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
   });
 
   test('click en "Noticias" abre la vista de noticias', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Noticias'));
-    expect(screen.getByText('Cargando noticias...')).toBeInTheDocument();
+    expect(screen.getByText('Noticias del Club')).toBeInTheDocument();
   });
 
-  test('"Nueva Inscripcion" del banner de Mis Inscripciones navega a la grilla de disciplinas', async () => {
+  test('"Nueva inscripción" del banner de Mis Inscripciones navega a la grilla de disciplinas', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Inscripciones'));
+    fireEvent.click(screen.getByText('Inscripciones'));
     await screen.findByRole('heading', { name: 'Mis inscripciones' });
 
-    fireEvent.click(screen.getByRole('button', { name: /nueva inscripcion/i }));
+    fireEvent.click(screen.getByRole('button', { name: /nueva inscripción/i }));
     expect(await screen.findByRole('heading', { name: 'Inscribite a una actividad' })).toBeInTheDocument();
   });
 
-  test('el botón "Volver" dentro del flujo de nueva reserva vuelve directo a la lista de instalaciones, no sale a Home', async () => {
+  test('el gesto de atrás dentro del flujo de nueva reserva vuelve directo a la lista de instalaciones, no sale a Home', async () => {
+    // Simula dónde aterriza un back real del celular: exactamente la entrada
+    // anterior a la que el paso actual pusheó (un solo nivel), no un objeto
+    // sin id — si no, el useBackToRoot de HomePage (que envuelve a todo el
+    // flujo) también se cree abandonado y salta directo a Home. Ver el mismo
+    // patrón en useBackToRoot.test.js ("consumidor externo por DEBAJO").
+    const pushStateSpy = jest.spyOn(window.history, 'pushState');
+    function simularGestoDeAtras() {
+      const ultimoId = pushStateSpy.mock.calls.at(-1)[0].id;
+      window.history.replaceState({ id: ultimoId - 1 }, '');
+      act(() => { window.dispatchEvent(new PopStateEvent('popstate')); });
+    }
+
     // Fija la hora "actual" a la madrugada para que el turno mockeado (08:00)
     // no quede filtrado por el chequeo de "turno ya pasado" según cuándo corra el test.
     const RealDate = global.Date;
@@ -170,29 +183,33 @@ describe('HomePage', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByText('Reservar instalación'));
     await screen.findByText('Cancha de fútbol');
+    await waitFor(() => expect(screen.queryByText('Hola, Ana')).not.toBeInTheDocument());
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
-    // "Volver" desde el paso de detalle aterriza en la lista de
+    // El gesto de atrás desde el paso de detalle aterriza en la lista de
     // instalaciones, no en Home.
     await screen.findByText('08:00');
-    fireEvent.click(screen.getAllByText('Volver')[0]);
+    simularGestoDeAtras();
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
-    expect(screen.queryByText('Bienvenido Ana Pérez')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Hola, Ana')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('08:00')).not.toBeInTheDocument());
 
-    // Avanzando dos pasos (detalle -> socios), "Volver" también aterriza
-    // directo en la lista de instalaciones, no un paso atrás (detalle) ni
-    // en Home — ya no hay retroceso paso a paso dentro del flujo.
+    // Avanzando dos pasos (detalle -> socios), el gesto de atrás también
+    // aterriza directo en la lista de instalaciones, no un paso atrás
+    // (detalle) ni en Home — ya no hay retroceso paso a paso dentro del flujo.
     fireEvent.click(screen.getByText('Cancha de fútbol'));
     await screen.findByText('08:00');
     fireEvent.click(screen.getByText('08:00'));
 
     await screen.findByText('Agregar socios');
-    fireEvent.click(screen.getAllByText('Volver')[0]);
+    simularGestoDeAtras();
 
     expect(await screen.findByRole('heading', { name: 'Realizá tu reserva' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Agregar socios')).not.toBeInTheDocument());
     expect(screen.getByText('Cancha de fútbol')).toBeInTheDocument();
-    expect(screen.queryByText('Bienvenido Ana Pérez')).not.toBeInTheDocument();
+    expect(screen.queryByText('Hola, Ana')).not.toBeInTheDocument();
 
+    pushStateSpy.mockRestore();
     global.Date = RealDate;
   });
 
@@ -201,12 +218,12 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByText('Reservar instalación'));
     await screen.findByRole('heading', { name: 'Realizá tu reserva' });
     fireEvent.click(screen.getByText('Inicio'));
-    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
   });
 
   test('"Nueva reserva" del banner de Mis Reservas navega al flujo de nueva reserva', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Reservas'));
+    fireEvent.click(screen.getByText('Reservas'));
     await screen.findByRole('heading', { name: 'Mis Reservas' });
 
     fireEvent.click(screen.getByRole('button', { name: /nueva reserva/i }));
@@ -226,19 +243,19 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByText('Cuotas y pagos'));
     await screen.findByRole('heading', { name: 'Cuotas' });
     fireEvent.click(screen.getByText('Inicio'));
-    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
   });
 
   test('muestra el nav inferior con los 5 botones y "Inicio" activo', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     expect(screen.getByText('Inicio').closest('button')).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByText('Mis Inscripciones')).toBeInTheDocument();
+    expect(screen.getByText('Inscripciones')).toBeInTheDocument();
   });
 
   test('click en un botón del nav inferior (distinto de Inicio) abre el overlay', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mi Carnet'));
-    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();    
+    fireEvent.click(screen.getByText('Carnet'));
+    expect(screen.queryByText('Próximamente...')).not.toBeInTheDocument();
     expect(await screen.findByText('Mi Pase de Acceso')).toBeInTheDocument();
   });
 
@@ -253,14 +270,14 @@ describe('HomePage', () => {
     fireEvent.click(screen.getByLabelText('Notificaciones'));
     await screen.findByRole('heading', { name: 'Mis alertas' });
     fireEvent.click(screen.getByText('Inicio'));
-    expect(screen.getByText('Bienvenido Ana Pérez')).toBeInTheDocument();
+    expect(screen.getByText('Hola, Ana')).toBeInTheDocument();
   });
 
-  test('click en el botón de perfil del header navega a la página de perfil, sin flecha de volver', () => {
+  test('click en el botón de perfil del header navega a la página de perfil, sin flecha de volver', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByLabelText('Mi perfil'));
     expect(screen.getByText('Cerrar sesión')).toBeInTheDocument();
-    expect(screen.queryByText('Bienvenido Ana Pérez')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Hola, Ana')).not.toBeInTheDocument());
     expect(screen.queryByLabelText('Volver')).not.toBeInTheDocument();
   });
 
@@ -297,7 +314,7 @@ describe('HomePage', () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
     
     await waitFor(() => {
-      expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/enrolar', 'POST', { socio_id: 'socio-1' });
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/accesos/enrolar', 'POST', {});
     });
     
     expect(localStorage.getItem('socio_totp_secret')).toBe('SECRETOVALIDO123');
@@ -325,25 +342,53 @@ describe('HomePage', () => {
 
   test('"Mis Entradas" del nav inferior navega a la página de entradas, dentro del layout', async () => {
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Entradas'));
+    fireEvent.click(screen.getByText('Entradas'));
     expect(await screen.findByRole('heading', { name: 'Mis Entradas' })).toBeInTheDocument();
     expect(screen.getByLabelText('Mi perfil')).toBeInTheDocument();
     expect(screen.getByText('Inicio').closest('button')).toBeInTheDocument();
   });
 
   test('"Ir a pagar" en una entrada pendiente navega a la página de pagos (onPagarEntrada)', async () => {
-    getEntradasPendientes.mockResolvedValueOnce([entradaPendienteFixture]);
+    // mockResolvedValue (no `Once`): HoyCard también llama a este service al montar Home.
+    getEntradasPendientes.mockResolvedValue([entradaPendienteFixture]);
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Entradas'));
+    fireEvent.click(screen.getByText('Entradas'));
     fireEvent.click(await screen.findByText('Ir a pagar'));
     expect(await screen.findByRole('heading', { name: 'Cuotas' })).toBeInTheDocument();
   });
 
   test('el botón de QR de una entrada pagada navega al carnet (onVerCarnet)', async () => {
-    getEntradasActivas.mockResolvedValueOnce([entradaPagadaFixture]);
+    // mockResolvedValue (no `Once`): HoyCard también llama a este service al montar Home.
+    getEntradasActivas.mockResolvedValue([entradaPagadaFixture]);
     render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
-    fireEvent.click(screen.getByText('Mis Entradas'));
+    fireEvent.click(screen.getByText('Entradas'));
     fireEvent.click(await screen.findByLabelText('Ver código QR de la entrada'));
     expect(await screen.findByText('Mi Pase de Acceso')).toBeInTheDocument();
+  });
+});
+
+describe('HomePage - badge de alertas no leídas (E5)', () => {
+  const ALERTA_MOCK = { id: 'a-1', mensaje: 'Novedad del club', creado_en: '2026-07-10T14:30:00Z' };
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  test('muestra el badge en la campana cuando hay alertas sin ver', async () => {
+    getAlertasSocio.mockResolvedValueOnce([ALERTA_MOCK]);
+    const { container } = render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    await waitFor(() => expect(container.querySelector('.app-header-bell-badge')).toBeInTheDocument());
+  });
+
+  test('entrar a Alertas apaga el badge y lo recuerda entre renders', async () => {
+    getAlertasSocio.mockResolvedValue([ALERTA_MOCK]);
+    const { container } = render(<HomePage socio={socioFixture} cerrarSesion={jest.fn()} />);
+    await waitFor(() => expect(container.querySelector('.app-header-bell-badge')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText('Notificaciones'));
+    await screen.findByText('Novedad del club');
+
+    await waitFor(() => expect(container.querySelector('.app-header-bell-badge')).not.toBeInTheDocument());
+    expect(localStorage.getItem('alertas_ultima_vista_socio-1')).toBe(ALERTA_MOCK.creado_en);
   });
 });

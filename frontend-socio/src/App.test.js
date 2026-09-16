@@ -52,13 +52,19 @@ describe('App', () => {
     expect(screen.queryByText('login-mock')).not.toBeInTheDocument();
   });
 
-  test('el dashboard no se muestra hasta que LoginSocio llama a onIngresoCompleto, aunque socio ya sea verdadero', () => {
+  test('el dashboard ya se monta debajo de LoginSocio cuando socio es verdadero, para que su salida no corte a un HomePage recién montado', () => {
     mockAuthState = { ...mockAuthState, socio: { nro_socio: '1000', nombre: 'Ana', apellido: 'Pérez' } };
     render(<App />);
     expect(screen.getByText('login-mock')).toBeInTheDocument();
-    expect(screen.queryByText('home-mock')).not.toBeInTheDocument();
+    expect(screen.getByText('home-mock')).toBeInTheDocument();
+  });
 
+  test('LoginSocio se deja de renderizar recién cuando llama a onIngresoCompleto', () => {
+    mockAuthState = { ...mockAuthState, socio: { nro_socio: '1000', nombre: 'Ana', apellido: 'Pérez' } };
+    render(<App />);
     fireEvent.click(screen.getByText('simular ingreso completo'));
+
+    expect(screen.queryByText('login-mock')).not.toBeInTheDocument();
     expect(screen.getByText('home-mock')).toBeInTheDocument();
   });
 

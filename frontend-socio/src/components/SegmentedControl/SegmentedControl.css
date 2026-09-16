@@ -1,0 +1,54 @@
+.segmented-control {
+  display: flex;
+  position: relative;
+  background-color: var(--color-bg-subtle);
+  border-radius: var(--radius-full);
+  padding: var(--space-1);
+  height: 44px;
+}
+
+.segmented-control-opcion {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.segmented-control--denso .segmented-control-opcion {
+  font-size: var(--text-label);
+  padding: 0 var(--space-1);
+}
+
+.segmented-control--denso .segmented-control-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.segmented-control-opcion--activa {
+  color: var(--color-text-primary);
+}
+
+.segmented-control-indicador {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  z-index: 0;
+}
+
+.segmented-control-label {
+  position: relative;
+  z-index: 1;
+}

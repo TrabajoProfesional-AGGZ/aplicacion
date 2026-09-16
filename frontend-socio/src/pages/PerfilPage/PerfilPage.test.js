@@ -125,11 +125,13 @@ describe('PerfilPage', () => {
     expect(screen.getByLabelText('Contraseña actual')).toBeInTheDocument();
   });
 
-  test('"Cancelar" cierra el formulario de cambio de contraseña', () => {
+  test('"Cancelar" cierra el formulario de cambio de contraseña', async () => {
     render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalCambiarContrasenia();
     fireEvent.click(screen.getByText('Cancelar'));
-    expect(screen.queryByLabelText('Contraseña actual')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByLabelText('Contraseña actual')).not.toBeInTheDocument();
+    });
   });
 
   test('muestra el error de la nueva contraseña al salir del campo, sin esperar al submit', () => {
@@ -287,6 +289,19 @@ describe('PerfilPage', () => {
     expect(await screen.findByText('Foto actualizada')).toBeInTheDocument();
   });
 
+  test('tocar "Listo" tras subir la foto cierra el modal antes del cierre automático', async () => {
+    subirFotoSocio.mockResolvedValueOnce({ foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' });
+    render(<PerfilPage socio={{ ...socioFixture, id: 'socio-1' }} cerrarSesion={jest.fn()} />);
+    abrirModalFoto();
+    await subirArchivoDesdeDispositivo(crearArchivo());
+    fireEvent.click(screen.getByText('Confirmar'));
+
+    await screen.findByText('Foto actualizada');
+    fireEvent.click(screen.getByRole('button', { name: 'Listo' }));
+
+    await waitFor(() => expect(screen.queryByText('Foto actualizada')).not.toBeInTheDocument());
+  });
+
   test('rechaza un archivo con tipo no permitido sin llamar al backend', async () => {
     render(<PerfilPage socio={socioFixture} cerrarSesion={jest.fn()} />);
     abrirModalFoto();
@@ -318,7 +333,7 @@ describe('PerfilPage', () => {
     expect(screen.getAllByLabelText('Cambiar foto de perfil')).toHaveLength(2);
   });
 
-  test('el botón "+" de la vista ampliada abre el formulario de subida', () => {
+  test('el botón "+" de la vista ampliada abre el formulario de subida', async () => {
     const socioConFoto = { ...socioFixture, foto_url: 'https://res.cloudinary.com/demo/image/upload/v1/socios/1.jpg' };
     render(<PerfilPage socio={socioConFoto} cerrarSesion={jest.fn()} />);
     fireEvent.click(screen.getByLabelText('Ver foto de perfil ampliada'));
@@ -327,7 +342,9 @@ describe('PerfilPage', () => {
     fireEvent.click(botonesCambiar[botonesCambiar.length - 1]);
 
     expect(screen.getByText('Subir desde el dispositivo')).toBeInTheDocument();
-    expect(screen.getAllByLabelText('Cambiar foto de perfil')).toHaveLength(1);
+    await waitFor(() => {
+      expect(screen.getAllByLabelText('Cambiar foto de perfil')).toHaveLength(1);
+    });
   });
 
 });

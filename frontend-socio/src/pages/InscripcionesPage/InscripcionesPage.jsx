@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, ClipboardList, MapPin, Plus, Tag } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { MapPin, Plus, Tag } from 'lucide-react';
 import { getDisciplinasPorSocio, darDeBajaInscripcion } from '../../services/disciplinasService';
-import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
+import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
 import './InscripcionesPage.css';
 
 const FILTROS = [
@@ -75,42 +79,24 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
     }
   }
 
+  const screenKey = detalle ? 'detalle' : 'lista';
+  const direccion = detalle ? 1 : -1;
+
   if (detalle) {
     return (
+      <ScreenTransition screenKey={screenKey} direction={direccion}>
       <div className="inscripciones-lista">
-        <button type="button" className="inscripciones-volver" onClick={() => setDetalle(null)}>
-          <ArrowLeft size={20} /> Volver
-        </button>
-
-        <section className="inscripcion-detalle-banner">
-          <div className="inscripcion-detalle-banner-texture" aria-hidden="true" />
-          {detalle.estado_suscripcion === 'en_espera' && (
-            <span className="inscripcion-detalle-banner-badge">En espera</span>
+        <PageHeader
+          accion={detalle.estado_suscripcion === 'en_espera' && (
+            <span className="inscripcion-detalle-badge">En espera</span>
           )}
-          <div className="inscripcion-detalle-banner-content">
-            <h2 className="inscripcion-detalle-banner-title">{detalle.nombre}</h2>
-            <div className="inscripcion-detalle-banner-stats">
-              <div className="inscripcion-detalle-banner-stat">
-                <span className="inscripcion-detalle-banner-stat-label">Categoría</span>
-                <span className="inscripcion-detalle-banner-stat-valor">
-                  {detalle.categoria_socio?.nombre ?? 'Todas'}
-                </span>
-              </div>
-              <div className="inscripcion-detalle-banner-divider" aria-hidden="true" />
-              <div className="inscripcion-detalle-banner-stat">
-                <span className="inscripcion-detalle-banner-stat-label">Sede</span>
-                <span className="inscripcion-detalle-banner-stat-valor">{detalle.sede.nombre}</span>
-              </div>
-              <div className="inscripcion-detalle-banner-divider" aria-hidden="true" />
-              <div className="inscripcion-detalle-banner-stat">
-                <span className="inscripcion-detalle-banner-stat-label">Arancel por mes</span>
-                <span className="inscripcion-detalle-banner-stat-valor">
-                  {detalle.arancelada ? formatearMonto(detalle.monto_mensual) : 'Sin costo'}
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
+          titulo={detalle.nombre}
+          stats={[
+            { label: 'Categoría', value: detalle.categoria_socio?.nombre ?? 'Todas' },
+            { label: 'Sede', value: detalle.sede.nombre },
+            { label: 'Arancel por mes', value: detalle.arancelada ? formatearMonto(detalle.monto_mensual) : 'Sin costo' },
+          ]}
+        />
 
         {detalle.estado_suscripcion !== 'en_espera' && (
           <button
@@ -122,120 +108,101 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
           </button>
         )}
 
-        {confirmarBaja && (
-          <ModalOverlay onClose={() => setConfirmarBaja(false)}>
-            <div className="inscripcion-confirmar-card">
-              <p>¿Seguro que querés darte de baja de {detalle.nombre}?</p>
-              <p className="inscripcion-confirmar-aviso">
-                No se realizará el reintegro de la cuota paga de este mes.
-              </p>
-              {errorBaja && <p className="inscripciones-error">{errorBaja}</p>}
-              <div className="inscripcion-confirmar-acciones">
-                <button
-                  type="button"
-                  className="inscripcion-confirmar-btn-no"
-                  onClick={() => setConfirmarBaja(false)}
-                  disabled={dandoBaja}
-                >
-                  Volver
-                </button>
-                <button
-                  type="button"
-                  className="inscripcion-confirmar-btn-si"
-                  onClick={confirmarBajaInscripcion}
-                  disabled={dandoBaja}
-                >
-                  {dandoBaja ? 'Dando de baja...' : 'Sí, dar de baja'}
-                </button>
+        <AnimatePresence>
+          {confirmarBaja && (
+            <ModalOverlay key="confirmar-baja" onClose={() => setConfirmarBaja(false)}>
+              <div className="inscripcion-confirmar-card">
+                <p>¿Seguro que querés darte de baja de {detalle.nombre}?</p>
+                <p className="inscripcion-confirmar-aviso">
+                  No se realizará el reintegro de la cuota paga de este mes.
+                </p>
+                {errorBaja && <p className="inscripciones-error">{errorBaja}</p>}
+                <div className="inscripcion-confirmar-acciones">
+                  <button
+                    type="button"
+                    className="inscripcion-confirmar-btn-no"
+                    onClick={() => setConfirmarBaja(false)}
+                    disabled={dandoBaja}
+                  >
+                    Volver
+                  </button>
+                  <button
+                    type="button"
+                    className="inscripcion-confirmar-btn-si"
+                    onClick={confirmarBajaInscripcion}
+                    disabled={dandoBaja}
+                  >
+                    {dandoBaja ? 'Dando de baja...' : 'Sí, dar de baja'}
+                  </button>
+                </div>
               </div>
-            </div>
-          </ModalOverlay>
-        )}
+            </ModalOverlay>
+          )}
+        </AnimatePresence>
       </div>
+      </ScreenTransition>
     );
   }
 
   return (
-    <>
-      {cargando && <LoadingScreen />}
-
-      {!cargando && error && <p className="inscripciones-error">No se pudieron cargar tus inscripciones.</p>}
-
-      {!cargando && !error && (
-        <section className="inscripciones-lista">
-          <section className="inscripciones-banner">
-            <div className="inscripciones-banner-texture" aria-hidden="true" />
-            <div className="inscripciones-banner-top">
-              <span className="inscripciones-banner-eyebrow">
-                <ClipboardList size={13} />
-                Actividades del club
-              </span>
-              <button type="button" className="inscripciones-banner-nueva-btn" onClick={onNuevaInscripcion}>
-                <Plus size={15} />
-                Nueva Inscripcion
-              </button>
-            </div>
-            <h2 className="inscripciones-banner-title">Mis inscripciones</h2>
-            <div className="inscripciones-banner-stats">
-              <div className="inscripciones-banner-stat" aria-label={`Inscripciones aranceladas: ${cantidadAranceladas}`}>
-                <span className="inscripciones-banner-stat-value">{cantidadAranceladas}</span>
-                <span className="inscripciones-banner-stat-label">Aranceladas</span>
-              </div>
-              <div className="inscripciones-banner-stat-divider" aria-hidden="true" />
-              <div className="inscripciones-banner-stat" aria-label={`Inscripciones sin costo: ${cantidadSinCosto}`}>
-                <span className="inscripciones-banner-stat-value">{cantidadSinCosto}</span>
-                <span className="inscripciones-banner-stat-label">Sin costo</span>
-              </div>
-              <div className="inscripciones-banner-stat-divider" aria-hidden="true" />
-              <div className="inscripciones-banner-stat" aria-label={`Inscripciones en espera: ${cantidadEnEspera}`}>
-                <span className="inscripciones-banner-stat-value">{cantidadEnEspera}</span>
-                <span className="inscripciones-banner-stat-label">En espera</span>
-              </div>
-            </div>
-          </section>
-
-          <fieldset className="inscripciones-filtros" aria-label="Filtrar inscripciones">
-            {FILTROS.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                className={`inscripciones-filtro-btn${filtro === f.id ? ' inscripciones-filtro-btn--activo' : ''}`}
-                onClick={() => setFiltro(f.id)}
-              >
-                {f.label}
-              </button>
-            ))}
-          </fieldset>
-
-          {inscripcionesVisibles.length === 0 && (
-            <p className="inscripciones-empty">No tenés inscripciones en esta categoría.</p>
-          )}
-
-          {inscripcionesVisibles.map((i) => (
-            <button type="button" className="inscripcion-card" key={i.id} onClick={() => abrirDetalle(i)}>
-              <div className="inscripcion-info">
-                <span className="inscripcion-nombre">{i.nombre}</span>
-                <span className="inscripcion-meta">
-                  <Tag size={13} />
-                  {i.categoria_socio?.nombre ?? 'Todas las categorías'}
-                </span>
-                <span className="inscripcion-meta">
-                  <MapPin size={13} />
-                  {i.sede.nombre}
-                </span>
-              </div>
-              <div className="inscripcion-tags">
-                {i.estado_suscripcion === 'en_espera' && (
-                  <span className="inscripcion-tag inscripcion-tag--en-espera">En espera</span>
-                )}
-                <span className={`inscripcion-tag inscripcion-tag--${i.arancelada ? 'arancelada' : 'sin-costo'}`}>
-                  {i.arancelada ? formatearMonto(i.monto_mensual) : 'Sin costo'}
-                </span>
-              </div>
+    <ScreenTransition screenKey={screenKey} direction={direccion}>
+      <section className="inscripciones-lista">
+        <PageHeader
+          eyebrow="Actividades del club"
+          titulo="Mis inscripciones"
+          accion={(
+            <button type="button" className="inscripciones-nueva-btn" onClick={onNuevaInscripcion}>
+              <Plus size={15} />
+              Nueva inscripción
             </button>
-          ))}
-        </section>
-      )}
-    </>
+          )}
+          stats={[
+            { label: 'Aranceladas', value: cargando ? '—' : cantidadAranceladas },
+            { label: 'Sin costo', value: cargando ? '—' : cantidadSinCosto },
+            { label: 'En espera', value: cargando ? '—' : cantidadEnEspera },
+          ]}
+        />
+
+        <SegmentedControl
+          opciones={FILTROS}
+          valor={filtro}
+          onChange={setFiltro}
+          ariaLabel="Filtrar inscripciones"
+          denso
+        />
+
+        {cargando && <SkeletonRows n={3} altura={72} />}
+
+        {!cargando && error && <p className="inscripciones-error">No se pudieron cargar tus inscripciones.</p>}
+
+        {!cargando && !error && inscripcionesVisibles.length === 0 && (
+          <p className="inscripciones-empty">No tenés inscripciones en esta categoría.</p>
+        )}
+
+        {!cargando && !error && inscripcionesVisibles.map((i) => (
+          <button type="button" className="inscripcion-card" key={i.id} onClick={() => abrirDetalle(i)}>
+            <div className="inscripcion-info">
+              <span className="inscripcion-nombre">{i.nombre}</span>
+              <span className="inscripcion-meta">
+                <Tag size={13} />
+                {i.categoria_socio?.nombre ?? 'Todas las categorías'}
+              </span>
+              <span className="inscripcion-meta">
+                <MapPin size={13} />
+                {i.sede.nombre}
+              </span>
+            </div>
+            <div className="inscripcion-tags">
+              {i.estado_suscripcion === 'en_espera' && (
+                <span className="inscripcion-tag inscripcion-tag--en-espera">En espera</span>
+              )}
+              <span className={`inscripcion-tag inscripcion-tag--${i.arancelada ? 'arancelada' : 'sin-costo'}`}>
+                {i.arancelada ? formatearMonto(i.monto_mensual) : 'Sin costo'}
+              </span>
+            </div>
+          </button>
+        ))}
+      </section>
+    </ScreenTransition>
   );
 }

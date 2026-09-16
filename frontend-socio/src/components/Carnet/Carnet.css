@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   padding: 2rem 1.5rem;
-  min-height: calc(100vh - var(--bottom-nav-height) - 70px);
+  min-height: calc(100dvh - var(--bottom-nav-height) - 70px);
   background-color: var(--color-bg);
   animation: fadeIn 0.3s ease-out;
 }
@@ -14,14 +14,14 @@
 }
 
 .carnet-header-mobile h2 {
-  font-size: 1.5rem;
+  font-size: var(--text-title);
   font-weight: 700;
   margin: 0 0 0.5rem 0;
 }
 
 .carnet-header-mobile p {
   color: var(--color-text-secondary);
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   margin: 0;
 }
 
@@ -43,11 +43,11 @@
 .carnet-card::after {
   content: '';
   position: absolute;
-  top: 0; left: -100%;
+  top: 0; left: 0;
   width: 50%; height: 100%;
   background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
-  transform: skewX(-20deg);
-  animation: shine 6s infinite;
+  transform: translateX(-200%) skewX(-20deg);
+  animation: shine 1.2s var(--ease-out, ease-out) 0.3s 1 forwards;
   pointer-events: none;
 }
 
@@ -63,8 +63,8 @@
   align-items: center;
   gap: 8px;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  font-size: 1.1rem;
+  letter-spacing: var(--tracking-heading);
+  font-size: var(--text-heading);
 }
 
 .carnet-status {
@@ -72,9 +72,9 @@
   color: #8fe3a1;
   padding: 4px 10px;
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: var(--tracking-caption);
 }
 
 /* Fondo obligatoriamente blanco para la lectura del QR */
@@ -103,7 +103,7 @@
   padding: 20px;
   text-align: center;
   color: white;
-  animation: fadeIn 0.2s ease-out;
+  animation: carnet-resultado-in 0.25s var(--ease-out);
 }
 
 .carnet-resultado-overlay--exito {
@@ -120,19 +120,19 @@
 
 .carnet-resultado-mensaje {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: var(--text-heading);
   font-weight: 700;
 }
 
 .carnet-resultado-nombre {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: var(--text-body);
   font-weight: 600;
 }
 
 .carnet-resultado-estado-financiero {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: var(--text-secondary);
   opacity: 0.9;
 }
 
@@ -156,54 +156,14 @@
   height: 220px;
   display: flex;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: var(--text-secondary);
 }
 
-.carnet-recargar-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 20px;
-}
-
-.carnet-recargar-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 999px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.carnet-recargar-btn:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.08);
-}
-
-.carnet-recargar-btn:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.carnet-recargar-icono--girando {
-  animation: girar 0.8s linear infinite;
-}
-
-.carnet-recargar-error {
-  margin: 0;
-  font-size: 0.75rem;
-  color: #ff8a80;
-}
-
-@keyframes girar {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.carnet-aviso {
+  margin: 0 0 20px;
+  text-align: center;
+  font-size: var(--text-caption);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .carnet-card-footer {
@@ -222,15 +182,45 @@
 }
 
 .data-label {
-  font-size: 0.7rem;
+  font-size: var(--text-label);
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: var(--tracking-label);
   color: #999;
 }
 
 .data-value {
-  font-size: 1.05rem;
+  font-size: var(--text-heading);
   font-weight: 600;
+}
+
+.carnet-timer {
+  height: 6px;
+  margin-bottom: 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.carnet-timer-fill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left;
+  background: rgba(255, 255, 255, 0.7);
+  transition: transform 1s linear;
+}
+
+.carnet-timer-fill--reset {
+  transition: none;
+}
+
+.carnet-qr-container--nuevo {
+  animation: carnet-qr-pulso 0.3s ease;
+}
+
+@keyframes carnet-qr-pulso {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.01); }
+  100% { transform: scale(1); }
 }
 
 /* Animaciones */
@@ -240,7 +230,10 @@
 }
 
 @keyframes shine {
-  0% { left: -100%; }
-  20% { left: 200%; }
-  100% { left: 200%; }
+  to { transform: translateX(300%) skewX(-20deg); }
+}
+
+@keyframes carnet-resultado-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }

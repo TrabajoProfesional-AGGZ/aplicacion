@@ -6,10 +6,10 @@ import { HomePage } from './pages/HomePage/HomePage';
 import './socio-theme.css';
 import { useAuth } from './hooks/useAuth';
 import { useBackToRoot } from './hooks/useBackToRoot';
+import { useEdgeSwipeBack } from './hooks/useEdgeSwipeBack';
 
-// sessionStorage (a diferencia de localStorage) se limpia al cerrar la pestaña/app pero
-// sobrevive a un refresh o a una redirección externa y vuelta (MercadoPago) — permite
-// distinguir una apertura real de la app de esos otros dos casos.
+// sessionStorage sobrevive a un refresh o ida-y-vuelta a MercadoPago, pero se
+// limpia al cerrar la pestaña: permite distinguir esos casos de una apertura real.
 const INTRO_MOSTRADA_KEY = 'su_intro_mostrada';
 
 /**
@@ -24,11 +24,10 @@ export default function App() {
   const { socio, cargandoAuth, cerrarSesion } = useAuth();
 
   useBackToRoot(mostrarRegistro, false, () => setMostrarRegistro(false));
+  useEdgeSwipeBack();
 
-  // Si ya había sesión activa y la animación ya se mostró en esta pestaña (refresh o
-  // vuelta de MercadoPago), saltamos directo al dashboard sin montar LoginSocio. Si es
-  // la primera resolución de auth en esta pestaña, LoginSocio monta igual y su animación
-  // de salida hace de intro antes de pasar al dashboard.
+  // Si ya había sesión y la intro ya se mostró en esta pestaña, saltamos directo al
+  // dashboard. Si no, LoginSocio monta y su animación de salida hace de intro.
   useEffect(() => {
     if (!cargandoAuth && !vistaInicializadaRef.current) {
       vistaInicializadaRef.current = true;
@@ -41,13 +40,32 @@ export default function App() {
   }, [cargandoAuth, socio]);
 
   const mostrarDashboard = vista === 'app' && Boolean(socio);
+  // Mientras LoginSocio anima su salida, el dashboard real ya se monta debajo
+  // (LoginSocio es un overlay fixed que se desvanece), en vez de cortar a un
+  // HomePage recién montado.
+  const mostrarDashboardDebajoDelLogin = vista === 'auth' && Boolean(socio) && !mostrarRegistro;
 
   if (cargandoAuth) {
     return <div style={{ height: '100dvh', backgroundColor: '#111111' }} />;
   }
 
-  if (!mostrarDashboard) {
+  if (mostrarDashboard) {
     return (
+      <HomePage
+        socio={socio}
+        cerrarSesion={cerrarSesion}
+      />
+    );
+  }
+
+  return (
+    <>
+      {mostrarDashboardDebajoDelLogin && (
+        <HomePage
+          socio={socio}
+          cerrarSesion={cerrarSesion}
+        />
+      )}
       <AnimatePresence mode="wait">
         {mostrarRegistro ? (
           <RegistroSocioForm
@@ -63,13 +81,6 @@ export default function App() {
           />
         )}
       </AnimatePresence>
-    );
-  }
-
-  return (
-    <HomePage
-      socio={socio}
-      cerrarSesion={cerrarSesion}
-    />
+    </>
   );
 }

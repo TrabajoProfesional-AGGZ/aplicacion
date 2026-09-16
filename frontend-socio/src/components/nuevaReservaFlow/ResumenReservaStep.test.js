@@ -13,7 +13,6 @@ const baseProps = {
   sociosAgregados: [],
   onConfirmar: jest.fn(),
   onCancelar: jest.fn(),
-  onVolver: jest.fn(),
   enviando: false,
   submitted: false,
   submitError: '',
@@ -104,12 +103,5 @@ describe('ResumenReservaStep', () => {
   test('sin sociosIncumplen no muestra ningún listado adicional junto al error', () => {
     render(<ResumenReservaStep {...baseProps} submitError="Ese turno ya no está disponible. Elegí otro horario." />);
     expect(screen.queryByText(/N°/)).not.toBeInTheDocument();
-  });
-
-  test('el botón de volver llama a onVolver', () => {
-    const onVolver = jest.fn();
-    render(<ResumenReservaStep {...baseProps} onVolver={onVolver} />);
-    fireEvent.click(screen.getByText('Volver'));
-    expect(onVolver).toHaveBeenCalled();
   });
 });

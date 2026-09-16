@@ -1,60 +1,10 @@
 .tienda-page { padding-bottom: var(--space-6); }
 
-/* ── Banner ── */
-.tienda-banner {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  margin-bottom: var(--space-6);
-  background:
-    radial-gradient(120% 140% at 12% -10%, #4a1a2b 0%, transparent 55%),
-    radial-gradient(120% 140% at 88% 110%, #4a1a2b 0%, transparent 55%),
-    linear-gradient(155deg, #230d15 0%, #14070c 42%, #100408 100%);
-  color: var(--color-surface);
-  border-radius: var(--radius-xl);
-  padding: var(--space-6);
-  box-shadow: 0 14px 30px -14px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-.tienda-banner-texture {
-  position: absolute; inset: 0; z-index: 0;
-  opacity: 0.5; mix-blend-mode: overlay; pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-.tienda-banner-top, .tienda-banner-title, .tienda-banner-stats { position: relative; z-index: 1; }
-.tienda-banner-top {
-  display: flex; flex-wrap: wrap; align-items: center;
-  justify-content: space-between; gap: var(--space-3); margin-bottom: var(--space-5);
-}
-.tienda-banner-eyebrow {
-  display: inline-flex; align-items: center; gap: var(--space-2);
-  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.09em;
-  text-transform: uppercase; color: rgba(255, 255, 255, 0.55);
-}
-.tienda-banner-title {
-  margin: 0 0 var(--space-5); font-size: 2rem; font-weight: 700;
-  letter-spacing: -0.03em; line-height: 1.05; text-wrap: balance;
-}
-.tienda-banner-stats {
-  display: flex; align-items: center; gap: var(--space-6);
-  padding-top: var(--space-4); border-top: 1px solid rgba(255, 255, 255, 0.12);
-}
-.tienda-banner-stat { display: flex; flex-direction: column; gap: var(--space-1); }
-.tienda-banner-stat-value {
-  font-family: var(--font-numeric); font-variant-numeric: tabular-nums;
-  font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em;
-  line-height: 1.1; color: var(--color-surface);
-}
-.tienda-banner-stat-label { font-size: 0.78rem; color: rgba(255, 255, 255, 0.55); }
-@media (max-width: 480px) {
-  .tienda-banner-title { font-size: 1.65rem; }
-}
-
 /* ── Mis compras (botón + lista) ── */
 .tienda-mis-compras-btn {
   display: inline-flex; align-items: center; gap: var(--space-2);
   background-color: var(--color-surface); border: 1px solid var(--color-border-medium);
-  color: var(--color-text-primary); font-family: inherit; font-size: 0.85rem; font-weight: 600;
+  color: var(--color-text-primary); font-family: inherit; font-size: var(--text-secondary); font-weight: 600;
   padding: var(--space-2) var(--space-4); border-radius: var(--radius-full); cursor: pointer;
   margin-bottom: var(--space-4); box-shadow: var(--shadow-sm);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
@@ -78,9 +28,9 @@
   display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary);
 }
 .compra-card-info { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
-.compra-card-nombre { font-weight: 700; color: var(--color-text-primary); font-size: 0.95rem; }
-.compra-card-cantidad, .compra-card-id { font-size: 0.78rem; color: var(--color-text-secondary); }
-.compra-card-precio { font-weight: 700; color: var(--color-text-primary); font-size: 0.95rem; }
+.compra-card-nombre { font-weight: 700; color: var(--color-text-primary); font-size: var(--text-body); }
+.compra-card-cantidad, .compra-card-id { font-size: var(--text-caption); color: var(--color-text-secondary); }
+.compra-card-precio { font-weight: 700; color: var(--color-text-primary); font-size: var(--text-body); }
 
 /* ── Grid de productos ── */
 .tienda-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
@@ -113,26 +63,20 @@
 
 .tienda-card-info { padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
 .tienda-card-nombre {
-  font-weight: 700; color: var(--color-text-primary); font-size: 0.92rem;
+  font-weight: 700; color: var(--color-text-primary); font-size: var(--text-body);
   overflow-wrap: break-word; word-break: break-word;
 }
 .tienda-card-precio {
-  font-weight: 700; color: var(--color-text-primary); font-size: 1rem;
+  font-weight: 700; color: var(--color-text-primary); font-size: var(--text-body);
   overflow-wrap: break-word; word-break: break-word;
 }
-.tienda-card-stock { font-size: 0.78rem; color: var(--color-text-secondary); overflow-wrap: break-word; }
+.tienda-card-stock { font-size: var(--text-caption); color: var(--color-text-secondary); overflow-wrap: break-word; }
 .tienda-card-stock--agotado {
-  font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
-  font-size: 0.72rem; color: var(--status-danger-border);
+  font-weight: 700; text-transform: uppercase; letter-spacing: var(--tracking-label);
+  font-size: var(--text-label); color: var(--status-danger-border);
 }
 
 /* ── Detalle ── */
-.tienda-volver {
-  display: inline-flex; align-items: center; gap: var(--space-2);
-  background: none; border: none; color: var(--color-text-secondary);
-  font-size: 0.88rem; font-weight: 600; cursor: pointer; padding: 0;
-  margin-bottom: var(--space-4);
-}
 .tienda-detalle-card {
   background-color: var(--color-surface); border-radius: var(--radius-md);
   overflow: hidden; box-shadow: var(--shadow-sm);
@@ -149,25 +93,25 @@
 }
 .tienda-agotado-badge {
   position: absolute; top: var(--space-3); right: var(--space-3); z-index: 1;
-  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  font-size: var(--text-label); font-weight: 700; letter-spacing: var(--tracking-label); text-transform: uppercase;
   color: var(--color-on-accent); background-color: var(--status-danger-border);
   padding: var(--space-1) var(--space-3); border-radius: var(--radius-full);
   box-shadow: var(--shadow-sm);
 }
 .tienda-detalle-nombre {
-  font-size: 1.4rem; font-weight: 700; color: var(--color-text-primary);
+  font-size: var(--text-title); font-weight: 700; color: var(--color-text-primary);
   margin: 0; padding: var(--space-4) var(--space-4) 0;
 }
 .tienda-detalle-precio {
-  display: block; font-weight: 700; font-size: 1.3rem;
+  display: block; font-weight: 700; font-size: var(--text-heading);
   color: var(--color-text-primary); padding: var(--space-2) var(--space-4) 0;
 }
 .tienda-detalle-stock {
-  display: block; font-size: 0.85rem; color: var(--color-text-secondary);
+  display: block; font-size: var(--text-secondary); color: var(--color-text-secondary);
   padding: var(--space-1) var(--space-4);
 }
 .tienda-detalle-desc {
-  font-size: 0.92rem; color: var(--color-text-secondary); line-height: 1.6;
+  font-size: var(--text-body); color: var(--color-text-secondary); line-height: var(--leading-body);
   padding: var(--space-3) var(--space-4) var(--space-5); margin: 0;
   border-top: 1px solid var(--color-border-medium); margin-top: var(--space-3);
 }
@@ -193,20 +137,23 @@
 .tienda-cantidad-btn:active:not(:disabled) { transform: scale(0.92); }
 .tienda-cantidad-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .tienda-cantidad-valor {
-  min-width: 24px; text-align: center; font-weight: 700; font-size: 1rem;
+  min-width: 24px; text-align: center; font-weight: 700; font-size: var(--text-body);
   color: var(--color-text-primary); font-family: var(--font-numeric); font-variant-numeric: tabular-nums;
 }
 .tienda-comprar-total {
-  font-weight: 700; font-size: 1.05rem; color: var(--color-text-primary);
+  font-weight: 700; font-size: var(--text-heading); color: var(--color-text-primary);
   font-family: var(--font-numeric); font-variant-numeric: tabular-nums;
 }
 .tienda-comprar-btn {
   border: none; background-color: var(--color-text-primary); color: var(--color-surface);
-  font-family: inherit; font-size: 0.95rem; font-weight: 700;
+  font-family: inherit; font-size: var(--text-body); font-weight: 700;
   padding: var(--space-4); border-radius: var(--radius-full); cursor: pointer;
   transition: opacity var(--transition-fast), transform var(--transition-fast);
 }
-.tienda-comprar-btn:hover { opacity: 0.9; }
+@media (hover: hover) {
+  .tienda-comprar-btn:hover { opacity: 0.9; }
+}
+
 .tienda-comprar-btn:active { transform: scale(0.98); }
 
 /* ── Utils ── */

@@ -1,4 +1,5 @@
-import { ArrowLeft, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './EventoDetalleStep.css';
 
 function formatearFecha(fechaIso) {
@@ -19,50 +20,23 @@ export function EventoDetalleStep({
   evento,
   yaTieneEntrada = false,
   onPagarEntrada,
-  onVolver,
   enviando = false,
   submitError = '',
 }) {
   return (
     <section className="detalle-evento">
-      <button type="button" className="detalle-volver-btn" onClick={onVolver}>
-        <ArrowLeft size={18} />
-        Volver
-      </button>
-
-      <section className="evento-banner">
-        <div className="evento-banner-texture" aria-hidden="true" />
-        {yaTieneEntrada && (
+      <PageHeader
+        accion={yaTieneEntrada && (
           <span className="evento-banner-badge">Ya tenés una entrada para este evento</span>
         )}
-        <div className="evento-banner-content">
-          <h2 className="evento-banner-nombre">{evento.nombre}</h2>
-
-          <div className="evento-banner-stats">
-            <div className="evento-banner-stat">
-              <span className="evento-banner-stat-label">Día</span>
-              <span className="evento-banner-stat-valor">{formatearFecha(evento.dia)}</span>
-            </div>
-            <div className="evento-banner-divider" aria-hidden="true" />
-            <div className="evento-banner-stat">
-              <span className="evento-banner-stat-label">Horario</span>
-              <span className="evento-banner-stat-valor">
-                {evento.hora_inicio?.slice(0, 5) ?? '--:--'} - {evento.hora_fin?.slice(0, 5) ?? '--:--'}
-              </span>
-            </div>
-            <div className="evento-banner-divider" aria-hidden="true" />
-            <div className="evento-banner-stat">
-              <span className="evento-banner-stat-label">Cupo</span>
-              <span className="evento-banner-stat-valor">{evento.entradas_vendidas}/{evento.capacidad_maxima}</span>
-            </div>
-            <div className="evento-banner-divider" aria-hidden="true" />
-            <div className="evento-banner-stat">
-              <span className="evento-banner-stat-label">Valor</span>
-              <span className="evento-banner-stat-valor">{formatearMonto(evento.valor_entrada)}</span>
-            </div>
-          </div>
-        </div>
-      </section>
+        titulo={evento.nombre}
+        stats={[
+          { label: 'Día', value: formatearFecha(evento.dia) },
+          { label: 'Horario', value: `${evento.hora_inicio?.slice(0, 5) ?? '--:--'} - ${evento.hora_fin?.slice(0, 5) ?? '--:--'}` },
+          { label: 'Cupo', value: `${evento.entradas_vendidas}/${evento.capacidad_maxima}` },
+          { label: 'Valor', value: formatearMonto(evento.valor_entrada) },
+        ]}
+      />
 
       {evento.foto_url && (
         <img

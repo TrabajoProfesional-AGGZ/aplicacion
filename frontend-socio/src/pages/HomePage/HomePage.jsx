@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
 import { Header } from '../../components/Header/Header';
 import { WelcomeCard } from '../../components/WelcomeCard/WelcomeCard';
 import { QuickAccessGrid } from '../../components/QuickAccessGrid/QuickAccessGrid';
 import { BottomNav } from '../../components/BottomNav/BottomNav';
-import { ProximamenteOverlay } from '../../components/ProximamenteOverlay/ProximamenteOverlay';
 import { PerfilPage } from '../PerfilPage/PerfilPage';
 import { FinanzasPage } from '../FinanzasPage/FinanzasPage';
 import { TramitesPage } from '../TramitesPage/TramitesPage';
@@ -17,12 +17,14 @@ import { MisEntradasPage } from '../MisEntradasPage/MisEntradasPage';
 import { NoticiasPage } from '../NoticiasPage/NoticiasPage';
 import { TiendaPage } from '../TiendaPage/TiendaPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
+import { DeudaBanner } from '../../components/DeudaBanner/DeudaBanner';
+import { HoyCard } from '../../components/HoyCard/HoyCard';
 import { BotinButton } from '../../components/BotinButton/BotinButton';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { useAlertasNoLeidas } from '../../hooks/useAlertasNoLeidas';
 import '../../socio-theme.css';
 import './HomePage.css';
 import { Carnet } from '../../components/Carnet/Carnet';
-import { AnimatePresence } from 'framer-motion';
 import { enrolarYGuardarSecreto } from '../../services/accesosService';
 import { PagoResultado } from '../../components/PagoResultado/PagoResultado'; 
 
@@ -33,7 +35,6 @@ import { PagoResultado } from '../../components/PagoResultado/PagoResultado';
  * de una redirección de Mercado Pago para mostrar el resultado del pago.
  */
 export function HomePage({ socio, cerrarSesion }) {
-  const [proximamente, setProximamente] = useState(null);
   const [itemAPagarId, setItemAPagarId] = useState(null);
   const [noticiaSeleccionadaId, setNoticiaSeleccionadaId] = useState(null);
   // Si la URL trae estos params, la app se abrió de vuelta desde la redirección de MP.
@@ -43,7 +44,16 @@ export function HomePage({ socio, cerrarSesion }) {
   const [vista, setVista] = useState(statusMP && externalReferenceMP ? 'pago-resultado' : 'inicio');
   const [estadoPagoMP, setEstadoPagoMP] = useState(statusMP);
 
+  const [vistaAnterior, setVistaAnterior] = useState(vista);
+  const [direccion, setDireccion] = useState(0);
+  if (vista !== vistaAnterior) {
+    setDireccion(vista === 'inicio' ? -1 : vistaAnterior === 'inicio' ? 1 : 0);
+    setVistaAnterior(vista);
+  }
+
   useBackToRoot(vista, 'inicio', () => setVista('inicio'));
+
+  const { hayNoLeidas: hayAlertasNoLeidas, marcarComoLeidas: marcarAlertasComoLeidas } = useAlertasNoLeidas(socio.id);
 
   useEffect(() => {
     const enrolarDispositivo = async () => {
@@ -81,10 +91,10 @@ export function HomePage({ socio, cerrarSesion }) {
     console.warn("Estás sin conexión. Mostrando el pase de acceso offline.");
     return (
       <div className="offline-fullscreen-container" style={{ minHeight: '100dvh', backgroundColor: 'var(--color-surface)', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ backgroundColor: '#ff9800', color: 'white', textAlign: 'center', padding: '8px', fontSize: '0.85rem', fontWeight: '600' }}>
+        <p className="offline-banner">
           Conexión perdida. Mostrando credencial offline.
-        </div>
-        
+        </p>
+
         <Carnet socio={socio} />
       </div>
     );
@@ -95,9 +105,11 @@ export function HomePage({ socio, cerrarSesion }) {
         onPerfil={() => setVista('perfil')}
         onAlertas={() => setVista('alertas')}
         mostrarPerfil={vista !== 'perfil'}
+        hayAlertasNoLeidas={hayAlertasNoLeidas}
       />
 
       <main className="home-page">
+       <ScreenTransition screenKey={vista} direction={direccion}>
         {vista === 'pago-resultado' && (
           <PagoResultado 
             status={estadoPagoMP} 
@@ -113,7 +125,7 @@ export function HomePage({ socio, cerrarSesion }) {
           />
         )}
         {vista === 'tramites' && <TramitesPage socio={socio} />}
-        {vista === 'alertas' && <AlertasPage socio={socio} />}
+        {vista === 'alertas' && <AlertasPage socio={socio} onAlertasCargadas={marcarAlertasComoLeidas} />}
         {vista === 'reservas' && (
           <ReservasPage
             socio={socio}
@@ -124,7 +136,6 @@ export function HomePage({ socio, cerrarSesion }) {
         {vista === 'nueva-reserva' && (
           <NuevaReservaPage
             socio={socio}
-            onSalir={() => setVista('inicio')}
             onExito={() => setVista('reservas')}
           />
         )}
@@ -134,7 +145,6 @@ export function HomePage({ socio, cerrarSesion }) {
         {vista === 'nueva-inscripcion' && (
           <NuevaInscripcionPage
             socio={socio}
-            onSalir={() => setVista('inicio')}
             onExito={() => setVista('inscripciones')}
             onIrATramites={() => setVista('tramites')}
           />
@@ -149,7 +159,6 @@ export function HomePage({ socio, cerrarSesion }) {
         {vista === 'nueva-entrada' && (
           <NuevaEntradaPage
             socio={socio}
-            onSalir={() => setVista('inicio')}
             onExito={() => setVista('mis-entradas')}
           />
         )}
@@ -163,9 +172,14 @@ export function HomePage({ socio, cerrarSesion }) {
         {vista === 'inicio' && (
           <>
             <WelcomeCard socio={socio} />
+            <DeudaBanner socio={socio} onClick={() => setVista('pagos')} />
             <CertificadoVencidoBanner socio={socio} onClick={() => setVista('tramites')} />
+            <HoyCard
+              socio={socio}
+              onVerReservas={() => setVista('reservas')}
+              onVerEntradas={() => setVista('mis-entradas')}
+            />
             <QuickAccessGrid
-              onProximamente={setProximamente}
               onPagos={() => setVista('pagos')}
               onTramites={() => setVista('tramites')}
               onReservas={() => setVista('nueva-reserva')}
@@ -177,15 +191,11 @@ export function HomePage({ socio, cerrarSesion }) {
             />
           </>
         )}
-        {vista === 'carnet' && (
-          <AnimatePresence>
-            <Carnet socio={socio} onClose={() => setVista('inicio')} />
-          </AnimatePresence>
-        )}
+        {vista === 'carnet' && <Carnet socio={socio} />}
+       </ScreenTransition>
       </main>
       
       <BottomNav
-        onProximamente={setProximamente}
         onInicio={() => setVista('inicio')}
         onReservas={() => setVista('reservas')}
         onMisInscripciones={() => setVista('inscripciones')}
@@ -194,11 +204,7 @@ export function HomePage({ socio, cerrarSesion }) {
         vistaActual={vista}
       />
 
-      {proximamente && (
-        <ProximamenteOverlay titulo={proximamente} onClose={() => setProximamente(null)} />
-      )}
-
-      <BotinButton />
+      {vista === 'inicio' && <BotinButton />}
     </div>
   );
 }

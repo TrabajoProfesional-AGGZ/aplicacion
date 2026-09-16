@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react';
-import { QrCode, Calendar } from 'lucide-react';
+import { QrCode } from 'lucide-react';
 import { getEntradasActivas, getEntradasHistoricas, getEntradasPendientes } from '../../services/eventosService';
-import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { SegmentedControl } from '../../components/SegmentedControl/SegmentedControl';
 import './MisEntradasPage.css';
+
+const VISTA_OPCIONES = [
+  { id: 'activas', label: 'Activas' },
+  { id: 'historicas', label: 'Históricas' },
+];
 
 const ESTADO_TAG = {
   Pagada: 'success',
@@ -56,51 +63,33 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet 
   const entradasVisibles = vista === 'activas' ? entradas : (historicas ?? []);
   const cargandoHistoricas = vista === 'historicas' && historicas === null && cargando;
 
+  const cargandoActivas = cargando && vista === 'activas';
+
   return (
     <>
-      {cargando && vista === 'activas' && <LoadingScreen />}
+      <section className="entradas-lista">
+        <PageHeader eyebrow="Eventos del club" titulo="Mis Entradas" />
 
-      {!(cargando && vista === 'activas') && error && (
-        <p className="entradas-error">No se pudieron cargar tus entradas.</p>
-      )}
+        <SegmentedControl
+          opciones={VISTA_OPCIONES}
+          valor={vista}
+          onChange={setVista}
+          ariaLabel="Alternar entradas activas o históricas"
+        />
 
-      {!(cargando && vista === 'activas') && !error && (
-        <section className="entradas-lista">
-          <section className="entradas-banner">
-            <div className="entradas-banner-texture" aria-hidden="true" />
-            <span className="entradas-banner-eyebrow">
-              <Calendar size={13} />
-              Eventos del club
-            </span>
-            <h2 className="entradas-banner-title">Mis Entradas</h2>
-          </section>
+        {(cargandoActivas || cargandoHistoricas) && <SkeletonRows n={3} altura={76} />}
 
-          <fieldset className="entradas-toggle" aria-label="Alternar entradas activas o históricas">
-            <button
-              type="button"
-              className={`entradas-toggle-btn${vista === 'activas' ? ' entradas-toggle-btn--activo' : ''}`}
-              onClick={() => setVista('activas')}
-            >
-              Activas
-            </button>
-            <button
-              type="button"
-              className={`entradas-toggle-btn${vista === 'historicas' ? ' entradas-toggle-btn--activo' : ''}`}
-              onClick={() => setVista('historicas')}
-            >
-              Históricas
-            </button>
-          </fieldset>
+        {!cargandoActivas && error && (
+          <p className="entradas-error">No se pudieron cargar tus entradas.</p>
+        )}
 
-          {cargandoHistoricas && <p className="entradas-empty">Cargando historial...</p>}
+        {!cargandoActivas && !cargandoHistoricas && !error && entradasVisibles.length === 0 && (
+          <p className="entradas-empty">
+            {vista === 'activas' ? 'No tenés entradas activas.' : 'No tenés entradas en tu historial.'}
+          </p>
+        )}
 
-          {!cargandoHistoricas && entradasVisibles.length === 0 && (
-            <p className="entradas-empty">
-              {vista === 'activas' ? 'No tenés entradas activas.' : 'No tenés entradas en tu historial.'}
-            </p>
-          )}
-
-          {!cargandoHistoricas && entradasVisibles.map((entrada) => {
+        {!cargandoActivas && !cargandoHistoricas && !error && entradasVisibles.map((entrada) => {
             const tono = ESTADO_TAG[entrada.estado] ?? 'neutral';
             return (
               <div className={`entrada-card entrada-card--${tono}`} key={entrada.id}>
@@ -133,9 +122,8 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet 
                 )}
               </div>
             );
-          })}
-        </section>
-      )}
+        })}
+      </section>
     </>
   );
 }

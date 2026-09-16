@@ -30,4 +30,14 @@ describe('Header', () => {
     render(<Header onPerfil={jest.fn()} mostrarPerfil={false} />);
     expect(screen.queryByLabelText('Mi perfil')).not.toBeInTheDocument();
   });
+
+  test('no muestra el badge de alertas por defecto', () => {
+    const { container } = render(<Header onPerfil={jest.fn()} />);
+    expect(container.querySelector('.app-header-bell-badge')).not.toBeInTheDocument();
+  });
+
+  test('muestra el badge de alertas cuando hayAlertasNoLeidas es true', () => {
+    const { container } = render(<Header onPerfil={jest.fn()} hayAlertasNoLeidas />);
+    expect(container.querySelector('.app-header-bell-badge')).toBeInTheDocument();
+  });
 });

@@ -24,6 +24,7 @@ jest.mock('framer-motion', () => {
   };
   return {
     motion: new Proxy({}, { get: (_, tag) => passthrough(tag) }),
+    AnimatePresence: ({ children }) => children,
     useReducedMotion: () => true,
   };
 });

@@ -67,8 +67,8 @@ describe('ReservasPage', () => {
     getReservasPorSocio.mockResolvedValue([RESERVA_PENDIENTE, RESERVA_CONFIRMADA]);
     getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
     render(<ReservasPage socio={socioFixture} />);
-    expect(await screen.findByLabelText('Reservas confirmadas: 1')).toBeInTheDocument();
-    expect(screen.getByLabelText('Reservas pendientes: 1')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Confirmadas: 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Pendientes: 1')).toBeInTheDocument();
   });
 
   test('cambiar de filtro muestra solo las reservas de ese estado', async () => {
@@ -77,20 +77,20 @@ describe('ReservasPage', () => {
     render(<ReservasPage socio={socioFixture} />);
     await screen.findByText('Cancha de fútbol');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Confirmadas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Confirmadas' }));
     await waitFor(() => expect(screen.getAllByText('Cancha de fútbol')).toHaveLength(1));
     expect(screen.getByText('Confirmada')).toBeInTheDocument();
     expect(screen.queryByText('Pendiente')).not.toBeInTheDocument();
   });
 
-  test('el filtro "Finalizadas" busca el historial y lo muestra', async () => {
+  test('el filtro "Todas" busca el historial y lo muestra', async () => {
     getReservasPorSocio.mockResolvedValue([RESERVA_PENDIENTE]);
     getInstalaciones.mockResolvedValue([INSTALACION_MOCK]);
     getReservasHistoricasPorSocio.mockResolvedValue([RESERVA_FINALIZADA]);
     render(<ReservasPage socio={socioFixture} />);
     await screen.findByText('Cancha de fútbol');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Finalizadas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Todas' }));
     await waitFor(() => expect(getReservasHistoricasPorSocio).toHaveBeenCalledWith('1000'));
     expect(await screen.findByText('Finalizada')).toBeInTheDocument();
   });
@@ -102,10 +102,11 @@ describe('ReservasPage', () => {
     render(<ReservasPage socio={socioFixture} />);
     await screen.findByText('Cancha de fútbol');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Finalizadas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Todas' }));
     await waitFor(() => expect(getReservasHistoricasPorSocio).toHaveBeenCalledTimes(1));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Todas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Pendientes' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Todas' }));
     await waitFor(() => expect(screen.getAllByText('Cancha de fútbol')).toHaveLength(2));
     expect(getReservasHistoricasPorSocio).toHaveBeenCalledTimes(1);
   });
@@ -117,7 +118,7 @@ describe('ReservasPage', () => {
     render(<ReservasPage socio={socioFixture} />);
     await screen.findByText('Cancha de fútbol');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Finalizadas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Todas' }));
     await screen.findByText('Finalizada');
     expect(screen.queryByRole('button', { name: 'Cancelar' })).not.toBeInTheDocument();
   });
@@ -170,7 +171,7 @@ describe('ReservasPage', () => {
 
     expect(await screen.findByText('Cancha de fútbol')).toBeInTheDocument();
     expect(screen.getByText('Confirmada')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Confirmadas' })).toHaveClass('reservas-filtro-btn--activo');
+    expect(screen.getByRole('radio', { name: 'Confirmadas' })).toHaveAttribute('aria-checked', 'true');
     expect(screen.queryByText('No tenés reservas en este estado.')).not.toBeInTheDocument();
   });
 
@@ -180,7 +181,7 @@ describe('ReservasPage', () => {
     render(<ReservasPage socio={socioFixture} />);
 
     await screen.findByText('Cancha de fútbol');
-    expect(screen.getByRole('button', { name: 'Pendientes' })).toHaveClass('reservas-filtro-btn--activo');
+    expect(screen.getByRole('radio', { name: 'Pendientes' })).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByText('Pendiente')).toBeInTheDocument();
   });
 
@@ -213,7 +214,9 @@ describe('ReservasPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
     fireEvent.click(screen.getByRole('button', { name: 'Volver' }));
 
-    expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    });
     expect(cancelReserva).not.toHaveBeenCalled();
   });
 
@@ -228,7 +231,9 @@ describe('ReservasPage', () => {
 
     fireEvent.click(mensaje.closest('.csf-overlay'));
 
-    expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('¿Seguro que querés cancelar esta reserva?')).not.toBeInTheDocument();
+    });
     expect(cancelReserva).not.toHaveBeenCalled();
   });
 

@@ -1,4 +1,4 @@
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { PagoCuotaFlow } from './PagoCuotaFlow';
 import { marcarPagoDemo } from '../../services/pagosService';
 
@@ -14,25 +14,19 @@ const mockSocio = { id: 'socio-1', nombre: 'Ana', apellido: 'Pérez' };
 describe('PagoCuotaFlow (pago simulado, rama demo)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
   });
 
   test('muestra el concepto y el botón de pago', () => {
-    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={jest.fn()} />);
+    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} />);
 
     expect(screen.getByText(/Cuota Social - 07\/2026/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^pagar$/i })).toBeInTheDocument();
   });
 
-  test('al pagar, llama a marcarPagoDemo y muestra éxito antes de volver', async () => {
+  test('al pagar, llama a marcarPagoDemo y muestra éxito', async () => {
     marcarPagoDemo.mockResolvedValue({ estado: 'Pagada' });
-    const onVolverMock = jest.fn();
 
-    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={onVolverMock} />);
+    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} />);
 
     fireEvent.click(screen.getByRole('button', { name: /^pagar$/i }));
 
@@ -41,32 +35,15 @@ describe('PagoCuotaFlow (pago simulado, rama demo)', () => {
     });
 
     expect(await screen.findByText(/pago registrado/i)).toBeInTheDocument();
-    expect(onVolverMock).not.toHaveBeenCalled();
-
-    act(() => {
-      jest.advanceTimersByTime(1500);
-    });
-
-    expect(onVolverMock).toHaveBeenCalledTimes(1);
   });
 
   test('muestra un mensaje de error si falla el pago simulado', async () => {
     marcarPagoDemo.mockRejectedValue(new Error('pago-demo-fallido'));
 
-    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={jest.fn()} />);
+    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} />);
 
     fireEvent.click(screen.getByRole('button', { name: /^pagar$/i }));
 
     expect(await screen.findByText(/no pudimos registrar el pago de prueba/i)).toBeInTheDocument();
-  });
-
-  test('el botón volver llama a la función onVolver', () => {
-    const onVolverMock = jest.fn();
-    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} onVolver={onVolverMock} />);
-
-    const btnVolver = screen.getByRole('button', { name: /volver/i });
-    fireEvent.click(btnVolver);
-
-    expect(onVolverMock).toHaveBeenCalledTimes(1);
   });
 });

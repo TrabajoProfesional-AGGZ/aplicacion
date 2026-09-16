@@ -5,13 +5,8 @@ import { AlertCircle, ChevronDown, Check } from 'lucide-react';
 import { DatePicker } from './DatePicker';
 import { setNativeValue, mergeRefs } from './nativeInputUtils';
 import { usePickerPopover } from './usePickerPopover';
+import { SPRING, slideVariants } from '../../styles/motion';
 import './Pickers.css';
-
-const slideVariants = {
-  enter: (dir) => ({ x: dir > 0 ? 52 : -52, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir) => ({ x: dir > 0 ? -52 : 52, opacity: 0 }),
-};
 
 /** Input de texto estándar; si `type="date"`, delega en `DatePicker`. */
 export const StyledInput = React.forwardRef(({ error, ...props }, ref) => {
@@ -178,7 +173,7 @@ export const FormStep = ({ direction, children }) => (
     initial="enter"
     animate="center"
     exit="exit"
-    transition={{ duration: 0.26, ease: 'easeInOut' }}
+    transition={SPRING.quick}
     className="csf-fields"
   >
     {children}

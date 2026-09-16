@@ -1,15 +1,16 @@
 import { PartyPopper } from 'lucide-react';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './WelcomeCard.css';
 
 // RGB (no hex) para variar la opacidad de texto/borde/glow del pill de estado
-// con una sola fuente por color (rgb(var(--estado-rgb) / alpha)). Usa los
-// tonos claros --status-*-bg en vez de los oscuros --status-*-border, que
-// sobre el gradiente casi negro de la card no se leían bien.
+// con una sola fuente por color (rgb(var(--estado-rgb) / alpha)). Tonos
+// saturados (no los pasteles --status-*-bg) para que el pill se vea vívido
+// sobre el gradiente casi negro de la card, en vez de lavado.
 const ESTADO_RGB = {
-  Activo: '167 218 167',
-  Moroso: '244 190 190',
-  Inactivo: '245 233 178',
-  Suspendido: '255 189 152',
+  Activo: '74 222 128',
+  Moroso: '248 113 113',
+  Inactivo: '250 204 21',
+  Suspendido: '251 146 60',
 };
 
 function esCumpleaniosHoy(fechaNacimiento) {
@@ -32,15 +33,14 @@ export function WelcomeCard({ socio }) {
   const esCumpleanios = esCumpleaniosHoy(socio.fecha_nacimiento);
 
   return (
-    <section className="welcome-card">
-      <div className="welcome-card-texture" aria-hidden="true" />
+    <PageHeader variant="hero">
       <div className="welcome-card-top">
         <p className="welcome-card-fecha">{fechaFormateada}</p>
         <p className="welcome-card-estado" style={{ '--estado-rgb': ESTADO_RGB[socio.estado?.nombre] }}>
           Estado: {socio.estado?.nombre}
         </p>
       </div>
-      <h1 className="welcome-card-saludo">Bienvenido {socio.nombre} {socio.apellido}</h1>
+      <h1 className="welcome-card-saludo">Hola, {socio.nombre}</h1>
       {esCumpleanios && (
         <p className="welcome-card-cumpleanios" role="status">
           <PartyPopper size={14} aria-hidden="true" />
@@ -48,6 +48,6 @@ export function WelcomeCard({ socio }) {
         </p>
       )}
       <p className="welcome-card-membresia">{socio.nro_socio} - {socio.categoria?.nombre}</p>
-    </section>
+    </PageHeader>
   );
 }

@@ -1,5 +1,6 @@
-import { ArrowLeft, Users, ChevronRight, MapPin, Tag } from 'lucide-react';
-import { LoadingScreen } from '../LoadingScreen/LoadingScreen';
+import { Users, ChevronRight, MapPin, Tag } from 'lucide-react';
+import { SkeletonRows } from '../SkeletonRows/SkeletonRows';
+import { PageHeader } from '../PageHeader/PageHeader';
 import './DisciplinasListStep.css';
 
 function textoCupos(disciplina) {
@@ -8,19 +9,12 @@ function textoCupos(disciplina) {
 }
 
 /** Grilla de disciplinas disponibles para inscribirse. */
-export function DisciplinasListStep({ disciplinas, cargando, error, onSeleccionar, onVolver }) {
+export function DisciplinasListStep({ disciplinas, cargando, error, onSeleccionar }) {
   return (
     <section className="disciplinas-lista">
-      <section className="disciplinas-banner">
-        <div className="disciplinas-banner-texture" aria-hidden="true" />
-        <button type="button" className="disciplinas-banner-volver" onClick={onVolver} aria-label="Volver">
-          <ArrowLeft size={18} />
-        </button>
-        <span className="disciplinas-banner-eyebrow">Actividades del club</span>
-        <h2 className="disciplinas-banner-title">Inscribite a una actividad</h2>
-      </section>
+      <PageHeader eyebrow="Actividades del club" titulo="Inscribite a una actividad" />
 
-      {cargando && <LoadingScreen />}
+      {cargando && <SkeletonRows n={4} altura={76} />}
 
       {!cargando && error && (
         <p className="disciplinas-error">No se pudieron cargar las disciplinas.</p>

@@ -1,0 +1,124 @@
+.hoy-card {
+  box-sizing: border-box;
+  width: 100%;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-5);
+  margin: var(--space-4) 0;
+  overflow: hidden;
+  transition: box-shadow var(--transition-normal), border-color var(--transition-normal);
+}
+
+.hoy-card--clickable {
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .hoy-card--clickable:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-border-strong);
+  }
+}
+
+.hoy-card--clickable:active {
+  box-shadow: var(--shadow-sm);
+}
+
+.hoy-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--text-label);
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  margin-bottom: var(--space-4);
+}
+
+.hoy-card-panel {
+  width: 100%;
+  touch-action: pan-y;
+}
+
+.hoy-card-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.hoy-card-item:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.hoy-card-item-nombre {
+  font-size: var(--text-body);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.hoy-card-item-horario {
+  flex-shrink: 0;
+  font-family: var(--font-numeric);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.3em 0.75em;
+  white-space: nowrap;
+}
+
+.hoy-card-ver-todas {
+  width: 100%;
+  margin-top: var(--space-3);
+  padding: var(--space-3) 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  font: inherit;
+  font-size: var(--text-secondary);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: none;
+  border: none;
+  border-top: 1px solid var(--color-border-light);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .hoy-card-ver-todas:hover {
+    background-color: var(--color-row-hover);
+  }
+}
+
+.hoy-card-ver-todas:active {
+  background-color: var(--color-bg-subtle);
+}
+
+.hoy-card-dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.hoy-card-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-border-medium);
+}
+
+.hoy-card-dot--activo {
+  background-color: var(--color-border-strong);
+}

@@ -22,6 +22,7 @@ export function SubirTramiteForm({ idSocio, onClose, onCreado }) {
   const [archivoNombre, setArchivoNombre] = useState('');
   const [estado, setEstado] = useState('inicial'); // inicial | subiendo | exito | error
   const [error, setError] = useState('');
+  const cierreTimeoutRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -30,6 +31,15 @@ export function SubirTramiteForm({ idSocio, onClose, onCreado }) {
       .catch(() => { if (!cancelled) setTipos([]); });
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => () => {
+    if (cierreTimeoutRef.current) clearTimeout(cierreTimeoutRef.current);
+  }, []);
+
+  function handleListo() {
+    if (cierreTimeoutRef.current) clearTimeout(cierreTimeoutRef.current);
+    onClose();
+  }
 
   const tipoSeleccionado = tipos.find((t) => String(t.id) === tipoId);
   const requiereVencimiento = Boolean(tipoSeleccionado?.requiere_vencimiento);
@@ -81,7 +91,7 @@ export function SubirTramiteForm({ idSocio, onClose, onCreado }) {
       });
       setEstado('exito');
       onCreado(creado);
-      setTimeout(onClose, 900);
+      cierreTimeoutRef.current = setTimeout(onClose, 3000);
     } catch (err) {
       setEstado('error');
       setError(mensajeError(err));
@@ -96,9 +106,16 @@ export function SubirTramiteForm({ idSocio, onClose, onCreado }) {
         </div>
         <div className="csf-card">
           {estado === 'exito' ? (
-            <p className="csf-success">
-              <CheckCircle2 size={18} /> Trámite cargado, queda en revisión.
-            </p>
+            <>
+              <p className="csf-success">
+                <CheckCircle2 size={18} /> Trámite cargado, queda en revisión.
+              </p>
+              <div className="csf-nav csf-nav--end">
+                <button type="button" className="csf-btn-submit csf-btn-submit--full" onClick={handleListo}>
+                  Listo
+                </button>
+              </div>
+            </>
           ) : (
             <form onSubmit={handleSubmit}>
               <div className="csf-fields">

@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ShoppingBag, Package, Minus, Plus, Receipt } from 'lucide-react';
+import { Package, Minus, Plus, Receipt } from 'lucide-react';
 import { getProductosDisponibles, getProducto, comprarProducto, getComprasPorSocio } from '../../services/tiendaService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
-import { LoadingScreen } from '../../components/LoadingScreen/LoadingScreen';
+import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
+import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
 import './TiendaPage.css';
+
+const ORDEN_VISTA = { lista: 0, detalle: 1, 'mis-compras': 1, pago: 2 };
 
 const MENSAJES_ERROR_COMPRA = {
   'producto-no-encontrado': 'No se pudo procesar la compra. Volvé a intentarlo.',
@@ -56,7 +60,22 @@ export function TiendaPage({ socio }) {
     setVistaInterna('lista');
   }
 
-  useBackToRoot(vistaInterna, 'lista', volverALista);
+  // El paso 'pago' ya creó la compra "Iniciada" en el backend: el gesto de
+  // atrás aterriza en "Mis compras", no reinicia la selección como 'detalle'.
+  function manejarVolver() {
+    volverALista();
+    if (vistaInterna === 'pago') setVistaInterna('mis-compras');
+  }
+
+  useBackToRoot(vistaInterna, 'lista', manejarVolver);
+
+  const [vistaAnterior, setVistaAnterior] = useState(vistaInterna);
+  const [direccion, setDireccion] = useState(0);
+  if (vistaInterna !== vistaAnterior) {
+    const diferencia = ORDEN_VISTA[vistaInterna] - ORDEN_VISTA[vistaAnterior];
+    setDireccion(diferencia > 0 ? 1 : diferencia < 0 ? -1 : 0);
+    setVistaAnterior(vistaInterna);
+  }
 
   async function cargarProductos() {
     try {
@@ -121,8 +140,6 @@ export function TiendaPage({ socio }) {
       .finally(() => setCargandoMisCompras(false));
   }
 
-  if (loading) return <LoadingScreen />;
-
   // ─── Pago ───
   if (vistaInterna === 'pago' && compraEnCurso) {
     return (
@@ -134,7 +151,6 @@ export function TiendaPage({ socio }) {
         }}
         tipoItem="compra"
         socio={socio}
-        onVolver={() => { volverALista(); setVistaInterna('mis-compras'); }}
       />
     );
   }
@@ -142,14 +158,11 @@ export function TiendaPage({ socio }) {
   // ─── Mis compras ───
   if (vistaInterna === 'mis-compras') {
     return (
+      <ScreenTransition screenKey={vistaInterna} direction={direccion}>
       <div className="tienda-page">
-        <button type="button" className="tienda-volver" onClick={volverALista}>
-          <ArrowLeft size={20} /> Volver
-        </button>
-
         <h2 className="tienda-detalle-nombre" style={{ padding: 0, marginBottom: 'var(--space-4)' }}>Mis compras</h2>
 
-        {cargandoMisCompras && <p className="tienda-empty">Cargando...</p>}
+        {cargandoMisCompras && <SkeletonRows n={3} altura={76} />}
 
         {!cargandoMisCompras && errorMisCompras && (
           <p className="tienda-error">No se pudieron cargar tus compras.</p>
@@ -179,6 +192,7 @@ export function TiendaPage({ socio }) {
           </div>
         )}
       </div>
+      </ScreenTransition>
     );
   }
 
@@ -186,11 +200,8 @@ export function TiendaPage({ socio }) {
   if (vistaInterna === 'detalle' && detalle) {
     const sinStock = Number(detalle.stock) <= 0;
     return (
+      <ScreenTransition screenKey={vistaInterna} direction={direccion}>
       <div className="tienda-page">
-        <button type="button" className="tienda-volver" onClick={volverALista}>
-          <ArrowLeft size={20} /> Volver
-        </button>
-
         <div className="tienda-detalle-card">
           <div className="tienda-detalle-media">
             <div className="tienda-detalle-foto-wrap">
@@ -256,35 +267,33 @@ export function TiendaPage({ socio }) {
           )}
         </div>
       </div>
+      </ScreenTransition>
     );
   }
 
   // ─── Lista ───
   return (
+    <ScreenTransition screenKey={vistaInterna} direction={direccion}>
     <div className="tienda-page">
-      <div className="tienda-banner">
-        <div className="tienda-banner-texture" />
-        <div className="tienda-banner-top">
-          <span className="tienda-banner-eyebrow"><ShoppingBag size={14} /> TIENDA DEL CLUB</span>
-        </div>
-        <h2 className="tienda-banner-title">Explorá nuestros productos</h2>
-        <div className="tienda-banner-stats">
-          <div className="tienda-banner-stat">
-            <span className="tienda-banner-stat-value">{productos.length}</span>
-            <span className="tienda-banner-stat-label">Disponibles</span>
-          </div>
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Tienda del club"
+        titulo="Explorá nuestros productos"
+        stats={[{ label: 'Disponibles', value: loading ? '—' : productos.length }]}
+      />
 
       <button type="button" className="tienda-mis-compras-btn" onClick={abrirMisCompras}>
         <Receipt size={16} /> Mis compras
       </button>
 
-      {error && <p className="tienda-error">{error}</p>}
+      {loading && <SkeletonRows n={4} altura={140} />}
 
-      {productos.length === 0 ? (
+      {!loading && error && <p className="tienda-error">{error}</p>}
+
+      {!loading && !error && productos.length === 0 && (
         <p className="tienda-empty">No hay productos disponibles por el momento.</p>
-      ) : (
+      )}
+
+      {!loading && !error && productos.length > 0 && (
         <div className="tienda-grid">
           {productos.map(p => {
             const agotado = Number(p.stock) === 0;
@@ -313,7 +322,8 @@ export function TiendaPage({ socio }) {
         </div>
       )}
 
-      {loadingDetalle && <p className="tienda-empty">Cargando...</p>}
+      {loadingDetalle && <SkeletonRows n={1} altura={220} />}
     </div>
+    </ScreenTransition>
   );
 }

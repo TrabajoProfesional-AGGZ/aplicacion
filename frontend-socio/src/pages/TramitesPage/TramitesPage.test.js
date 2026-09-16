@@ -93,10 +93,10 @@ describe('TramitesPage', () => {
       { ...TRAMITE_MOCK, id: 't-3', estado: 'rechazado' },
     ]);
     render(<TramitesPage socio={socioFixture} />);
-    expect(await screen.findByLabelText('Trámites cargados: 3')).toBeInTheDocument();
-    expect(screen.getByLabelText('Trámites aprobados: 1')).toBeInTheDocument();
-    expect(screen.getByLabelText('Trámites en revisión: 1')).toBeInTheDocument();
-    expect(screen.getByLabelText('Trámites rechazados: 1')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Cargados: 3')).toBeInTheDocument();
+    expect(screen.getByLabelText('Aprobados: 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('En revisión: 1')).toBeInTheDocument();
+    expect(screen.getByLabelText('Rechazados: 1')).toBeInTheDocument();
   });
 
   test('no actualiza el estado si el componente se desmonta antes de que resuelva el fetch', async () => {
