@@ -26,20 +26,14 @@ export function PageHeader({
         {subtitulo && <p className="page-header-subtitulo">{subtitulo}</p>}
         {stats.length > 0 && (
           <div className="page-header-stats">
-            {stats.flatMap((s, i) => {
-              const nodes = [
-                <div className="page-header-stat" key={`stat-${s.label}`} aria-label={`${s.label}: ${s.value}`}>
-                  <span className={`page-header-stat-value${s.tono ? ` page-header-stat-value--${s.tono}` : ''}`}>
-                    {s.value}
-                  </span>
-                  <span className="page-header-stat-label">{s.label}</span>
-                </div>,
-              ];
-              if (i < stats.length - 1) {
-                nodes.push(<div className="page-header-stat-divider" aria-hidden="true" key={`divider-${s.label}`} />);
-              }
-              return nodes;
-            })}
+            {stats.map((s) => (
+              <div className="page-header-stat" key={`stat-${s.label}`} aria-label={`${s.label}: ${s.value}`}>
+                <span className="page-header-stat-label">{s.label}</span>
+                <span className={`page-header-stat-value${s.tono ? ` page-header-stat-value--${s.tono}` : ''}`}>
+                  {s.value}
+                </span>
+              </div>
+            ))}
           </div>
         )}
         {accion && <div className="page-header-accion">{accion}</div>}

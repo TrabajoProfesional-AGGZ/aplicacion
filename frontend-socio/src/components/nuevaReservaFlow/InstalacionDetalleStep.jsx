@@ -35,7 +35,7 @@ export function InstalacionDetalleStep({
         titulo={instalacion.nombre}
         subtitulo={`${instalacion.tipo} · ${instalacion.capacidad_maxima} personas`}
         stats={[
-          { label: 'Cancelación sin cargo', value: `hasta ${tolerancia} min antes` },
+          { label: 'Cancelación sin cargo', value: `Hasta ${tolerancia} min antes` },
           { label: 'Duración del turno', value: `${instalacion.duracion_turno} min` },
           { label: 'Valor del turno', value: formatearMonto(instalacion.valor_turno) },
         ]}

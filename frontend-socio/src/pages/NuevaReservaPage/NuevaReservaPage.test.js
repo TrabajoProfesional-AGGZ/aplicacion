@@ -85,7 +85,7 @@ describe('NuevaReservaPage', () => {
     fireEvent.click(screen.getByText('Cancha de fútbol'));
 
     await screen.findByText('08:00');
-    expect(screen.getByText('hasta 60 min antes')).toBeInTheDocument();
+    expect(screen.getByText('Hasta 60 min antes')).toBeInTheDocument();
     fireEvent.click(screen.getByText('08:00'));
 
     await screen.findByText('Agregar socios');

@@ -59,7 +59,7 @@ export function DisciplinaDetalleStep({
         )}
         titulo={disciplina.nombre}
         stats={[
-          { label: 'Cupos', value: textoCupos(disciplina) },
+          { label: disciplina.cupo_maximo == null ? 'Sin límite' : 'Cupos', value: textoCupos(disciplina) },
           { label: 'Categoría de socio', value: disciplina.categoria_socio?.nombre ?? 'Todas' },
           { label: 'Sede', value: disciplina.sede.nombre },
           { label: 'Arancel por mes', value: disciplina.arancelada ? formatearMonto(disciplina.monto_mensual) : 'Sin costo' },

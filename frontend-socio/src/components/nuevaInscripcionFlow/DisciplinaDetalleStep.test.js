@@ -38,6 +38,17 @@ describe('DisciplinaDetalleStep', () => {
     expect(screen.getByText('Todas')).toBeInTheDocument();
   });
 
+  test('muestra "Sin límite" en vez de "Cupos" cuando la disciplina no tiene cupo máximo', () => {
+    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_SIN_COSTO} onInscribirme={jest.fn()} />);
+    expect(screen.getByText('Sin límite')).toBeInTheDocument();
+    expect(screen.queryByText('Cupos')).not.toBeInTheDocument();
+  });
+
+  test('muestra "Cupos" cuando la disciplina tiene cupo máximo definido', () => {
+    render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} />);
+    expect(screen.getByText('Cupos')).toBeInTheDocument();
+  });
+
   test('click en "Inscribirme" llama a onInscribirme', () => {
     const onInscribirme = jest.fn();
     render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={onInscribirme} />);
