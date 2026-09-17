@@ -18,8 +18,8 @@ export default defineConfig({
         name: 'Inter Miami CF',
         short_name: 'Inter Miami',
         description: 'App oficial para socios del club',
-        theme_color: '#f7b5cd',
-        background_color: '#f5f5f5',
+        theme_color: '#231f20',
+        background_color: '#f1dfe7',
         display: 'standalone', 
         icons: [
           {
