@@ -76,23 +76,6 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
     return () => clearTimeout(timer);
   }, [shouldReduceMotion]);
 
-  // El status bar del navegador/PWA se pinta con el <meta name="theme-color">,
-  // no con el CSS de la página. El default (index.html/manifest) es el blanco
-  // del header; mientras se ve esta pantalla (banda oscura) lo pisamos y lo
-  // restauramos al desmontar.
-  useEffect(() => {
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (!meta) return undefined;
-    const previo = meta.getAttribute('content');
-    const colorBanda = getComputedStyle(document.documentElement)
-      .getPropertyValue('--color-text-primary')
-      .trim();
-    if (colorBanda) meta.setAttribute('content', colorBanda);
-    return () => {
-      if (previo !== null) meta.setAttribute('content', previo);
-    };
-  }, []);
-
   useEffect(() => {
     if (socio && shouldReduceMotion && !ingresoCompletoLlamado.current) {
       ingresoCompletoLlamado.current = true;
