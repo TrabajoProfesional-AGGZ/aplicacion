@@ -15,8 +15,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
-        name: 'SocioUnido Club',
-        short_name: 'SocioUnido',
+        name: 'Inter Miami CF',
+        short_name: 'Inter Miami',
         description: 'App oficial para socios del club',
         theme_color: '#f7b5cd',
         background_color: '#f5f5f5',
