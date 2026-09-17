@@ -3,6 +3,7 @@
 html {
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
+  background-color: var(--color-bg);
 }
 
 body {
