@@ -26,8 +26,8 @@ const CANCELABLES = new Set(['Confirmada', 'Pendiente']);
 
 function formatearFecha(fechaIso) {
   return new Intl.DateTimeFormat('es-AR', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(fechaIso));
@@ -120,6 +120,7 @@ export function ReservasPage({ socio, onNuevaReserva = () => {}, onPagarReserva 
     <>
       <section className="reservas-lista">
         <PageHeader
+          variant="hero"
           eyebrow="Instalaciones del club"
           titulo="Mis Reservas"
           accion={(

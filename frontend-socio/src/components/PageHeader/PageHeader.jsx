@@ -1,9 +1,10 @@
 import './PageHeader.css';
 
 /**
- * Encabezado de página. `variant="title"` (claro, por defecto) para listas y
- * flujos; `variant="hero"` (oscuro, gradiente + grano) solo para momentos de
- * identidad: WelcomeCard, Carnet, resumen de Finanzas.
+ * Encabezado de página. `variant="hero"` (oscuro, gradiente + grano) es el
+ * banner estándar — se usa en todas las páginas/pasos de flujo, no solo en
+ * momentos de identidad. `variant="title"` (claro, default del prop) queda
+ * disponible pero sin uso actual en la app.
  */
 export function PageHeader({
   variant = 'title',

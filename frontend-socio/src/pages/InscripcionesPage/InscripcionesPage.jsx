@@ -87,6 +87,7 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
       <ScreenTransition screenKey={screenKey} direction={direccion}>
       <div className="inscripciones-lista">
         <PageHeader
+          variant="hero"
           accion={detalle.estado_suscripcion === 'en_espera' && (
             <span className="inscripcion-detalle-badge">En espera</span>
           )}
@@ -148,6 +149,7 @@ export function InscripcionesPage({ socio, onNuevaInscripcion = () => {} }) {
     <ScreenTransition screenKey={screenKey} direction={direccion}>
       <section className="inscripciones-lista">
         <PageHeader
+          variant="hero"
           eyebrow="Actividades del club"
           titulo="Mis inscripciones"
           accion={(

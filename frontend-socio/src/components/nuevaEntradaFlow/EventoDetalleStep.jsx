@@ -4,8 +4,8 @@ import './EventoDetalleStep.css';
 
 function formatearFecha(fechaIso) {
   return new Intl.DateTimeFormat('es-AR', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(fechaIso));
@@ -26,6 +26,7 @@ export function EventoDetalleStep({
   return (
     <section className="detalle-evento">
       <PageHeader
+        variant="hero"
         accion={yaTieneEntrada && (
           <span className="evento-banner-badge">Ya tenés una entrada para este evento</span>
         )}

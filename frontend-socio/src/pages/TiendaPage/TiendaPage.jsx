@@ -276,6 +276,7 @@ export function TiendaPage({ socio }) {
     <ScreenTransition screenKey={vistaInterna} direction={direccion}>
     <div className="tienda-page">
       <PageHeader
+        variant="hero"
         eyebrow="Tienda del club"
         titulo="Explorá nuestros productos"
         stats={[{ label: 'Disponibles', value: loading ? '—' : productos.length }]}

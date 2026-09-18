@@ -54,6 +54,7 @@ export function DisciplinaDetalleStep({
   return (
     <section className="detalle-disciplina">
       <PageHeader
+        variant="hero"
         accion={yaInscripto && (
           <span className="disciplina-banner-badge">Ya estás inscripto a esta disciplina</span>
         )}

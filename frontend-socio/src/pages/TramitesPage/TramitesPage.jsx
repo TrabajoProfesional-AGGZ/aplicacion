@@ -21,8 +21,8 @@ const ESTADO_LABEL = {
 
 function formatearFecha(fechaIso) {
   return new Intl.DateTimeFormat('es-AR', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(fechaIso));
@@ -59,6 +59,7 @@ export function TramitesPage({ socio }) {
     <>
       <section className="tramites-lista">
         <PageHeader
+          variant="hero"
           eyebrow="Documentación del socio"
           titulo="Mis trámites"
           accion={(

@@ -22,7 +22,7 @@ function formatearMonto(monto) {
 export function InstalacionesListStep({ instalaciones, cargando, error, onSeleccionar }) {
   return (
     <section className="instalaciones-lista">
-      <PageHeader eyebrow="Instalaciones del club" titulo="Realizá tu reserva" />
+      <PageHeader variant="hero" eyebrow="Instalaciones del club" titulo="Realizá tu reserva" />
 
       {cargando && <SkeletonRows n={4} altura={76} />}
 

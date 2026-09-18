@@ -8,8 +8,8 @@ function formatearMonto(monto) {
 
 function formatearFecha(fechaIso) {
   return new Intl.DateTimeFormat('es-AR', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(fechaIso));
@@ -58,6 +58,7 @@ export function ResumenReservaStep({
     <section className="resumen-reserva">
 
       <PageHeader
+        variant="hero"
         eyebrow="Nueva reserva"
         titulo="Confirmá tu reserva"
         stats={[

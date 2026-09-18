@@ -73,6 +73,7 @@ export function AgregarSociosStep({ socioTitular, sociosAgregados, cuposDisponib
   return (
     <section className="agregar-socios">
       <PageHeader
+        variant="hero"
         eyebrow="Nueva reserva"
         titulo="Agregar socios"
         subtitulo="Podés continuar solo con vos, o sumar más socios a esta reserva buscándolos por número."

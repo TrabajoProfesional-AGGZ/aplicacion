@@ -14,8 +14,8 @@ function formatearFecha(fechaIso) {
   if (diffDias < 7) return `Hace ${diffDias} días`;
 
   return new Intl.DateTimeFormat('es-AR', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: fecha.getFullYear() !== ahora.getFullYear() ? 'numeric' : undefined,
     timeZone: 'UTC',
   }).format(fecha);

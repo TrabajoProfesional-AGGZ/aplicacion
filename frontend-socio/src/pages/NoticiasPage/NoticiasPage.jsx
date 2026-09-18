@@ -91,6 +91,7 @@ export function NoticiasPage({ noticiaInicialId = null, onConsumirNoticiaInicial
     <ScreenTransition screenKey={screenKey} direction={direccion}>
     <div className="noticias-page">
       <PageHeader
+        variant="hero"
         eyebrow="Novedades del club"
         titulo="Noticias del Club"
         stats={[{ label: 'Vigentes', value: loading ? '—' : noticias.length }]}

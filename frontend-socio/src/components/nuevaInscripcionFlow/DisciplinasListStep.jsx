@@ -12,7 +12,7 @@ function textoCupos(disciplina) {
 export function DisciplinasListStep({ disciplinas, cargando, error, onSeleccionar }) {
   return (
     <section className="disciplinas-lista">
-      <PageHeader eyebrow="Actividades del club" titulo="Inscribite a una actividad" />
+      <PageHeader variant="hero" eyebrow="Actividades del club" titulo="Inscribite a una actividad" />
 
       {cargando && <SkeletonRows n={4} altura={76} />}
 

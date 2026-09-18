@@ -14,8 +14,8 @@ import './PerfilPage.css';
 function formatearFecha(fechaIso) {
   if (!fechaIso) return null;
   return new Intl.DateTimeFormat('es-AR', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(fechaIso));
