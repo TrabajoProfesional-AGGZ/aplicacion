@@ -102,7 +102,7 @@ describe('PerfilPage', () => {
     expect(screen.getByText('30123456')).toBeInTheDocument();
     expect(screen.getByText('ana.perez@example.com')).toBeInTheDocument();
     expect(screen.getByText('+54 9 11 5555-1234')).toBeInTheDocument();
-    expect(screen.getByText('12 de mayo de 1990')).toBeInTheDocument();
+    expect(screen.getByText('12/05/1990')).toBeInTheDocument();
     expect(container.querySelectorAll('.perfil-card')).toHaveLength(1);
   });
 

@@ -4,7 +4,7 @@ import { PageHeader } from '../PageHeader/PageHeader';
 import './EventosListStep.css';
 
 function formatearFecha(fechaIso) {
-  return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(fechaIso));
+  return new Intl.DateTimeFormat('es-AR', { day: '2-digit', month: '2-digit', timeZone: 'UTC' }).format(new Date(fechaIso));
 }
 
 function formatearMonto(monto) {
@@ -15,7 +15,7 @@ function formatearMonto(monto) {
 export function EventosListStep({ eventos, cargando, error, onSeleccionar }) {
   return (
     <section className="eventos-lista">
-      <PageHeader eyebrow="Eventos del club" titulo="Comprá tu entrada" />
+      <PageHeader variant="hero" eyebrow="Eventos del club" titulo="Comprá tu entrada" />
 
       {cargando && <SkeletonRows n={4} altura={76} />}
 

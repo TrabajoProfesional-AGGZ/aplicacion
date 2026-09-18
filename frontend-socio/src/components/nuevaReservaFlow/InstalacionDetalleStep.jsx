@@ -31,6 +31,7 @@ export function InstalacionDetalleStep({
   return (
     <section className="detalle-instalacion">
       <PageHeader
+        variant="hero"
         eyebrow={instalacion.tipo}
         titulo={instalacion.nombre}
         subtitulo={`${instalacion.tipo} · ${instalacion.capacidad_maxima} personas`}

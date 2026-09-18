@@ -30,6 +30,11 @@
   margin: 0 0 var(--space-5);
 }
 
+/* Confirmadas a la izquierda, Pendientes a la derecha, hueco en el medio. */
+.reservas-lista .page-header-stats {
+  justify-content: space-between;
+}
+
 .reservas-empty {
   text-align: center;
   color: var(--color-text-secondary);

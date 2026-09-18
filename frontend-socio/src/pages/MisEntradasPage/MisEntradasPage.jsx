@@ -20,8 +20,8 @@ const ESTADO_TAG = {
 
 function formatearFecha(fechaIso) {
   return new Intl.DateTimeFormat('es-AR', {
-    day: 'numeric',
-    month: 'long',
+    day: '2-digit',
+    month: '2-digit',
     year: 'numeric',
     timeZone: 'UTC',
   }).format(new Date(fechaIso));
@@ -68,7 +68,7 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet 
   return (
     <>
       <section className="entradas-lista">
-        <PageHeader eyebrow="Eventos del club" titulo="Mis Entradas" />
+        <PageHeader variant="hero" eyebrow="Eventos del club" titulo="Mis Entradas" />
 
         <SegmentedControl
           opciones={VISTA_OPCIONES}

@@ -30,6 +30,12 @@
   margin: 0 0 var(--space-5);
 }
 
+/* Las 3 stats en una sola línea en vez de partirse en dos filas. */
+.inscripciones-lista .page-header-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--space-3);
+}
+
 .inscripciones-empty {
   text-align: center;
   color: var(--color-text-secondary);
