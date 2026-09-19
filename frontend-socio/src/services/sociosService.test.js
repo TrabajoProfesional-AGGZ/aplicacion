@@ -6,7 +6,17 @@ jest.mock('../utils/utils', () => ({
   fetchWithOutAuth: jest.fn(),
 }));
 
+// La ruta pre-login lleva el club en el path y lo saca del resolutor, no de un parámetro.
+jest.mock('./clubService', () => ({
+  idDeClubActual: jest.fn(async () => 'club-uno'),
+}));
+import { idDeClubActual } from './clubService';
+
 describe('sociosService', () => {
+  beforeEach(() => {
+    idDeClubActual.mockResolvedValue('club-uno');
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -18,11 +28,18 @@ describe('sociosService', () => {
 
       const resultado = await validarSocio(1, '12345678');
 
-      expect(fetchWithOutAuth).toHaveBeenCalledWith('/api/v1/socios/validar', 'POST', {
+      expect(fetchWithOutAuth).toHaveBeenCalledWith('/api/v1/clubes/club-uno/socios/validar', 'POST', {
         nro_socio: 1,
         dni: '12345678',
       });
       expect(resultado).toEqual(socio);
+    });
+
+    test('si el club no se puede resolver, no llega a pegarle al backend', async () => {
+      idDeClubActual.mockRejectedValueOnce(new Error('club-desconocido'));
+
+      await expect(validarSocio(1, '12345678')).rejects.toThrow('club-desconocido');
+      expect(fetchWithOutAuth).not.toHaveBeenCalled();
     });
 
     test('lanza socio-no-encontrado en 404', async () => {

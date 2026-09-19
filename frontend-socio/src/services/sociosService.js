@@ -1,13 +1,24 @@
 import { fetchTo, fetchWithOutAuth } from '../utils/utils';
+import { idDeClubActual } from './clubService';
 
 /**
  * Valida nro de socio + DNI + mail contra el registro pre-cargado (sin sesión Firebase todavía).
  * Devuelve `{ ok, token }`: `token` es de un solo uso y hay que pasárselo después a
  * `reclamarCuentaSocio` (issue #249/A-01).
- * @throws {Error} 'socio-no-encontrado' | 'cuenta-ya-registrada' | 'demasiados-intentos'
+ *
+ * El club va **en el path**: es una ruta pre-login, así que no hay token del que el gateway pueda
+ * propagar el claim `club_id`. Es spoofeable por diseño —cualquiera puede probar con otro club— y
+ * la mitigación es el rate limit por IP del gateway; el aislamiento no se relaja, porque del otro
+ * lado el engine se resuelve igual contra el catálogo de clubes.
+ * @throws {Error} 'socio-no-encontrado' | 'cuenta-ya-registrada' | 'demasiados-intentos' | 'club-desconocido' | 'servicio-no-disponible'
  */
 export async function validarSocio(nroSocio, dni, mail) {
-  const res = await fetchWithOutAuth('/api/v1/socios/validar', 'POST', { nro_socio: nroSocio, dni, mail });
+  const clubId = await idDeClubActual();
+  const res = await fetchWithOutAuth(
+    `/api/v1/clubes/${encodeURIComponent(clubId)}/socios/validar`,
+    'POST',
+    { nro_socio: nroSocio, dni, mail },
+  );
   if (res.status === 404) throw new Error('socio-no-encontrado');
   if (res.status === 409) throw new Error('cuenta-ya-registrada');
   if (res.status === 429) throw new Error('demasiados-intentos');
