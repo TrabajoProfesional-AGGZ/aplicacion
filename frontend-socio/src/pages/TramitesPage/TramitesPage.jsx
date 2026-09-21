@@ -5,6 +5,7 @@ import { getTramitesPorSocio } from '../../services/tramitesService';
 import { SubirTramiteForm } from '../../components/subirTramiteForm/SubirTramiteForm';
 import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
+import { estaVencido } from '../../utils/tramitesVigencia';
 import './TramitesPage.css';
 
 const ESTADO_TAG = {
@@ -85,7 +86,8 @@ export function TramitesPage({ socio }) {
         )}
 
         {!cargando && !error && tramites.map((t) => {
-          const tono = ESTADO_TAG[t.estado] ?? 'neutral';
+          const vencido = estaVencido(t);
+          const tono = vencido ? 'danger' : (ESTADO_TAG[t.estado] ?? 'neutral');
           return (
             <div className={`tramite-card tramite-card--${tono}`} key={t.id}>
               <div className="tramite-info">
@@ -97,7 +99,7 @@ export function TramitesPage({ socio }) {
                 {t.observaciones && <span className="tramite-observaciones">{t.observaciones}</span>}
               </div>
               <span className={`tramite-tag tramite-tag--${tono}`}>
-                {ESTADO_LABEL[t.estado] ?? t.estado}
+                {vencido ? 'Vencido' : (ESTADO_LABEL[t.estado] ?? t.estado)}
               </span>
             </div>
           );
