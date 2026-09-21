@@ -1,11 +1,32 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { auth, messaging } from '../firebase';
 import { getToken } from 'firebase/messaging';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signOut, getIdTokenResult } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
 import { getSocioPorEmail } from '../services/sociosService';
-import { clubEnMemoria, recordarClub } from '../services/clubService';
+import { clubEnMemoria, recordarClub, idDeClubActual } from '../services/clubService';
 import { AuthContext } from './authContextObject';
+
+/**
+ * Compara el claim `club_id` del token contra el club de este dominio (resuelto por hostname).
+ * Sin este chequeo, loguearse con la cuenta de un socio de otro club dejaría operando sobre los
+ * datos reales de ESE club mientras la pantalla muestra la marca de este dominio: el club que
+ * resuelve `ClubContext` es puramente cosmético.
+ *
+ * Devuelve `true` también cuando el club de este dominio no se pudo resolver (sin red, catálogo
+ * caído): no hay nada contra qué comparar, y bloquear el login ahí sería más agresivo que lo que
+ * hace `ClubProvider`, que tampoco frena el render en ese caso.
+ */
+async function clubDelTokenCoincide(firebaseUser) {
+  let clubDelDominio;
+  try {
+    clubDelDominio = await idDeClubActual();
+  } catch {
+    return true;
+  }
+  const { claims } = await getIdTokenResult(firebaseUser);
+  return !claims.club_id || claims.club_id === clubDelDominio;
+}
 
 /**
  * Provee la sesión del socio (estado Firebase + perfil de backend) a toda la
@@ -45,8 +66,15 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
+          if (!(await clubDelTokenCoincide(firebaseUser))) {
+            setSocio(null);
+            setAuthError('Credenciales invalidas');
+            setCargandoAuth(false);
+            return;
+          }
+
           const token = await firebaseUser.getIdToken();
-          localStorage.setItem('socioToken', token); 
+          localStorage.setItem('socioToken', token);
           let res = await fetchTo(`/api/v1/socios/por-email/${encodeURIComponent(firebaseUser.email)}`, 'GET');
 
           if (res.ok) {
