@@ -8,14 +8,11 @@ body {
 /* ================= LOGIN ================= */
 .login-container {
   position: fixed;
-  /* Extiende el fixed por encima del viewport "seguro" para que .login-band
-     (hija absoluta, top:0) también se estire y cubra el notch/status bar,
-     en vez de dejar asomar --color-bg debajo de la banda. */
-  top: calc(-1 * env(safe-area-inset-top, 0px));
+  top: 0;
   left: 0;
   right: 0;
-  height: calc(100vh + env(safe-area-inset-top, 0px));
-  height: calc(100dvh + env(safe-area-inset-top, 0px));
+  height: 100vh;
+  height: 100dvh;
   z-index: var(--z-modal);
   overflow: hidden;
   display: flex;

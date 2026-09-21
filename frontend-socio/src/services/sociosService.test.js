@@ -1,4 +1,4 @@
-import { validarSocio, reclamarCuentaSocio, subirFotoSocio, getSocioByNroSocio } from './sociosService';
+import { validarSocio, reclamarCuentaSocio, subirFotoSocio, getSocioByNroSocio, asignarPagoSimuladoClaim } from './sociosService';
 import { fetchTo, fetchWithOutAuth } from '../utils/utils';
 
 jest.mock('../utils/utils', () => ({
@@ -6,7 +6,17 @@ jest.mock('../utils/utils', () => ({
   fetchWithOutAuth: jest.fn(),
 }));
 
+// La ruta pre-login lleva el club en el path y lo saca del resolutor, no de un parámetro.
+jest.mock('./clubService', () => ({
+  idDeClubActual: jest.fn(async () => 'club-uno'),
+}));
+import { idDeClubActual } from './clubService';
+
 describe('sociosService', () => {
+  beforeEach(() => {
+    idDeClubActual.mockResolvedValue('club-uno');
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -18,11 +28,18 @@ describe('sociosService', () => {
 
       const resultado = await validarSocio(1, '12345678');
 
-      expect(fetchWithOutAuth).toHaveBeenCalledWith('/api/v1/socios/validar', 'POST', {
+      expect(fetchWithOutAuth).toHaveBeenCalledWith('/api/v1/clubes/club-uno/socios/validar', 'POST', {
         nro_socio: 1,
         dni: '12345678',
       });
       expect(resultado).toEqual(socio);
+    });
+
+    test('si el club no se puede resolver, no llega a pegarle al backend', async () => {
+      idDeClubActual.mockRejectedValueOnce(new Error('club-desconocido'));
+
+      await expect(validarSocio(1, '12345678')).rejects.toThrow('club-desconocido');
+      expect(fetchWithOutAuth).not.toHaveBeenCalled();
     });
 
     test('lanza socio-no-encontrado en 404', async () => {
@@ -81,6 +98,33 @@ describe('sociosService', () => {
     test('lanza error genérico ante otras respuestas no exitosas', async () => {
       fetchTo.mockResolvedValue({ ok: false, status: 400 });
       await expect(reclamarCuentaSocio('12345678')).rejects.toThrow('Error al reclamar la cuenta del socio');
+    });
+  });
+
+  describe('asignarPagoSimuladoClaim (rama demo)', () => {
+    test('lleva el club en el path, porque el token todavía no tiene el claim club_id', async () => {
+      fetchTo.mockResolvedValue({ ok: true, json: () => Promise.resolve({ ok: true }) });
+
+      await asignarPagoSimuladoClaim('id-token');
+
+      expect(fetchTo).toHaveBeenCalledWith(
+        '/api/v1/auth/clubes/club-uno/claims/pago-simulado-demo',
+        'POST',
+        { id_token: 'id-token' },
+      );
+    });
+
+    test('si el club no se puede resolver, no llega a pegarle al backend', async () => {
+      idDeClubActual.mockRejectedValueOnce(new Error('club-desconocido'));
+
+      await expect(asignarPagoSimuladoClaim('id-token')).rejects.toThrow('club-desconocido');
+      expect(fetchTo).not.toHaveBeenCalled();
+    });
+
+    test('lanza un error si el backend rechaza la asignación', async () => {
+      fetchTo.mockResolvedValue({ ok: false });
+
+      await expect(asignarPagoSimuladoClaim('id-token')).rejects.toThrow('Error al asignar el permiso de pago simulado');
     });
   });
 

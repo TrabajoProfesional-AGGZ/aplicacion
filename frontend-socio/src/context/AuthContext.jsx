@@ -4,6 +4,7 @@ import { getToken } from 'firebase/messaging';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { fetchTo } from '../utils/utils';
 import { getSocioPorEmail } from '../services/sociosService';
+import { clubEnMemoria, recordarClub } from '../services/clubService';
 import { AuthContext } from './authContextObject';
 
 /**
@@ -77,7 +78,14 @@ export function AuthProvider({ children }) {
           }
         }
       } else {
+        // El `clear()` es a propósito amplio: se va toda la sesión cacheada del socio, incluido
+        // el secreto TOTP del carnet. El club no es dato de sesión sino del dominio, así que se
+        // preserva: sin él, un arranque offline después de cerrar sesión se quedaría sin marca
+        // blanca y sin poder resolver ninguna ruta pre-login.
+        const clubCacheado = clubEnMemoria();
         localStorage.clear();
+        if (clubCacheado) recordarClub(clubCacheado);
+
         setSocio(null);
         setAuthError(null);
       }

@@ -90,6 +90,10 @@ const {
           setFormError('No pudimos validar tu identidad. Por favor, revisá los datos completados.');
         } else if (error.message === 'demasiados-intentos') {
           setFormError('Demasiados intentos de validación. Esperá unos minutos antes de volver a probar.');
+        } else if (error.message === 'club-desconocido') {
+          // La validación va contra el club de este dominio, y el catálogo no reconoce ninguno:
+          // el mensaje se distingue de una caída porque se arregla dando de alta el dominio.
+          setFormError('No pudimos identificar el club de este sitio. Avisale al club.');
         } else {
           console.error('Error al validar el socio:', error);
           setFormError('Error de conexión al validar el socio.');
@@ -174,6 +178,8 @@ const {
         setFormError('El email ya está en uso. Por favor, iniciá sesión.');
       } else if (err.message === 'error-actualizacion') {
         setFormError('Tu cuenta fue creada pero hubo un error al guardar tus datos. Contactá al club.');
+      } else if (err.message === 'club-desconocido') {
+        setFormError('No pudimos identificar el club de este sitio. Avisale al club.');
       } else {
         setFormError('Error al procesar el registro. Verificá tu conexión e intentá de nuevo.');
       }

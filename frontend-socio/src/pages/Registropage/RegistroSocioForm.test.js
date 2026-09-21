@@ -23,6 +23,12 @@ jest.mock('../../utils/utils', () => ({
 }));
 import { fetchTo } from '../../utils/utils';
 
+// `asignarTipoClaim` resuelve el club de este dominio para ponerlo en el path: acá se fija, para
+// no salir a la red por el catálogo de clubes desde un test de formulario.
+jest.mock('../../services/clubService', () => ({
+  idDeClubActual: jest.fn(async () => 'club-uno'),
+}));
+
 const onSuccess = jest.fn();
 const onCancel = jest.fn();
 
@@ -182,7 +188,7 @@ describe('RegistroSocioForm', () => {
       expect.anything(), 'juan@club.com', 'Clave12345'
     ));
     await waitFor(() => expect(fetchTo).toHaveBeenCalledWith(
-      '/api/v1/auth/claims/tipo', 'POST', { id_token: 'mock-id-token', tipo: 'socio' }
+      '/api/v1/auth/clubes/club-uno/claims/tipo', 'POST', { id_token: 'mock-id-token', tipo: 'socio' }
     ));
     await waitFor(() => expect(fetchTo).toHaveBeenCalledWith(
       '/api/v1/socios/por-dni/12345678', 'PATCH', expect.objectContaining({ nombre: 'Juan', apellido: 'Lopez' })
