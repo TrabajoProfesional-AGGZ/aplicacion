@@ -109,4 +109,24 @@ describe('TramitesPage', () => {
 
     await waitFor(() => expect(getTramitesPorSocio).toHaveBeenCalled());
   });
+
+  test('muestra el tag "Vencido" en un trámite aprobado cuya fecha de vencimiento ya pasó', async () => {
+    getTramitesPorSocio.mockResolvedValue([
+      { ...TRAMITE_MOCK, estado: 'aprobado', fecha_vencimiento: '2020-01-01' },
+    ]);
+    render(<TramitesPage socio={socioFixture} />);
+    const tipo = await screen.findByText('Apto médico');
+    const card = tipo.closest('.tramite-card');
+    expect(within(card).getByText('Vencido')).toBeInTheDocument();
+    expect(within(card).queryByText('Aprobado')).not.toBeInTheDocument();
+  });
+
+  test('muestra "Aprobado" en un trámite aprobado que todavía no venció', async () => {
+    getTramitesPorSocio.mockResolvedValue([
+      { ...TRAMITE_MOCK, estado: 'aprobado', fecha_vencimiento: '2099-01-01' },
+    ]);
+    render(<TramitesPage socio={socioFixture} />);
+    const tipo = await screen.findByText('Apto médico');
+    expect(within(tipo.closest('.tramite-card')).getByText('Aprobado')).toBeInTheDocument();
+  });
 });

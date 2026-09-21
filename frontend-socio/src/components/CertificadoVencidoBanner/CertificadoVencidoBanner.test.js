@@ -1,14 +1,19 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { CertificadoVencidoBanner, __resetCachePendientesParaTests } from './CertificadoVencidoBanner';
-import { getTramitesPendientes } from '../../services/tramitesService';
+import { getTramitesPendientes, getTramitesPorSocio } from '../../services/tramitesService';
 
 jest.mock('../../services/tramitesService', () => ({
   getTramitesPendientes: jest.fn(),
+  getTramitesPorSocio: jest.fn(),
 }));
 
 const socioFixture = { id: 'socio-1' };
 
 describe('CertificadoVencidoBanner', () => {
+  beforeEach(() => {
+    getTramitesPorSocio.mockResolvedValue([]);
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
     __resetCachePendientesParaTests();
@@ -70,5 +75,51 @@ describe('CertificadoVencidoBanner', () => {
     getTramitesPendientes.mockImplementation(() => new Promise(() => {})); // nunca resuelve en este remount
     render(<CertificadoVencidoBanner socio={socioFixture} onClick={jest.fn()} />);
     expect(screen.getByText(/tenés un trámite vencido/i)).toBeInTheDocument();
+  });
+
+  test('no muestra el banner si el trámite vencido ya fue renovado con otro aprobado y vigente del mismo tipo', async () => {
+    const tipo = { id: 1, nombre: 'Apto médico' };
+    getTramitesPendientes.mockResolvedValue({
+      vencidos: [{ id: 't-viejo', tipo_tramite: tipo }], por_vencer: [], total: 1,
+    });
+    getTramitesPorSocio.mockResolvedValue([
+      { id: 't-viejo', tipo_tramite: tipo, estado: 'aprobado', fecha_vencimiento: '2020-01-01' },
+      { id: 't-nuevo', tipo_tramite: tipo, estado: 'aprobado', fecha_vencimiento: '2099-01-01' },
+    ]);
+    const { container } = render(<CertificadoVencidoBanner socio={socioFixture} onClick={jest.fn()} />);
+    await waitFor(() => expect(getTramitesPorSocio).toHaveBeenCalled());
+    expect(container.firstChild).toBeNull();
+  });
+
+  test('sigue mostrando el banner si el aprobado vigente es de otro tipo', async () => {
+    getTramitesPendientes.mockResolvedValue({
+      vencidos: [{ id: 't-viejo', tipo_tramite: { id: 1 } }], por_vencer: [], total: 1,
+    });
+    getTramitesPorSocio.mockResolvedValue([
+      { id: 't-viejo', tipo_tramite: { id: 1 }, estado: 'aprobado', fecha_vencimiento: '2020-01-01' },
+      { id: 't-otro', tipo_tramite: { id: 2 }, estado: 'aprobado', fecha_vencimiento: '2099-01-01' },
+    ]);
+    render(<CertificadoVencidoBanner socio={socioFixture} onClick={jest.fn()} />);
+    expect(await screen.findByText(/tenés un trámite vencido/i)).toBeInTheDocument();
+  });
+
+  test('un trámite en revisión del mismo tipo no cuenta como renovación', async () => {
+    const tipo = { id: 1 };
+    getTramitesPendientes.mockResolvedValue({
+      vencidos: [{ id: 't-viejo', tipo_tramite: tipo }], por_vencer: [], total: 1,
+    });
+    getTramitesPorSocio.mockResolvedValue([
+      { id: 't-viejo', tipo_tramite: tipo, estado: 'aprobado', fecha_vencimiento: '2020-01-01' },
+      { id: 't-nuevo', tipo_tramite: tipo, estado: 'en_revision', fecha_vencimiento: null },
+    ]);
+    render(<CertificadoVencidoBanner socio={socioFixture} onClick={jest.fn()} />);
+    expect(await screen.findByText(/tenés un trámite vencido/i)).toBeInTheDocument();
+  });
+
+  test('si falla el listado completo, muestra el aviso del backend igual', async () => {
+    getTramitesPendientes.mockResolvedValue({ vencidos: [{ id: 't-1' }], por_vencer: [], total: 1 });
+    getTramitesPorSocio.mockRejectedValue(new Error('servicio-no-disponible'));
+    render(<CertificadoVencidoBanner socio={socioFixture} onClick={jest.fn()} />);
+    expect(await screen.findByText(/tenés un trámite vencido/i)).toBeInTheDocument();
   });
 });
