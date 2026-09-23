@@ -1,4 +1,5 @@
 import { fetchTo } from '../utils/utils';
+import { logger } from '../utils/logger';
 
 const SECRETO_VALIDO_REGEX = /^[a-zA-Z0-9]+$/;
 
@@ -21,7 +22,7 @@ export async function enrolarYGuardarSecreto(socio) {
   const secreto = data.totp_secret;
 
   if (typeof secreto !== 'string' || !SECRETO_VALIDO_REGEX.test(secreto)) {
-    console.error('El secreto TOTP recibido del servidor no tiene un formato válido.');
+    logger.error('El secreto TOTP recibido del servidor no tiene un formato válido.');
     return null;
   }
 

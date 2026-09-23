@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { marcarPagoDemo } from '../../services/pagosService';
 import './PagoCuotaFlow.css';
+import { logger } from '../../utils/logger';
 
 // --- Implementación real de Mercado Pago (comentada en la rama `demo`) ---
 // esta rama reemplaza el botón de pago real por uno que marca el item como
@@ -48,7 +49,7 @@ export function PagoCuotaFlow({ item, tipoItem, socio }) {
       })
       .catch((err) => {
         if (!cancelled) setError('No pudimos conectar con Mercado Pago. Intentá de nuevo más tarde.');
-        console.error("Error al crear preferencia:", err);
+        logger.error("Error al crear preferencia:", err);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

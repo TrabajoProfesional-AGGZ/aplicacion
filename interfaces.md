@@ -8,7 +8,7 @@ nav_order: 2
 
 Aquí se documentan las pantallas principales de la Progressive Web App (PWA) de SocioUnido. 
 
-Para demostrar la flexibilidad de la plataforma y su capacidad de personalización (marca blanca), se exponen dos variantes para cada vista: el **Esquema neutro** (base por defecto de SocioUnido) y el **Esquema personalizado**, aplicado a modo de ejemplo utilizando la identidad institucional del **Mamelodi Sundowns** de Sudáfrica.
+Para demostrar la flexibilidad de la plataforma y su capacidad de personalización (marca blanca), se exponen dos variantes para cada vista: el **Esquema neutro** (base por defecto de SocioUnido) y el **Esquema personalizado**, aplicado a modo de ejemplo utilizando la identidad institucional del **Inter Miami CF** de Estados Unidos.
 
 ## Login
 
@@ -20,8 +20,8 @@ La puerta de entrada a la plataforma, donde el socio ingresa sus credenciales o 
     <img src="img/login_neutro.jpeg" alt="Login Neutro" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/login_mamelodi.jpeg" alt="Login Mamelodi Sundowns" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/login_miami.jpeg" alt="Login Inter Miami CF" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -37,8 +37,8 @@ El panel principal de bienvenida, que consolida el estado del socio, los accesos
     <img src="img/home_neutro.jpeg" alt="Home Neutro" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/home_mamelodi.jpeg" alt="Home Mamelodi Sundowns" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/home_miami.jpeg" alt="Home Inter Miami CF" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -54,8 +54,8 @@ La credencial digital y código QR dinámico que permite al socio identificarse 
     <img src="img/carnet_neutro.jpeg" alt="Carnet Neutro" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/carnet_mamelodi.jpeg" alt="Carnet Mamelodi Sundowns" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/carnet_miami.jpeg" alt="Carnet Inter Miami CF" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -71,7 +71,7 @@ Módulo financiero donde el usuario puede revisar su historial de pagos, consult
     <img src="img/pagos_neutro.jpeg" alt="Cuotas y pagos Neutro" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/pagos_mamelodi.jpeg" alt="Cuotas y pagos Mamelodi Sundowns" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/pagos_miami.jpeg" alt="Cuotas y pagos Inter Miami CF" style="max-width: 300px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>

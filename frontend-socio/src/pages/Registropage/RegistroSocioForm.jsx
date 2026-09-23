@@ -13,6 +13,7 @@ import { asignarTipoClaim } from '../../services/authClaimsService';
 
 import { auth } from '../../firebase';
 import { createUserWithEmailAndPassword, getIdToken, deleteUser } from 'firebase/auth';
+import { logger } from '../../utils/logger';
 
 const STEPS = [
   { id: 1, label: 'Validación', icon: ShieldCheck },
@@ -95,7 +96,7 @@ const {
           // el mensaje se distingue de una caída porque se arregla dando de alta el dominio.
           setFormError('No pudimos identificar el club de este sitio. Avisale al club.');
         } else {
-          console.error('Error al validar el socio:', error);
+          logger.error('Error al validar el socio:', error);
           setFormError('Error de conexión al validar el socio.');
         }
       } finally {
@@ -146,7 +147,7 @@ const {
       try {
         await reclamarCuentaSocio(data.nroDocumento, tokenValidacionRef.current);
       } catch (reclamarErr) {
-        console.error('No se pudo marcar la cuenta como reclamada:', reclamarErr);
+        logger.error('No se pudo marcar la cuenta como reclamada:', reclamarErr);
       }
 
       // Rama demo: auto-otorga pago_simulado a toda
@@ -167,9 +168,9 @@ const {
       if (usuarioCreado) {
         try {
           await deleteUser(usuarioCreado);
-          console.log("Rollback ejecutado: Usuario fantasma eliminado de Firebase.");
+          logger.log("Rollback ejecutado: Usuario fantasma eliminado de Firebase.");
         } catch (rollbackErr) {
-          console.error("Error crítico al intentar hacer rollback:", rollbackErr);
+          logger.error("Error crítico al intentar hacer rollback:", rollbackErr);
         }
       }
       if (err.message === 'validacion-fallida') {

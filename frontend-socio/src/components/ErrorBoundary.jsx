@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { logger } from '../utils/logger';
 
 /**
  * Error boundary de React: captura errores no manejados en el árbol de componentes
@@ -15,7 +16,7 @@ export class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    console.error('Error no capturado en la aplicación:', error, info.componentStack);
+    logger.error('Error no capturado en la aplicación:', error, info.componentStack);
   }
 
   render() {
