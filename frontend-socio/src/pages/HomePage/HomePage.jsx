@@ -27,6 +27,7 @@ import './HomePage.css';
 import { Carnet } from '../../components/Carnet/Carnet';
 import { enrolarYGuardarSecreto } from '../../services/accesosService';
 import { PagoResultado } from '../../components/PagoResultado/PagoResultado'; 
+import { logger } from '../../utils/logger';
 
 /**
  * Dashboard principal: dueño del estado `vista` que decide qué pantalla se
@@ -69,10 +70,10 @@ export function HomePage({ socio, cerrarSesion }) {
       try {
         const secreto = await enrolarYGuardarSecreto(socio);
         if (secreto) {
-          console.log("Dispositivo enrolado correctamente para acceso offline.");
+          logger.log("Dispositivo enrolado correctamente para acceso offline.");
         }
       } catch (error) {
-        console.error("No se pudo enrolar el dispositivo:", error);
+        logger.error("No se pudo enrolar el dispositivo:", error);
       }
     };
 
@@ -88,7 +89,7 @@ export function HomePage({ socio, cerrarSesion }) {
   };
 
   if (socio.modoOffline) {
-    console.warn("Estás sin conexión. Mostrando el pase de acceso offline.");
+    logger.warn("Estás sin conexión. Mostrando el pase de acceso offline.");
     return (
       <div className="offline-fullscreen-container" style={{ minHeight: '100dvh', backgroundColor: 'var(--color-surface)', display: 'flex', flexDirection: 'column' }}>
         <p className="offline-banner">

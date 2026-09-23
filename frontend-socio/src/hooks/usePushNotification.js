@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { getToken } from 'firebase/messaging';
 import { messaging } from '../firebase';
 import { fetchTo } from '../utils/utils'
+import { logger } from '../utils/logger';
 
 /** Pide permiso de notificaciones push y registra el token FCM contra el backend. */
 export const usePushNotifications = (usuarioAutenticado) => {
@@ -22,15 +23,15 @@ export const usePushNotifications = (usuarioAutenticado) => {
               token: currentToken,
               plataforma: 'web'
             });
-            console.log('Token push registrado con éxito en el backend');
+            logger.log('Token push registrado con éxito en el backend');
           } else {
-            console.log('No se pudo generar el token de registro.');
+            logger.log('No se pudo generar el token de registro.');
           }
         } else {
-          console.log('El usuario denegó el permiso para notificaciones.');
+          logger.log('El usuario denegó el permiso para notificaciones.');
         }
       } catch (error) {
-        console.error('Error al obtener el token o pedir permisos:', error);
+        logger.error('Error al obtener el token o pedir permisos:', error);
       }
     };
 

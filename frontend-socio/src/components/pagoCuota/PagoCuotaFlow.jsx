@@ -3,6 +3,7 @@ import { Wallet } from '@mercadopago/sdk-react';
 import { inicializarMercadoPago } from '../../utils/mercadopago';
 import { crearPreferenciaPago } from '../../services/pagosService';
 import './PagoCuotaFlow.css';
+import { logger } from '../../utils/logger';
 
 function formatearPrecio(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
@@ -32,7 +33,7 @@ export function PagoCuotaFlow({ item, tipoItem, socio }) {
       })
       .catch((err) => {
         if (!cancelled) setError('No pudimos conectar con Mercado Pago. Intentá de nuevo más tarde.');
-        console.error("Error al crear preferencia:", err);
+        logger.error("Error al crear preferencia:", err);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

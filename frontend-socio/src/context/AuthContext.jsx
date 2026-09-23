@@ -6,6 +6,7 @@ import { fetchTo } from '../utils/utils';
 import { getSocioPorEmail } from '../services/sociosService';
 import { clubEnMemoria, recordarClub, idDeClubActual } from '../services/clubService';
 import { AuthContext } from './authContextObject';
+import { logger } from '../utils/logger';
 
 /**
  * Compara el claim `club_id` del token contra el club de este dominio (resuelto por hostname).
@@ -48,7 +49,7 @@ export function AuthProvider({ children }) {
       const savedSocioNro = localStorage.getItem('socio_nro_socio');
 
       if (savedSecret && savedSocioId) {
-        console.log("PWA Offline Boot: Rescatando sesión local directamente.");
+        logger.log("PWA Offline Boot: Rescatando sesión local directamente.");
         setTimeout(() => {
           setSocio({
             id: savedSocioId,
@@ -86,7 +87,7 @@ export function AuthProvider({ children }) {
             setAuthError('Servicio no disponible');
           }
         } catch (error) {
-          console.warn("Fallo la conexión con el backend:", error);
+          logger.warn("Fallo la conexión con el backend:", error);
 
           // Sesión de Firebase válida pero el backend no respondió: rescata la
           // misma sesión cacheada en vez de deslogear al socio.
@@ -97,7 +98,7 @@ export function AuthProvider({ children }) {
           const savedSocioNro = localStorage.getItem('socio_nro_socio');
 
           if (savedSecret && savedSocioId) {
-            console.log("Rescatando sesión local para renderizar el QR.");
+            logger.log("Rescatando sesión local para renderizar el QR.");
             setSocio({ id: savedSocioId, modoOffline: true, nombre: savedSocioNombre, apellido: savedSocioApellido, nro_socio: savedSocioNro });
             setAuthError(null);
           } else {
@@ -136,13 +137,13 @@ export function AuthProvider({ children }) {
           });
           if (currentToken) {
             await fetchTo('/api/v1/notificaciones/token', 'POST', {token: currentToken, plataforma: 'web', email: auth.currentUser?.email});
-            console.log('Token de notificaciones registrado exitosamente.');
+            logger.log('Token de notificaciones registrado exitosamente.');
           } else {
-            console.warn('No se pudo generar el token de Firebase.');
+            logger.warn('No se pudo generar el token de Firebase.');
           }
         }
       } catch (error) {
-        console.error('Error al registrar dispositivo para notificaciones:', error);
+        logger.error('Error al registrar dispositivo para notificaciones:', error);
       }
     };
 
@@ -163,7 +164,7 @@ export function AuthProvider({ children }) {
       const data = await getSocioPorEmail(auth.currentUser.email);
       setSocio((prev) => (prev?.modoOffline ? prev : data));
     } catch (error) {
-      console.warn('No se pudo refrescar el perfil del socio:', error);
+      logger.warn('No se pudo refrescar el perfil del socio:', error);
     }
   }, []);
 

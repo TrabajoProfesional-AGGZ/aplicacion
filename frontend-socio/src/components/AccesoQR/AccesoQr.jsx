@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '../../utils/logger';
 import { QRCodeSVG } from 'qrcode.react';
 import * as OTPAuth from 'otpauth';
 
@@ -33,7 +34,7 @@ const AccesoQR = () => {
             secret: OTPAuth.Secret.fromBase32(secreto)
           });
         } catch (err) {
-          console.error('Secreto TOTP inválido o corrupto:', err);
+          logger.error('Secreto TOTP inválido o corrupto:', err);
           generadorTotp = null;
           return;
         }
@@ -43,7 +44,7 @@ const AccesoQR = () => {
         const token = generadorTotp.generate();
         setQrData(`${socioIdActual}|${token}`);
       } catch (err) {
-        console.error('Error al generar TOTP token:', err);
+        logger.error('Error al generar TOTP token:', err);
       }
     };
 
