@@ -1,38 +1,22 @@
-import { useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
-import { marcarPagoDemo } from '../../services/pagosService';
+import { useState, useEffect } from 'react';
+import { Wallet } from '@mercadopago/sdk-react';
+import { inicializarMercadoPago } from '../../utils/mercadopago';
+import { crearPreferenciaPago } from '../../services/pagosService';
 import './PagoCuotaFlow.css';
 import { logger } from '../../utils/logger';
-
-// --- Implementación real de Mercado Pago (comentada en la rama `demo`) ---
-// esta rama reemplaza el botón de pago real por uno que marca el item como
-// pagado directo contra el backend (POST /api/v1/demo/marcar-pagado), para
-// poder testear con usuarios reales sin pasarles credenciales de Mercado Pago.
-// No borrar — descomentar + revertir el componente de abajo al mergear a main.
-//
-// import { useEffect } from 'react';
-// import { Wallet } from '@mercadopago/sdk-react';
-// import { inicializarMercadoPago } from '../../utils/mercadopago';
-// import { crearPreferenciaPago } from '../../services/pagosService';
 
 function formatearPrecio(monto) {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(monto);
 }
 
 /**
- * Flujo de pago genérico (cuota, reserva, entrada o compra).
- *
- * Rama `demo`: en vez de crear una preferencia de Mercado Pago y renderizar
- * el Wallet Brick, el botón "Pagar" marca el item como pagado directamente
- * vía `marcarPagoDemo` (ver pagosService.js) — no hay pasarela de pago real.
+ * Flujo de pago genérico (cuota, reserva, entrada o compra): crea la
+ * preferencia de pago en el backend y renderiza el botón de Mercado Pago (Wallet Brick).
  */
 export function PagoCuotaFlow({ item, tipoItem, socio }) {
-  const [estado, setEstado] = useState('idle'); // idle | procesando | exito | error
-  const [error, setError] = useState('');
-
-  /* --- Implementación real de Mercado Pago (comentada, rama demo) ---
   const [preferenceId, setPreferenceId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     inicializarMercadoPago();
@@ -57,20 +41,6 @@ export function PagoCuotaFlow({ item, tipoItem, socio }) {
 
     return () => { cancelled = true; };
   }, [item, tipoItem]);
-  */
-
-  const handlePagar = () => {
-    setEstado('procesando');
-    setError('');
-    marcarPagoDemo(item.id, tipoItem)
-      .then(() => {
-        setEstado('exito');
-      })
-      .catch(() => {
-        setEstado('error');
-        setError('No pudimos registrar el pago de prueba. Intentá de nuevo.');
-      });
-  };
 
   return (
     <div className="pago-flow-container">
@@ -82,21 +52,20 @@ export function PagoCuotaFlow({ item, tipoItem, socio }) {
       </div>
 
       <div className="pago-flow-wallet-wrapper">
-        {estado === 'error' && <p className="pago-flow-error">{error}</p>}
+        {loading && <p className="pago-flow-loading">Cargando pasarela de pago segura...</p>}
+        {error && <p className="pago-flow-error">{error}</p>}
 
-        {estado === 'exito' ? (
-          <p className="pago-flow-exito">
-            <CheckCircle2 size={20} /> ¡Pago registrado!
-          </p>
-        ) : (
-          <button
-            type="button"
-            className="pago-flow-pagar-demo-btn"
-            onClick={handlePagar}
-            disabled={estado === 'procesando'}
-          >
-            {estado === 'procesando' ? 'Procesando...' : 'Pagar'}
-          </button>
+        {preferenceId && (
+          <Wallet 
+            initialization={{ 
+              preferenceId: preferenceId,
+              // 'self' redirige en la misma pestaña. Para móviles es más nativo.
+              redirectMode: 'self' 
+            }} 
+            customization={{ 
+              texts: { valueProp: 'smart_option' } // "Paga con Mercado Pago"
+            }} 
+          />
         )}
       </div>
     </div>

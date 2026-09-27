@@ -1,49 +1,49 @@
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { PagoCuotaFlow } from './PagoCuotaFlow';
-import { marcarPagoDemo } from '../../services/pagosService';
+import { crearPreferenciaPago } from '../../services/pagosService';
 
-// Rama demo: PagoCuotaFlow ya no crea una preferencia de Mercado Pago, marca
-// el pago directo contra el backend (ver pagosService.js::marcarPagoDemo).
+// 1. Mock el servicio para que no haga llamadas reales
 jest.mock('../../services/pagosService', () => ({
-  marcarPagoDemo: jest.fn(),
+  crearPreferenciaPago: jest.fn(),
+}));
+
+// 2. Mock el SDK de Mercado Pago
+jest.mock('@mercadopago/sdk-react', () => ({
+  initMercadoPago: jest.fn(),
+  Wallet: () => <div data-testid="wallet-brick">Botón de Checkout Pro</div>
 }));
 
 const mockItem = { id: 'item-1', monto: 15000, concepto: 'Cuota Social - 07/2026' };
 const mockSocio = { id: 'socio-1', nombre: 'Ana', apellido: 'Pérez' };
 
-describe('PagoCuotaFlow (pago simulado, rama demo)', () => {
+describe('PagoCuotaFlow', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('muestra el concepto y el botón de pago', () => {
+  test('muestra el concepto y carga el botón de Mercado Pago cuando obtiene la preferencia', async () => {
+    crearPreferenciaPago.mockResolvedValue({ id_preferencia: 'pref-123' });
+    
     render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} />);
 
     expect(screen.getByText(/Cuota Social - 07\/2026/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^pagar$/i })).toBeInTheDocument();
-  });
-
-  test('al pagar, llama a marcarPagoDemo y muestra éxito', async () => {
-    marcarPagoDemo.mockResolvedValue({ estado: 'Pagada' });
-
-    render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} />);
-
-    fireEvent.click(screen.getByRole('button', { name: /^pagar$/i }));
 
     await waitFor(() => {
-      expect(marcarPagoDemo).toHaveBeenCalledWith('item-1', 'cuota');
+      expect(crearPreferenciaPago).toHaveBeenCalledWith(mockItem, 'cuota');
     });
 
-    expect(await screen.findByText(/pago registrado/i)).toBeInTheDocument();
+    expect(await screen.findByTestId('wallet-brick')).toBeInTheDocument();
   });
 
-  test('muestra un mensaje de error si falla el pago simulado', async () => {
-    marcarPagoDemo.mockRejectedValue(new Error('pago-demo-fallido'));
-
+  test('muestra un mensaje de error si falla la creación de la preferencia', async () => {
+    crearPreferenciaPago.mockRejectedValue(new Error('error-al-crear-preferencia'));
+    
     render(<PagoCuotaFlow item={mockItem} tipoItem="cuota" socio={mockSocio} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /^pagar$/i }));
+    await waitFor(() => {
+      expect(crearPreferenciaPago).toHaveBeenCalled();
+    });
 
-    expect(await screen.findByText(/no pudimos registrar el pago de prueba/i)).toBeInTheDocument();
+    expect(screen.queryByTestId('wallet-brick')).not.toBeInTheDocument();
   });
 });

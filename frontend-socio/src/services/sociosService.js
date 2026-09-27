@@ -42,26 +42,6 @@ export async function reclamarCuentaSocio(dni, token) {
   return res.json();
 }
 
-/**
- * Rama demo: auto-otorga el permiso `pago_simulado`
- * a la cuenta recién creada, para que los testers no necesiten una asignación
- * manual vía script antes de poder usar el pago simulado. No llamar desde `main`.
- *
- * Igual que `asignarTipoClaim`: es pre-claim (el token todavía no tiene `club_id`), así que el
- * club va en el path. Del otro lado el claim le gana al path si ya existiera.
- * @throws {Error} 'club-desconocido' | 'servicio-no-disponible'
- */
-export async function asignarPagoSimuladoClaim(idToken) {
-  const clubId = await idDeClubActual();
-  const res = await fetchTo(
-    `/api/v1/auth/clubes/${encodeURIComponent(clubId)}/claims/pago-simulado-demo`,
-    'POST',
-    { id_token: idToken },
-  );
-  if (!res.ok) throw new Error('Error al asignar el permiso de pago simulado');
-  return res.json();
-}
-
 export async function subirFotoSocio(idSocio, imagenBase64) {
   const res = await fetchTo(`/api/v1/socios/${encodeURIComponent(idSocio)}/foto`, 'POST', { imagen_base64: imagenBase64 });
   if (res.status >= 500) throw new Error('servicio-no-disponible');
