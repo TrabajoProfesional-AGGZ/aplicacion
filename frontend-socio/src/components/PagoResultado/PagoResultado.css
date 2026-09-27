@@ -68,7 +68,7 @@
 .pago-resultado-btn {
   margin-top: var(--space-6);
   background-color: var(--color-surface);
-  color: var(--color-text-strong);
+  color: var(--color-text-primary);
   border: none;
   font-family: inherit;
   font-size: var(--text-body);
