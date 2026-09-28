@@ -75,28 +75,28 @@ describe('MisEntradasPage', () => {
     expect(onVerCarnet).toHaveBeenCalledTimes(1);
   });
 
-  test('alternar a "Históricas" pide y muestra el historial', async () => {
+  test('alternar a "Pasadas" pide y muestra el historial', async () => {
     getEntradasActivas.mockResolvedValue([]);
     getEntradasPendientes.mockResolvedValue([]);
     getEntradasHistoricas.mockResolvedValue([ENTRADA_VENCIDA]);
     render(<MisEntradasPage socio={SOCIO} />);
     await screen.findByText('No tenés entradas activas.');
 
-    fireEvent.click(screen.getByRole('radio', { name: 'Históricas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Pasadas' }));
 
     expect(await screen.findByText('Fiesta de fin de año')).toBeInTheDocument();
     expect(screen.getByText('Vencida')).toBeInTheDocument();
     expect(getEntradasHistoricas).toHaveBeenCalledWith('socio-1');
   });
 
-  test('las entradas históricas no muestran el botón de QR', async () => {
+  test('las entradas pasadas no muestran el botón de QR', async () => {
     getEntradasActivas.mockResolvedValue([]);
     getEntradasPendientes.mockResolvedValue([]);
     getEntradasHistoricas.mockResolvedValue([ENTRADA_VENCIDA]);
     render(<MisEntradasPage socio={SOCIO} />);
     await screen.findByText('No tenés entradas activas.');
 
-    fireEvent.click(screen.getByRole('radio', { name: 'Históricas' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Pasadas' }));
 
     await screen.findByText('Fiesta de fin de año');
     expect(screen.queryByLabelText('Ver código QR de la entrada')).not.toBeInTheDocument();
