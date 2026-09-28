@@ -6,6 +6,14 @@ body {
 }
 
 /* ================= LOGIN ================= */
+/*
+ * `.login-container` solo fija la posición y recorta — el scroll real vive en
+ * `.login-scroll-area`. iOS Safari no siempre reconoce `overflow-y: auto` como
+ * scrolleable vía touch cuando está en el MISMO elemento que `position: fixed`
+ * a pantalla completa (bug conocido de WebKit); separarlos en dos elementos
+ * (overlay fijo + región interna con su propio scroll) es el workaround que
+ * funciona de forma consistente.
+ */
 .login-container {
   position: fixed;
   top: 0;
@@ -15,11 +23,20 @@ body {
   height: 100dvh;
   z-index: var(--z-modal);
   overflow: hidden;
+  background-color: var(--color-surface);
+}
+
+.login-scroll-area {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   padding: var(--space-8);
-  background-color: var(--color-surface);
+  padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom));
 }
 
 .login-band {
@@ -62,7 +79,8 @@ body {
 .login-form-wrapper {
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
+  margin-inline: auto;
+  margin-block: auto;
   display: flex;
   flex-direction: column;
   z-index: 10;
@@ -73,22 +91,15 @@ body {
   text-align: center;
   color: var(--color-text-secondary);
   font-size: var(--text-heading);
-  margin-top: 7rem;
-  margin-bottom: 3rem;
+  margin-top: calc(30vh + var(--space-6));
+  margin-top: calc(30dvh + var(--space-6));
+  margin-bottom: var(--space-6);
   font-weight: 400;
-}
-
-@media (max-width: 480px) {
-  .login-slogan {
-    /* En mobile la banda del logo ocupa proporcionalmente más alto, así que
-       el mismo margen fijo que en desktop deja el texto pegado a la banda. */
-    margin-top: 9.5rem;
-  }
 }
 
 .login-error {
   color: var(--color-danger);
-  font-size: var(--text-secondary);
+  font-size: var(--text-body);
   margin: 0 0 var(--space-6) 0;
   text-align: center;
 }
@@ -127,7 +138,7 @@ body {
   color: var(--color-text-secondary);
   text-decoration: underline;
   cursor: pointer;
-  font-size: var(--text-secondary);
+  font-size: var(--text-body);
   padding: 0;
 }
 
@@ -137,8 +148,8 @@ body {
 
 .login-registro-link {
   text-align: center;
-  margin-top: var(--space-8);
-  font-size: var(--text-secondary);
+  margin-top: var(--space-4);
+  font-size: var(--text-body);
 }
 
 .login-link-btn {
@@ -147,6 +158,7 @@ body {
   color: var(--color-text-secondary);
   text-decoration: underline;
   cursor: pointer;
+  font-size: inherit;
 }
 
 .input-group {
@@ -157,7 +169,7 @@ body {
 }
 
 .input-label {
-  font-size: var(--text-secondary);
+  font-size: var(--text-body);
   color: var(--color-text-secondary);
 }
 
@@ -166,7 +178,7 @@ body {
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
-  font-size: var(--text-body);
+  font-size: var(--text-heading);
   font-family: inherit;
   box-sizing: border-box;
   outline: none;
@@ -184,7 +196,7 @@ body {
   color: var(--color-on-accent);
   border: none;
   border-radius: var(--radius-md);
-  font-size: var(--text-body);
+  font-size: var(--text-heading);
   font-weight: 500;
   cursor: pointer;
   transition: background-color var(--transition-normal), transform var(--transition-fast);

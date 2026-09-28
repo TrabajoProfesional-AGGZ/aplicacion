@@ -7,6 +7,7 @@ import { InstalacionDetalleStep } from '../../components/nuevaReservaFlow/Instal
 import { AgregarSociosStep } from '../../components/nuevaReservaFlow/AgregarSociosStep';
 import { ResumenReservaStep } from '../../components/nuevaReservaFlow/ResumenReservaStep';
 import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
+import { guardarProgreso, limpiarProgreso } from '../../services/progresoRechazadoService';
 
 const ORDEN_STEP = { lista: 0, detalle: 1, socios: 2, resumen: 3 };
 
@@ -43,29 +44,45 @@ function filtrarTurnosPasados(turnos, fecha) {
  * Flujo de reserva de una instalación en 4 pasos: instalaciones → detalle
  * (fecha y turno) → agregar socios → resumen y confirmación.
  */
-export function NuevaReservaPage({ socio, onExito }) {
-  const [step, setStep] = useState('lista');
+export function NuevaReservaPage({
+  socio,
+  onExito,
+  onIrAPagos = () => {},
+  onIrATramites = () => {},
+  progresoInicial = null,
+  onProgresoConsumido = () => {},
+}) {
+  const [step, setStep] = useState(() => (progresoInicial ? 'resumen' : 'lista'));
 
   const [instalaciones, setInstalaciones] = useState([]);
   const [cargandoInstalaciones, setCargandoInstalaciones] = useState(true);
   const [errorInstalaciones, setErrorInstalaciones] = useState(false);
 
-  const [instalacionSeleccionada, setInstalacionSeleccionada] = useState(null);
-  const [fecha, setFecha] = useState(hoyISO());
+  const [instalacionSeleccionada, setInstalacionSeleccionada] = useState(() => progresoInicial?.datos?.instalacion ?? null);
+  const [fecha, setFecha] = useState(() => progresoInicial?.datos?.fecha ?? hoyISO());
   const [turnos, setTurnos] = useState([]);
   const [cargandoTurnos, setCargandoTurnos] = useState(false);
   const [errorTurnos, setErrorTurnos] = useState('');
-  const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
-  const [cuposDisponiblesTurno, setCuposDisponiblesTurno] = useState(null);
+  const [turnoSeleccionado, setTurnoSeleccionado] = useState(() => progresoInicial?.datos?.turno ?? null);
+  const [cuposDisponiblesTurno, setCuposDisponiblesTurno] = useState(() => progresoInicial?.datos?.cuposDisponibles ?? null);
 
-  const [sociosAgregados, setSociosAgregados] = useState([]);
+  const [sociosAgregados, setSociosAgregados] = useState(() => progresoInicial?.datos?.sociosAgregados ?? []);
 
   const [enviando, setEnviando] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [reservaConfirmada, setReservaConfirmada] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [errorTipo, setErrorTipo] = useState('');
   const [sociosIncumplen, setSociosIncumplen] = useState([]);
   const successTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (progresoInicial) {
+      limpiarProgreso();
+      onProgresoConsumido();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useBackToRoot(step, 'lista', volverAInstalaciones);
 
@@ -144,6 +161,7 @@ export function NuevaReservaPage({ socio, onExito }) {
     setCuposDisponiblesTurno(null);
     setSociosAgregados([]);
     setSubmitError('');
+    setErrorTipo('');
     setSociosIncumplen([]);
     setReservaConfirmada(false);
     setStep('lista');
@@ -152,6 +170,7 @@ export function NuevaReservaPage({ socio, onExito }) {
   async function confirmarReserva() {
     setEnviando(true);
     setSubmitError('');
+    setErrorTipo('');
     setSociosIncumplen([]);
     try {
       const reserva = await createReserva({
@@ -160,16 +179,36 @@ export function NuevaReservaPage({ socio, onExito }) {
         fecha_reserva: fecha,
         hora_inicio: turnoSeleccionado,
       });
+      limpiarProgreso();
       setReservaConfirmada(reserva.estado === 'Confirmada');
       setSubmitted(true);
       successTimeoutRef.current = setTimeout(() => onExito(), 3000);
     } catch (e) {
+      const incumplen = e.sociosIncumplen ?? [];
       setSubmitError(MENSAJES_ERROR_SUBMIT[e.message] || 'No se pudo registrar la reserva. Intentá de nuevo.');
-      setSociosIncumplen(e.sociosIncumplen ?? []);
+      setErrorTipo(e.message);
+      setSociosIncumplen(incumplen);
+
+      if (e.message === 'socio-moroso' && incumplen.includes(socio.nro_socio)) {
+        guardarProgreso('reserva', socio.id, {
+          instalacion: instalacionSeleccionada,
+          fecha,
+          turno: turnoSeleccionado,
+          cuposDisponibles: cuposDisponiblesTurno,
+          sociosAgregados,
+        });
+      }
     } finally {
       setEnviando(false);
     }
   }
+
+  const socioIncumplePropio = sociosIncumplen.includes(socio.nro_socio);
+  const motivoRechazo = errorTipo === 'socio-moroso' && socioIncumplePropio
+    ? 'moroso'
+    : errorTipo === 'apto-medico' && socioIncumplePropio
+      ? 'tramite'
+      : null;
 
   if (step === 'lista') {
     return (
@@ -231,6 +270,9 @@ export function NuevaReservaPage({ socio, onExito }) {
         submitError={submitError}
         sociosIncumplen={sociosIncumplen}
         onVerReservas={verMisReservas}
+        motivoRechazo={motivoRechazo}
+        onIrAPagar={onIrAPagos}
+        onIrATramites={onIrATramites}
       />
     </ScreenTransition>
   );

@@ -4,19 +4,6 @@
 }
 
 
-.disciplina-banner-badge {
-  display: block;
-  width: fit-content;
-  font-size: var(--text-label);
-  font-weight: 700;
-  letter-spacing: var(--tracking-label);
-  color: var(--color-text-primary);
-  background-color: var(--color-bg-subtle);
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-full);
-  text-align: right;
-  max-width: 65%;
-}
 
 .disciplina-inscribirme-btn {
   border: none;
@@ -58,19 +45,6 @@
   color: var(--status-danger-border);
   font-size: var(--text-secondary);
   margin: 0;
-}
-
-.detalle-error-accion-btn {
-  border: 1px solid var(--status-danger-border);
-  background: none;
-  color: var(--status-danger-border);
-  font-family: inherit;
-  font-size: var(--text-secondary);
-  font-weight: 600;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  margin-top: var(--space-3);
 }
 
 .detalle-sin-cupo-texto {

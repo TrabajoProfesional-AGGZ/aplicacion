@@ -1,0 +1,12 @@
+.rechazo-acciones-btn {
+  border: 1px solid var(--status-danger-border);
+  background: none;
+  color: var(--status-danger-border);
+  font-family: inherit;
+  font-size: var(--text-secondary);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  margin-top: var(--space-3);
+}

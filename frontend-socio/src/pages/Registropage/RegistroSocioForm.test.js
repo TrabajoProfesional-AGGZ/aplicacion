@@ -41,7 +41,7 @@ async function fillStep1() {
 async function fillStep2() {
   await userEvent.type(screen.getByPlaceholderText('María'), 'Juan');
   await userEvent.type(screen.getByPlaceholderText('González'), 'Lopez');
-  fireEvent.change(document.querySelector('input[type="date"]'), { target: { value: '1990-01-01' } });
+  await userEvent.type(screen.getByPlaceholderText('DD/MM/AAAA'), '15031990');
   await userEvent.selectOptions(screen.getByRole('combobox'), 'Masculino');
 }
 
@@ -191,7 +191,7 @@ describe('RegistroSocioForm', () => {
       '/api/v1/auth/clubes/club-uno/claims/tipo', 'POST', { id_token: 'mock-id-token', tipo: 'socio' }
     ));
     await waitFor(() => expect(fetchTo).toHaveBeenCalledWith(
-      '/api/v1/socios/por-dni/12345678', 'PATCH', expect.objectContaining({ nombre: 'Juan', apellido: 'Lopez' })
+      '/api/v1/socios/por-dni/12345678', 'PATCH', expect.objectContaining({ nombre: 'Juan', apellido: 'Lopez', fecha_nacimiento: '1990-03-15' })
     ));
     expect(fetchTo.mock.calls[1][2]).not.toHaveProperty('email');
     await waitFor(() => expect(reclamarCuentaSocio).toHaveBeenCalledWith('12345678', 'tok-validacion'));
@@ -282,5 +282,18 @@ describe('RegistroSocioForm', () => {
     fireEvent.blur(passwordInput);
     expect(await screen.findByText('Debe incluir al menos una mayúscula')).toBeInTheDocument();
     expect(createUserWithEmailAndPassword).not.toHaveBeenCalled();
+  });
+
+  test('permite alternar la visibilidad de la contraseña en el registro', async () => {
+    render(<RegistroSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
+    await navigateToStep4();
+    const passwordInput = screen.getByPlaceholderText('Mínimo 10 caracteres, con mayúscula, minúscula y número');
+    expect(passwordInput).toHaveAttribute('type', 'password');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Mostrar contraseña' }));
+    expect(passwordInput).toHaveAttribute('type', 'text');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ocultar contraseña' }));
+    expect(passwordInput).toHaveAttribute('type', 'password');
   });
 });

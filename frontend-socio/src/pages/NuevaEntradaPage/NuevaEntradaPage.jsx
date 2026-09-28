@@ -11,6 +11,7 @@ import { EventoDetalleStep } from '../../components/nuevaEntradaFlow/EventoDetal
 import { EntradaExitoStep } from '../../components/nuevaEntradaFlow/EntradaExitoStep';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
+import { guardarProgreso, limpiarProgreso } from '../../services/progresoRechazadoService';
 
 const ORDEN_STEP = { lista: 0, detalle: 1, pago: 2, exito: 2 };
 
@@ -33,20 +34,35 @@ function mensajeError(codigo) {
  * Flujo de compra de entrada a un evento: lista → detalle → pago (o pantalla
  * de éxito directa si el evento es gratuito).
  */
-export function NuevaEntradaPage({ socio, onExito = () => {} }) {
-  const [step, setStep] = useState('lista');
+export function NuevaEntradaPage({
+  socio,
+  onExito = () => {},
+  onIrAPagos = () => {},
+  progresoInicial = null,
+  onProgresoConsumido = () => {},
+}) {
+  const [step, setStep] = useState(() => (progresoInicial ? 'detalle' : 'lista'));
 
   const [eventos, setEventos] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
   const [eventosConEntradaIds, setEventosConEntradaIds] = useState(new Set());
 
-  const [eventoSeleccionado, setEventoSeleccionado] = useState(null);
-  const [yaTieneEntrada, setYaTieneEntrada] = useState(false);
+  const [eventoSeleccionado, setEventoSeleccionado] = useState(() => progresoInicial?.datos?.evento ?? null);
   const [entradaPendiente, setEntradaPendiente] = useState(null);
   const [enviando, setEnviando] = useState(false);
   const [errorCompra, setErrorCompra] = useState('');
   const successTimeoutRef = useRef(null);
+
+  const yaTieneEntrada = Boolean(eventoSeleccionado) && eventosConEntradaIds.has(eventoSeleccionado.id);
+
+  useEffect(() => {
+    if (progresoInicial) {
+      limpiarProgreso();
+      onProgresoConsumido();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // El paso 'pago' ya creó la entrada Pendiente en el backend: no reinicia la
   // selección del evento como 'detalle' — el gesto de atrás va a "mis entradas".
@@ -89,7 +105,6 @@ export function NuevaEntradaPage({ socio, onExito = () => {} }) {
 
   function irADetalle(evento) {
     setEventoSeleccionado(evento);
-    setYaTieneEntrada(eventosConEntradaIds.has(evento.id));
     setErrorCompra('');
     setStep('detalle');
   }
@@ -97,7 +112,6 @@ export function NuevaEntradaPage({ socio, onExito = () => {} }) {
   function volverALista() {
     setEventoSeleccionado(null);
     setEntradaPendiente(null);
-    setYaTieneEntrada(false);
     setStep('lista');
   }
 
@@ -106,6 +120,7 @@ export function NuevaEntradaPage({ socio, onExito = () => {} }) {
     setErrorCompra('');
     try {
       const entrada = await comprarEntrada(eventoSeleccionado.id, socio.id);
+      limpiarProgreso();
       setEntradaPendiente(entrada);
       if (entrada.estado === 'Pagada') {
         setStep('exito');
@@ -115,6 +130,9 @@ export function NuevaEntradaPage({ socio, onExito = () => {} }) {
       }
     } catch (e) {
       setErrorCompra(e.message);
+      if (e.message === 'moroso') {
+        guardarProgreso('entrada', socio.id, { evento: eventoSeleccionado });
+      }
     } finally {
       setEnviando(false);
     }
@@ -154,8 +172,11 @@ export function NuevaEntradaPage({ socio, onExito = () => {} }) {
           evento={eventoSeleccionado}
           yaTieneEntrada={yaTieneEntrada}
           onPagarEntrada={handlePagarEntrada}
+          onVerEntradas={onExito}
           enviando={enviando}
           submitError={errorCompra ? mensajeError(errorCompra) : ''}
+          motivoRechazo={errorCompra === 'moroso' ? 'moroso' : null}
+          onIrAPagar={onIrAPagos}
         />
       </ScreenTransition>
     );

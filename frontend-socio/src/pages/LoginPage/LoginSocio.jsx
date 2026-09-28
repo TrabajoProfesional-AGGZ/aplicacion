@@ -178,15 +178,16 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
         </motion.div>
       )}
 
-      <motion.div
-        variants={formContainerVariants}
-        initial="hidden"
-        animate={formAnimateState}
-        className="login-form-wrapper"
-      >
-        <motion.h2 variants={formItemVariants} className="login-slogan">
-          Porque el club es de los socios, y la gestión es de <b>SocioUnido</b>
-        </motion.h2>
+      <div className="login-scroll-area">
+        <motion.div
+          variants={formContainerVariants}
+          initial="hidden"
+          animate={formAnimateState}
+          className="login-form-wrapper"
+        >
+          <motion.h2 variants={formItemVariants} className="login-slogan">
+            Porque el club es de los socios, y la gestión es de <b>SocioUnido</b>
+          </motion.h2>
 
         <motion.form onSubmit={manejarLogin} variants={formItemVariants}>
           <div className="input-group">
@@ -240,15 +241,15 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
           <button type="submit" disabled={cargando} className="su-button login-submit-btn">
             {cargando ? 'Ingresando...' : 'Ingresar'}
           </button>
+
+          <div className="login-registro-link">
+            <button type="button" onClick={irARegistro} className="login-link-btn">
+              ¿Es tu primera vez? Configurar mi cuenta
+            </button>
+          </div>
         </motion.form>
-
-        <motion.div variants={formItemVariants} className="login-registro-link">
-          <button type="button" onClick={irARegistro} className="login-link-btn">
-            ¿Es tu primera vez? Configurar mi cuenta
-          </button>
         </motion.div>
-
-      </motion.div>
+      </div>
 
       <AnimatePresence>
         {mostrarRecuperar && (

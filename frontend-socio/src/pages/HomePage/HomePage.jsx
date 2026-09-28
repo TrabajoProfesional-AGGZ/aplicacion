@@ -20,6 +20,7 @@ import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBan
 import { DeudaBanner } from '../../components/DeudaBanner/DeudaBanner';
 import { HoyCard } from '../../components/HoyCard/HoyCard';
 import { BotinButton } from '../../components/BotinButton/BotinButton';
+import { VolverAlFlujoBanner } from '../../components/VolverAlFlujoBanner/VolverAlFlujoBanner';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { useAlertasNoLeidas } from '../../hooks/useAlertasNoLeidas';
 import '../../socio-theme.css';
@@ -35,9 +36,17 @@ import { logger } from '../../utils/logger';
  * enrola el dispositivo para el pase de acceso offline y detecta la vuelta
  * de una redirección de Mercado Pago para mostrar el resultado del pago.
  */
+const VISTA_POR_TIPO_PROGRESO = {
+  reserva: 'nueva-reserva',
+  inscripcion: 'nueva-inscripcion',
+  entrada: 'nueva-entrada',
+  compra: 'tienda',
+};
+
 export function HomePage({ socio, cerrarSesion }) {
   const [itemAPagarId, setItemAPagarId] = useState(null);
   const [noticiaSeleccionadaId, setNoticiaSeleccionadaId] = useState(null);
+  const [restaurar, setRestaurar] = useState(null);
   // Si la URL trae estos params, la app se abrió de vuelta desde la redirección de MP.
   const searchParams = new URLSearchParams(window.location.search);
   const statusMP = searchParams.get('status');
@@ -88,6 +97,11 @@ export function HomePage({ socio, cerrarSesion }) {
     setVista('inicio');
   };
 
+  const manejarVolverAlFlujo = (progreso) => {
+    setRestaurar(progreso);
+    setVista(VISTA_POR_TIPO_PROGRESO[progreso.tipo] ?? 'inicio');
+  };
+
   if (socio.modoOffline) {
     logger.warn("Estás sin conexión. Mostrando el pase de acceso offline.");
     return (
@@ -112,18 +126,24 @@ export function HomePage({ socio, cerrarSesion }) {
       <main className="home-page">
        <ScreenTransition screenKey={vista} direction={direccion}>
         {vista === 'pago-resultado' && (
-          <PagoResultado 
-            status={estadoPagoMP} 
-            onVolver={manejarVolverDePago} 
-          />
+          <>
+            <VolverAlFlujoBanner socio={socio} onVolver={manejarVolverAlFlujo} />
+            <PagoResultado
+              status={estadoPagoMP}
+              onVolver={manejarVolverDePago}
+            />
+          </>
         )}
         {vista === 'perfil' && <PerfilPage socio={socio} cerrarSesion={cerrarSesion} />}
         {vista === 'pagos' && (
-          <FinanzasPage
-            socio={socio}
-            itemAPagarId={itemAPagarId}
-            onConsumirItemAPagar={() => setItemAPagarId(null)}
-          />
+          <>
+            <VolverAlFlujoBanner socio={socio} onVolver={manejarVolverAlFlujo} />
+            <FinanzasPage
+              socio={socio}
+              itemAPagarId={itemAPagarId}
+              onConsumirItemAPagar={() => setItemAPagarId(null)}
+            />
+          </>
         )}
         {vista === 'tramites' && <TramitesPage socio={socio} />}
         {vista === 'alertas' && <AlertasPage socio={socio} onAlertasCargadas={marcarAlertasComoLeidas} />}
@@ -138,6 +158,10 @@ export function HomePage({ socio, cerrarSesion }) {
           <NuevaReservaPage
             socio={socio}
             onExito={() => setVista('reservas')}
+            onIrAPagos={() => setVista('pagos')}
+            onIrATramites={() => setVista('tramites')}
+            progresoInicial={restaurar?.tipo === 'reserva' ? restaurar : null}
+            onProgresoConsumido={() => setRestaurar(null)}
           />
         )}
         {vista === 'inscripciones' && (
@@ -148,6 +172,9 @@ export function HomePage({ socio, cerrarSesion }) {
             socio={socio}
             onExito={() => setVista('inscripciones')}
             onIrATramites={() => setVista('tramites')}
+            onIrAPagos={() => setVista('pagos')}
+            progresoInicial={restaurar?.tipo === 'inscripcion' ? restaurar : null}
+            onProgresoConsumido={() => setRestaurar(null)}
           />
         )}
         {vista === 'noticias' && (
@@ -156,11 +183,21 @@ export function HomePage({ socio, cerrarSesion }) {
             onConsumirNoticiaInicial={() => setNoticiaSeleccionadaId(null)}
           />
         )}
-        {vista === 'tienda' && <TiendaPage socio={socio} />}
+        {vista === 'tienda' && (
+          <TiendaPage
+            socio={socio}
+            onIrAPagos={() => setVista('pagos')}
+            progresoInicial={restaurar?.tipo === 'compra' ? restaurar : null}
+            onProgresoConsumido={() => setRestaurar(null)}
+          />
+        )}
         {vista === 'nueva-entrada' && (
           <NuevaEntradaPage
             socio={socio}
             onExito={() => setVista('mis-entradas')}
+            onIrAPagos={() => setVista('pagos')}
+            progresoInicial={restaurar?.tipo === 'entrada' ? restaurar : null}
+            onProgresoConsumido={() => setRestaurar(null)}
           />
         )}
         {vista === 'mis-entradas' && (

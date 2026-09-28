@@ -1,5 +1,6 @@
 import { CheckCircle2, AlertCircle, UserRound } from 'lucide-react';
 import { PageHeader } from '../PageHeader/PageHeader';
+import { RechazoAcciones } from '../RechazoAcciones/RechazoAcciones';
 import './ResumenReservaStep.css';
 
 function formatearMonto(monto) {
@@ -30,6 +31,9 @@ export function ResumenReservaStep({
   submitError,
   sociosIncumplen = [],
   onVerReservas,
+  motivoRechazo = null,
+  onIrAPagar,
+  onIrATramites,
 }) {
   if (submitted) {
     return (
@@ -97,6 +101,7 @@ export function ResumenReservaStep({
               })}
             </ul>
           )}
+          <RechazoAcciones motivo={motivoRechazo} onIrAPagar={onIrAPagar} onIrATramites={onIrATramites} />
         </div>
       )}
 

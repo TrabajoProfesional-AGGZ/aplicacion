@@ -9,6 +9,7 @@ import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { DisciplinasListStep } from '../../components/nuevaInscripcionFlow/DisciplinasListStep';
 import { DisciplinaDetalleStep } from '../../components/nuevaInscripcionFlow/DisciplinaDetalleStep';
 import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
+import { guardarProgreso, limpiarProgreso } from '../../services/progresoRechazadoService';
 
 const ORDEN_STEP = { lista: 0, detalle: 1 };
 
@@ -33,15 +34,22 @@ function mensajeError(codigo, categoriaRequerida) {
  * Flujo de inscripción a una disciplina: lista → detalle, con inscripción
  * directa o suma a lista de espera si no hay cupo.
  */
-export function NuevaInscripcionPage({ socio, onExito = () => {}, onIrATramites = () => {} }) {
-  const [step, setStep] = useState('lista');
+export function NuevaInscripcionPage({
+  socio,
+  onExito = () => {},
+  onIrATramites = () => {},
+  onIrAPagos = () => {},
+  progresoInicial = null,
+  onProgresoConsumido = () => {},
+}) {
+  const [step, setStep] = useState(() => (progresoInicial ? 'detalle' : 'lista'));
 
   const [disciplinas, setDisciplinas] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(false);
   const [estadoPorDisciplina, setEstadoPorDisciplina] = useState(new Map());
 
-  const [disciplinaSeleccionada, setDisciplinaSeleccionada] = useState(null);
+  const [disciplinaSeleccionada, setDisciplinaSeleccionada] = useState(() => progresoInicial?.datos?.disciplina ?? null);
   const [yaInscripto, setYaInscripto] = useState(false);
 
   const [enviando, setEnviando] = useState(false);
@@ -51,6 +59,14 @@ export function NuevaInscripcionPage({ socio, onExito = () => {}, onIrATramites 
   const [submitted, setSubmitted] = useState(false);
   const [enEspera, setEnEspera] = useState(false);
   const successTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    if (progresoInicial) {
+      limpiarProgreso();
+      onProgresoConsumido();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useBackToRoot(step, 'lista', volverALista);
 
@@ -109,6 +125,7 @@ export function NuevaInscripcionPage({ socio, onExito = () => {}, onIrATramites 
     setSinCupo(false);
     try {
       await inscribirseADisciplina(disciplinaSeleccionada.id, socio.id);
+      limpiarProgreso();
       setSubmitted(true);
       successTimeoutRef.current = setTimeout(() => onExito(), 3000);
     } catch (e) {
@@ -117,11 +134,16 @@ export function NuevaInscripcionPage({ socio, onExito = () => {}, onIrATramites 
       } else {
         setErrorTipo(e.message);
         if (e.message === 'categoria-no-coincide') setCategoriaRequerida(e.categoriaRequerida || '');
+        if (e.message === 'moroso') {
+          guardarProgreso('inscripcion', socio.id, { disciplina: disciplinaSeleccionada });
+        }
       }
     } finally {
       setEnviando(false);
     }
   }
+
+  const motivoRechazo = errorTipo === 'moroso' ? 'moroso' : errorTipo === 'apto-medico' ? 'tramite' : null;
 
   async function handleSumarseListaEspera() {
     setEnviando(true);
@@ -151,7 +173,8 @@ export function NuevaInscripcionPage({ socio, onExito = () => {}, onIrATramites 
           sinCupo={sinCupo}
           submitError={errorTipo ? mensajeError(errorTipo, categoriaRequerida) : ''}
           onSumarseListaEspera={handleSumarseListaEspera}
-          mostrarBotonTramites={errorTipo === 'apto-medico'}
+          motivoRechazo={motivoRechazo}
+          onIrAPagar={onIrAPagos}
           onIrATramites={onIrATramites}
           onVerInscripciones={verMisInscripciones}
         />

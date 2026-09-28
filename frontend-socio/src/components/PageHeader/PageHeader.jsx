@@ -1,3 +1,4 @@
+import { CheckCircle2 } from 'lucide-react';
 import './PageHeader.css';
 
 /**
@@ -14,6 +15,7 @@ export function PageHeader({
   subtitulo = null,
   stats = [],
   accion = null,
+  aviso = null,
   children = null,
 }) {
   const claseTono = variant === 'hero' && tono ? ` page-header--${tono}` : '';
@@ -38,6 +40,20 @@ export function PageHeader({
           </div>
         )}
         {accion && <div className="page-header-accion">{accion}</div>}
+        {aviso && (
+          <div className="page-header-aviso">
+            <CheckCircle2 size={22} className="page-header-aviso-icon" aria-hidden="true" />
+            <div className="page-header-aviso-texto">
+              <p className="page-header-aviso-titulo">{aviso.titulo}</p>
+              <p className="page-header-aviso-descripcion">{aviso.texto}</p>
+              {aviso.accion && (
+                <button type="button" className="page-header-aviso-btn" onClick={aviso.accion.onClick}>
+                  {aviso.accion.label}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
         {children}
       </div>
     </header>
