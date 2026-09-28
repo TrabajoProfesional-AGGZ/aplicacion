@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
-import { AlertCircle, ChevronDown, Check } from 'lucide-react';
+import { AlertCircle, ChevronDown, Check, Eye, EyeOff } from 'lucide-react';
 import { DatePicker } from './DatePicker';
 import { setNativeValue, mergeRefs } from './nativeInputUtils';
 import { usePickerPopover } from './usePickerPopover';
@@ -17,6 +17,29 @@ export const StyledInput = React.forwardRef(({ error, ...props }, ref) => {
       {...props}
       className={`csf-input${error ? ' csf-input--error' : ''}`}
     />
+  );
+});
+
+/** Input de contraseña con toggle de visibilidad (mismo patrón que `LoginSocio.jsx`), compatible con `register()`. */
+export const PasswordInput = React.forwardRef(({ error, className, ...props }, ref) => {
+  const [mostrar, setMostrar] = useState(false);
+  return (
+    <div className="csf-password-wrapper">
+      <input
+        ref={ref}
+        {...props}
+        type={mostrar ? 'text' : 'password'}
+        className={`csf-input${error ? ' csf-input--error' : ''}${className ? ` ${className}` : ''}`}
+      />
+      <button
+        type="button"
+        className="csf-toggle-password"
+        onClick={() => setMostrar((v) => !v)}
+        aria-label={mostrar ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+      >
+        {mostrar ? <EyeOff size={18} /> : <Eye size={18} />}
+      </button>
+    </div>
   );
 });
 
