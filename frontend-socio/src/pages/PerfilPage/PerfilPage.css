@@ -200,9 +200,8 @@
   font-weight: 600;
   letter-spacing: var(--tracking-heading);
   line-height: var(--leading-heading);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .perfil-card-estado {
@@ -260,9 +259,8 @@
 .perfil-dato-valor {
   font-size: var(--text-body);
   font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .perfil-cambiar-button {
