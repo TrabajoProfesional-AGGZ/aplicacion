@@ -19,7 +19,7 @@ import { TiendaPage } from '../TiendaPage/TiendaPage';
 import { CertificadoVencidoBanner } from '../../components/CertificadoVencidoBanner/CertificadoVencidoBanner';
 import { DeudaBanner } from '../../components/DeudaBanner/DeudaBanner';
 import { HoyCard } from '../../components/HoyCard/HoyCard';
-import { BotinButton } from '../../components/BotinButton/BotinButton';
+// import { BotinButton } from '../../components/BotinButton/BotinButton';
 import { VolverAlFlujoBanner } from '../../components/VolverAlFlujoBanner/VolverAlFlujoBanner';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { useAlertasNoLeidas } from '../../hooks/useAlertasNoLeidas';
@@ -242,7 +242,7 @@ export function HomePage({ socio, cerrarSesion }) {
         vistaActual={vista}
       />
 
-      {vista === 'inicio' && <BotinButton />}
+      {/* {vista === 'inicio' && <BotinButton />} */}
     </div>
   );
 }
