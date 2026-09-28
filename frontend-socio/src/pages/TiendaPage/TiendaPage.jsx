@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Package, Minus, Plus, Receipt } from 'lucide-react';
 import { getProductosDisponibles, getProducto, comprarProducto, getComprasPorSocio } from '../../services/tiendaService';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
@@ -6,6 +6,8 @@ import { SkeletonRows } from '../../components/SkeletonRows/SkeletonRows';
 import { PagoCuotaFlow } from '../../components/pagoCuota/PagoCuotaFlow';
 import { PageHeader } from '../../components/PageHeader/PageHeader';
 import { ScreenTransition } from '../../components/ScreenTransition/ScreenTransition';
+import { RechazoAcciones } from '../../components/RechazoAcciones/RechazoAcciones';
+import { guardarProgreso, limpiarProgreso } from '../../services/progresoRechazadoService';
 import './TiendaPage.css';
 
 const ORDEN_VISTA = { lista: 0, detalle: 1, 'mis-compras': 1, pago: 2 };
@@ -32,7 +34,7 @@ function formatearPrecio(monto) {
  * Catálogo de la tienda del club: lista → detalle → compra → pago, más una
  * vista de compras ya pagadas ("Mis compras").
  */
-export function TiendaPage({ socio }) {
+export function TiendaPage({ socio, onIrAPagos = () => {}, progresoInicial = null, onProgresoConsumido = () => {} }) {
   const [productos, setProductos] = useState([]);
   const [detalle, setDetalle] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +42,7 @@ export function TiendaPage({ socio }) {
   const [error, setError] = useState(null);
   const [comprando, setComprando] = useState(false);
   const [cantidad, setCantidad] = useState(1);
+  const progresoRestauradoRef = useRef(false);
 
   const [vistaInterna, setVistaInterna] = useState('lista');
   const [enviandoCompra, setEnviandoCompra] = useState(false);
@@ -90,6 +93,18 @@ export function TiendaPage({ socio }) {
 
   useEffect(() => { cargarProductos(); }, []);
 
+  useEffect(() => {
+    if (progresoRestauradoRef.current || !progresoInicial) return;
+    progresoRestauradoRef.current = true;
+    abrirDetalle(progresoInicial.datos.productoId).then(() => {
+      setCantidad(progresoInicial.datos.cantidad);
+      setComprando(true);
+    });
+    limpiarProgreso();
+    onProgresoConsumido();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function abrirDetalle(id) {
     try {
       setLoadingDetalle(true);
@@ -120,10 +135,14 @@ export function TiendaPage({ socio }) {
     try {
       // Crea la fila "Iniciada" (descuenta stock ya) y recién ahí muestra el Brick de pago.
       const compraIniciada = await comprarProducto(detalle.id, socio.id, cantidad);
+      limpiarProgreso();
       setCompraEnCurso(compraIniciada);
       setVistaInterna('pago');
     } catch (e) {
       setErrorCompra(e.message);
+      if (e.message === 'moroso') {
+        guardarProgreso('compra', socio.id, { productoId: detalle.id, cantidad });
+      }
     } finally {
       setEnviandoCompra(false);
     }
@@ -222,7 +241,10 @@ export function TiendaPage({ socio }) {
           {detalle.descripcion && <p className="tienda-detalle-desc">{detalle.descripcion}</p>}
 
           {errorCompra && (
-            <p className="tienda-error" role="alert">{mensajeError(errorCompra)}</p>
+            <>
+              <p className="tienda-error" role="alert">{mensajeError(errorCompra)}</p>
+              <RechazoAcciones motivo={errorCompra === 'moroso' ? 'moroso' : null} onIrAPagar={onIrAPagos} />
+            </>
           )}
 
           {!sinStock && (

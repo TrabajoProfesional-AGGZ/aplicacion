@@ -156,7 +156,38 @@ describe('NuevaEntradaPage', () => {
     render(<NuevaEntradaPage socio={SOCIO} />);
     fireEvent.click(await screen.findByText('Fiesta de fin de año'));
 
-    expect(await screen.findByText('Ya tenés una entrada para este evento')).toBeInTheDocument();
+    expect(await screen.findByText('Ya tenés tu entrada')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Reserva tu entrada' })).not.toBeInTheDocument();
+  });
+
+  test('si la compra falla por morosidad, ofrece "Ir a pagar" y guarda el progreso por 5 minutos', async () => {
+    localStorage.clear();
+    getEventos.mockResolvedValue([EVENTO]);
+    comprarEntrada.mockRejectedValue(new Error('moroso'));
+    const onIrAPagos = jest.fn();
+    render(<NuevaEntradaPage socio={SOCIO} onIrAPagos={onIrAPagos} />);
+    fireEvent.click(await screen.findByText('Fiesta de fin de año'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reserva tu entrada' }));
+
+    const boton = await screen.findByRole('button', { name: 'Ir a pagar' });
+    fireEvent.click(boton);
+    expect(onIrAPagos).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem('su_progreso_rechazado')).not.toBeNull();
+  });
+
+  test('con progresoInicial, arranca directo en el detalle del evento guardado y consume el progreso', async () => {
+    getEventos.mockResolvedValue([EVENTO]);
+    const onProgresoConsumido = jest.fn();
+    render(
+      <NuevaEntradaPage
+        socio={SOCIO}
+        progresoInicial={{ tipo: 'entrada', datos: { evento: EVENTO } }}
+        onProgresoConsumido={onProgresoConsumido}
+      />
+    );
+
+    expect(await screen.findByRole('heading', { name: 'Fiesta de fin de año' })).toBeInTheDocument();
+    expect(onProgresoConsumido).toHaveBeenCalledTimes(1);
   });
 });

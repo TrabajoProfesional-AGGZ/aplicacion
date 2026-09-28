@@ -8,7 +8,7 @@ import './MisEntradasPage.css';
 
 const VISTA_OPCIONES = [
   { id: 'activas', label: 'Activas' },
-  { id: 'historicas', label: 'Históricas' },
+  { id: 'historicas', label: 'Pasadas' },
 ];
 
 const ESTADO_TAG = {
@@ -28,7 +28,7 @@ function formatearFecha(fechaIso) {
 }
 
 /**
- * Entradas del socio, con toggle Activas/Históricas (históricas se cargan
+ * Entradas del socio, con toggle Activas/Pasadas (pasadas se cargan
  * recién al abrir esa pestaña por primera vez).
  */
 export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet = () => {} }) {
@@ -74,7 +74,7 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet 
           opciones={VISTA_OPCIONES}
           valor={vista}
           onChange={setVista}
-          ariaLabel="Alternar entradas activas o históricas"
+          ariaLabel="Alternar entradas activas o pasadas"
         />
 
         {(cargandoActivas || cargandoHistoricas) && <SkeletonRows n={3} altura={76} />}
@@ -85,7 +85,7 @@ export function MisEntradasPage({ socio, onPagarEntrada = () => {}, onVerCarnet 
 
         {!cargandoActivas && !cargandoHistoricas && !error && entradasVisibles.length === 0 && (
           <p className="entradas-empty">
-            {vista === 'activas' ? 'No tenés entradas activas.' : 'No tenés entradas en tu historial.'}
+            {vista === 'activas' ? 'No tenés entradas activas.' : 'No tenés entradas pasadas.'}
           </p>
         )}
 

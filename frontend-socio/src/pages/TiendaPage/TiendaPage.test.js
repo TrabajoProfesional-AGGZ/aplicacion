@@ -158,16 +158,37 @@ describe('TiendaPage', () => {
     expect(screen.queryByTestId('payment-brick')).not.toBeInTheDocument();
   });
 
-  test('un error moroso se muestra inline con el mensaje correspondiente', async () => {
+  test('un error moroso se muestra inline con el mensaje correspondiente y ofrece "Ir a pagar", guardando el progreso', async () => {
+    localStorage.clear();
     getProducto.mockResolvedValue(detalleConStock);
     comprarProducto.mockRejectedValue(new Error('moroso'));
-    render(<TiendaPage socio={SOCIO} />);
+    const onIrAPagos = jest.fn();
+    render(<TiendaPage socio={SOCIO} onIrAPagos={onIrAPagos} />);
 
     fireEvent.click(await screen.findByText('Remera oficial'));
     fireEvent.click(await screen.findByText('Comprar'));
     fireEvent.click(screen.getByText('Confirmar compra'));
 
     expect(await screen.findByText('Tenés pagos pendientes. Regularizá tu situación para poder comprar.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Ir a pagar' }));
+    expect(onIrAPagos).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem('su_progreso_rechazado')).not.toBeNull();
+  });
+
+  test('con progresoInicial, abre directo el detalle del producto guardado con la cantidad guardada', async () => {
+    getProducto.mockResolvedValue(detalleConStock);
+    const onProgresoConsumido = jest.fn();
+    render(
+      <TiendaPage
+        socio={SOCIO}
+        progresoInicial={{ tipo: 'compra', datos: { productoId: '1', cantidad: 2 } }}
+        onProgresoConsumido={onProgresoConsumido}
+      />
+    );
+
+    expect(await screen.findByText('Confirmar compra')).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(onProgresoConsumido).toHaveBeenCalledTimes(1);
   });
 
   test('el gesto de atrás desde el detalle muestra la lista de nuevo', async () => {

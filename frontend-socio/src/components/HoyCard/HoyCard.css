@@ -58,7 +58,7 @@
 }
 
 .hoy-card-item-nombre {
-  font-size: var(--text-body);
+  font-size: var(--text-heading);
   font-weight: 600;
   color: var(--color-text-primary);
 }

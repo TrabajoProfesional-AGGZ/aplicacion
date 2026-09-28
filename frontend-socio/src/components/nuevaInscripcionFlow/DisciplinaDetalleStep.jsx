@@ -1,5 +1,6 @@
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { PageHeader } from '../PageHeader/PageHeader';
+import { RechazoAcciones } from '../RechazoAcciones/RechazoAcciones';
 import './DisciplinaDetalleStep.css';
 
 function formatearMonto(monto) {
@@ -26,7 +27,8 @@ export function DisciplinaDetalleStep({
   sinCupo = false,
   submitError = '',
   onSumarseListaEspera = () => {},
-  mostrarBotonTramites = false,
+  motivoRechazo = null,
+  onIrAPagar = () => {},
   onIrATramites = () => {},
   onVerInscripciones,
 }) {
@@ -55,9 +57,11 @@ export function DisciplinaDetalleStep({
     <section className="detalle-disciplina">
       <PageHeader
         variant="hero"
-        accion={yaInscripto && (
-          <span className="disciplina-banner-badge">Ya estás inscripto a esta disciplina</span>
-        )}
+        aviso={yaInscripto && {
+          titulo: 'Ya estás inscripto',
+          texto: 'Podés verlo en Mis Inscripciones.',
+          accion: onVerInscripciones && { label: 'Ver mis inscripciones', onClick: onVerInscripciones },
+        }}
         titulo={disciplina.nombre}
         stats={[
           { label: disciplina.cupo_maximo == null ? 'Sin límite' : 'Cupos', value: textoCupos(disciplina) },
@@ -73,11 +77,7 @@ export function DisciplinaDetalleStep({
             <AlertCircle size={14} />
             {submitError}
           </p>
-          {mostrarBotonTramites && (
-            <button type="button" className="detalle-error-accion-btn" onClick={onIrATramites}>
-              Actualizar apto médico
-            </button>
-          )}
+          <RechazoAcciones motivo={motivoRechazo} onIrAPagar={onIrAPagar} onIrATramites={onIrATramites} />
         </div>
       )}
 

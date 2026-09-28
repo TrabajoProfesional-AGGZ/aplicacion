@@ -2,8 +2,8 @@ import {
   User, Mail, Phone,
   Calendar, Lock, ShieldCheck, MapPin
 } from 'lucide-react';
-import { validarFechaNacimiento, getDocNumberRules, getPasswordRules } from '../../utils/formValidators';
-import { Field, StyledInput, StyledSelect, FormStep, DocNumberField, EmailField } from '../../components/createForm/FormFields';
+import { aplicarMascaraFecha, parsearFechaTexto, validarFechaNacimientoTexto, getDocNumberRules, getPasswordRules } from '../../utils/formValidators';
+import { Field, StyledInput, StyledSelect, FormStep, DocNumberField, EmailField, PasswordInput } from '../../components/createForm/FormFields';
 import { MultiStepFormShell } from '../../components/createForm/MultiStepFormShell';
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 import { useEffect, useRef, useState } from 'react';
@@ -47,6 +47,7 @@ const {
 
   const [validandoPaso, setValidandoPaso] = useState(false);
   const montadoRef = useRef(true);
+  const fechaAnteriorRef = useRef('');
   // Token de un solo uso que devuelve /socios/validar en el paso 1 y que consume
   // /reclamar al final: ata el reclamo a esta validación puntual (issue #249/A-01).
   // Va en un ref y no en estado porque no se renderiza: cambiarlo no debe re-renderizar.
@@ -131,7 +132,7 @@ const {
       const payload = {
         nombre: data.nombre,
         apellido: data.apellido,
-        fecha_nacimiento: data.fechaNacimiento,
+        fecha_nacimiento: parsearFechaTexto(data.fechaNacimiento),
         nro_documento: data.nroDocumento,
         genero: data.genero,
         telefono: data.telefono,
@@ -180,6 +181,7 @@ const {
   };
 
   const nroDocumentoRegister = register('nroDocumento', getDocNumberRules());
+  const fechaNacimientoRegister = register('fechaNacimiento', { required: 'Requerida', validate: validarFechaNacimientoTexto });
 
   const enviarFormulario = handleSubmit(onSubmit);
 
@@ -243,9 +245,18 @@ const {
             <div className="csf-grid-2">
               <Field label="Fecha de nacimiento" icon={Calendar} error={errors.fechaNacimiento?.message}>
                 <StyledInput
-                  {...register('fechaNacimiento', { required: 'Requerida', validate: validarFechaNacimiento })}
-                  type="date"
-                  max={new Date().toISOString().split('T')[0]}
+                  {...fechaNacimientoRegister}
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="DD/MM/AAAA"
+                  maxLength={10}
+                  autoComplete="bday"
+                  onChange={(e) => {
+                    const masked = aplicarMascaraFecha(e.target.value, fechaAnteriorRef.current);
+                    fechaAnteriorRef.current = masked;
+                    e.target.value = masked;
+                    fechaNacimientoRegister.onChange(e);
+                  }}
                   error={!!errors.fechaNacimiento}
                 />
               </Field>
@@ -289,9 +300,8 @@ const {
         {step === 4 && (
           <FormStep key="step4" direction={direction}>
             <Field label="Contraseña" icon={Lock} error={errors.password?.message}>
-              <StyledInput
+              <PasswordInput
                 {...register('password', getPasswordRules())}
-                type="password"
                 placeholder="Mínimo 10 caracteres, con mayúscula, minúscula y número"
                 autoComplete="new-password"
                 error={!!errors.password}
