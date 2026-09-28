@@ -6,22 +6,22 @@
   font-size: 115%;
 
   /* Colors */
-  /* Paleta de club (rama demo): Inter Miami CF — #231F20 / #F7B5CD / #FFFFFF.
-     Ver nota "Colores por club (rama demo)" más abajo en este CLAUDE.md. */
-  --color-text-primary: #231f20;
+  /* Paleta de club (rama ciudad): Club Ciudad de Buenos Aires — #0D2040 / #4B9CD3 / #FFFFFF.
+     Ver nota "Colores por club (rama ciudad)" más abajo en este CLAUDE.md. */
+  --color-text-primary: #0d2040;
   --color-text-secondary: #4a4a4a;
   /* Placeholders y texto atenuado que igual debe leerse (≥ 4.5:1 sobre --color-bg). */
   --color-text-placeholder: #707070;
-  --color-bg: #f1dfe7;
+  --color-bg: #e4eff7;
   --color-surface: #ffffff;
   --color-border: #e8e8e8;
   --color-border-medium: #d0d0d0;
-  --color-border-strong: #231f20;
+  --color-border-strong: #0d2040;
   --color-border-light: #efefef;
-  --color-accent: #f7b5cd;
+  --color-accent: #4b9cd3;
   --color-accent-hover: #ffffff;
-  /* Rosa más oscuro que --color-accent, para fondos de íconos (no mirrorea WebApp/tokens.css) */
-  --color-accent-dark: #d36990;
+  /* Celeste más oscuro que --color-accent, para fondos de íconos (no mirrorea WebApp/tokens.css) */
+  --color-accent-dark: #2f6690;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
   /* Relleno de botones destructivos. Separado de --color-danger (texto/borde)

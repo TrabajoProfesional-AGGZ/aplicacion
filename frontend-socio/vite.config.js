@@ -15,11 +15,11 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
-        name: 'Inter Miami CF',
-        short_name: 'Inter Miami',
+        name: 'Club Ciudad de Buenos Aires',
+        short_name: 'Club Ciudad',
         description: 'App oficial para socios del club',
-        theme_color: '#231f20',
-        background_color: '#f1dfe7',
+        theme_color: '#0d2040',
+        background_color: '#e4eff7',
         display: 'standalone', 
         icons: [
           {

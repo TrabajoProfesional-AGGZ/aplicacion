@@ -6,8 +6,8 @@ import { ModalOverlay } from './ModalOverlay';
 import { SPRING } from '../../styles/motion';
 
 const STEP_COLORS = {
-  bubbleActive: '#231f20',
-  bubbleIdle: '#e6d6dc',
+  bubbleActive: '#0d2040',
+  bubbleIdle: '#cfe0ee',
   onBubble: '#ffffff',
   idleIcon: '#5c7285',
   success: '#0D6E0D',
