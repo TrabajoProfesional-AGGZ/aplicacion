@@ -97,19 +97,24 @@ describe('NuevaInscripcionPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/apto médico/);
-    fireEvent.click(screen.getByRole('button', { name: 'Actualizar apto médico' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ir a mis trámites' }));
     expect(onIrATramites).toHaveBeenCalled();
   });
 
-  test('muestra el error de deuda (moroso)', async () => {
+  test('muestra el error de deuda (moroso) y ofrece ir a pagar, guardando el progreso', async () => {
     getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
     inscribirseADisciplina.mockRejectedValue(new Error('moroso'));
-    render(<NuevaInscripcionPage socio={SOCIO} />);
+    const onIrAPagos = jest.fn();
+    localStorage.clear();
+    render(<NuevaInscripcionPage socio={SOCIO} onIrAPagos={onIrAPagos} />);
     fireEvent.click(await screen.findByText('Natación'));
 
     fireEvent.click(screen.getByRole('button', { name: 'Inscribirme' }));
 
     expect(await screen.findByText(/Tenés pagos pendientes/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Ir a pagar' }));
+    expect(onIrAPagos).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem('su_progreso_rechazado')).not.toBeNull();
   });
 
   test('cuando no hay cupo, ofrece sumarse a la lista de espera', async () => {
@@ -139,23 +144,23 @@ describe('NuevaInscripcionPage', () => {
     expect(await screen.findByRole('heading', { name: 'Inscribite a una actividad' })).toBeInTheDocument();
   });
 
-  test('si el socio ya está inscripto, el detalle muestra el badge y oculta el botón de inscripción', async () => {
+  test('si el socio ya está inscripto, el detalle muestra el aviso y oculta el botón de inscripción', async () => {
     getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
     getDisciplinasPorSocio.mockResolvedValue([{ id: 'disc-1', estado_suscripcion: 'activa' }]);
     render(<NuevaInscripcionPage socio={SOCIO} />);
     fireEvent.click(await screen.findByText('Natación'));
 
-    expect(await screen.findByText('Ya estás inscripto a esta disciplina')).toBeInTheDocument();
+    expect(await screen.findByText('Ya estás inscripto')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Inscribirme' })).not.toBeInTheDocument();
   });
 
-  test('el socio en lista de espera también ve el badge de ya inscripto', async () => {
+  test('el socio en lista de espera también ve el aviso de ya inscripto', async () => {
     getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
     getDisciplinasPorSocio.mockResolvedValue([{ id: 'disc-1', estado_suscripcion: 'en_espera' }]);
     render(<NuevaInscripcionPage socio={SOCIO} />);
     fireEvent.click(await screen.findByText('Natación'));
 
-    expect(await screen.findByText('Ya estás inscripto a esta disciplina')).toBeInTheDocument();
+    expect(await screen.findByText('Ya estás inscripto')).toBeInTheDocument();
   });
 
   test('muestra la categoría requerida interpolada cuando la categoría no coincide', async () => {
@@ -171,5 +176,20 @@ describe('NuevaInscripcionPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'Esta disciplina es solamente para socios de categoría: Infantil'
     );
+  });
+
+  test('con progresoInicial, arranca directo en el detalle de la disciplina guardada y consume el progreso', async () => {
+    getDisciplinasActivas.mockResolvedValue([DISCIPLINA]);
+    const onProgresoConsumido = jest.fn();
+    render(
+      <NuevaInscripcionPage
+        socio={SOCIO}
+        progresoInicial={{ tipo: 'inscripcion', datos: { disciplina: DISCIPLINA } }}
+        onProgresoConsumido={onProgresoConsumido}
+      />
+    );
+
+    expect(await screen.findByRole('heading', { name: 'Natación' })).toBeInTheDocument();
+    expect(onProgresoConsumido).toHaveBeenCalledTimes(1);
   });
 });

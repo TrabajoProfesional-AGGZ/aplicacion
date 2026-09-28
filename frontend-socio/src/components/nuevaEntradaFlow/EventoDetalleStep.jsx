@@ -1,5 +1,6 @@
 import { AlertCircle } from 'lucide-react';
 import { PageHeader } from '../PageHeader/PageHeader';
+import { RechazoAcciones } from '../RechazoAcciones/RechazoAcciones';
 import './EventoDetalleStep.css';
 
 function formatearFecha(fechaIso) {
@@ -20,16 +21,21 @@ export function EventoDetalleStep({
   evento,
   yaTieneEntrada = false,
   onPagarEntrada,
+  onVerEntradas,
   enviando = false,
   submitError = '',
+  motivoRechazo = null,
+  onIrAPagar,
 }) {
   return (
     <section className="detalle-evento">
       <PageHeader
         variant="hero"
-        accion={yaTieneEntrada && (
-          <span className="evento-banner-badge">Ya tenés una entrada para este evento</span>
-        )}
+        aviso={yaTieneEntrada && {
+          titulo: 'Ya tenés tu entrada',
+          texto: 'Podés verla en Mis Entradas.',
+          accion: onVerEntradas && { label: 'Ver mis entradas', onClick: onVerEntradas },
+        }}
         titulo={evento.nombre}
         stats={[
           { label: 'Día', value: formatearFecha(evento.dia) },
@@ -61,6 +67,7 @@ export function EventoDetalleStep({
             <AlertCircle size={14} />
             {submitError}
           </p>
+          <RechazoAcciones motivo={motivoRechazo} onIrAPagar={onIrAPagar} />
         </div>
       )}
 

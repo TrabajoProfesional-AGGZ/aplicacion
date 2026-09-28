@@ -74,13 +74,28 @@ describe('DisciplinaDetalleStep', () => {
         disciplina={DISCIPLINA_ARANCELADA}
         onInscribirme={jest.fn()}
         submitError="Necesitás actualizar tu apto médico."
-        mostrarBotonTramites
+        motivoRechazo="tramite"
         onIrATramites={onIrATramites}
       />
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Necesitás actualizar tu apto médico.');
-    fireEvent.click(screen.getByRole('button', { name: 'Actualizar apto médico' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ir a mis trámites' }));
     expect(onIrATramites).toHaveBeenCalled();
+  });
+
+  test('muestra el botón "Ir a pagar" cuando el rechazo es por morosidad', () => {
+    const onIrAPagar = jest.fn();
+    render(
+      <DisciplinaDetalleStep
+        disciplina={DISCIPLINA_ARANCELADA}
+        onInscribirme={jest.fn()}
+        submitError="Tenés pagos pendientes."
+        motivoRechazo="moroso"
+        onIrAPagar={onIrAPagar}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Ir a pagar' }));
+    expect(onIrAPagar).toHaveBeenCalled();
   });
 
   test('sin cupo: oculta "Inscribirme" y ofrece sumarse a la lista de espera', () => {
@@ -112,7 +127,7 @@ describe('DisciplinaDetalleStep', () => {
     expect(screen.getByText('¡Te sumaste a la lista de espera!')).toBeInTheDocument();
   });
 
-  test('cuando yaInscripto es true, muestra el badge y oculta el botón de inscripción', () => {
+  test('cuando yaInscripto es true, muestra el aviso y oculta el botón de inscripción', () => {
     render(
       <DisciplinaDetalleStep
         disciplina={DISCIPLINA_ARANCELADA}
@@ -120,13 +135,13 @@ describe('DisciplinaDetalleStep', () => {
         yaInscripto
       />
     );
-    expect(screen.getByText('Ya estás inscripto a esta disciplina')).toBeInTheDocument();
+    expect(screen.getByText('Ya estás inscripto')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Inscribirme' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Sumarme a lista de espera' })).not.toBeInTheDocument();
   });
 
-  test('cuando yaInscripto es false, no muestra el badge', () => {
+  test('cuando yaInscripto es false, no muestra el aviso', () => {
     render(<DisciplinaDetalleStep disciplina={DISCIPLINA_ARANCELADA} onInscribirme={jest.fn()} />);
-    expect(screen.queryByText('Ya estás inscripto a esta disciplina')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ya estás inscripto')).not.toBeInTheDocument();
   });
 });

@@ -3,6 +3,7 @@ import { NuevaReservaPage } from './NuevaReservaPage';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { getTurnosDisponibles, createReserva } from '../../services/reservasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
+import { leerProgreso } from '../../services/progresoRechazadoService';
 
 jest.mock('../../services/instalacionesService', () => ({
   getInstalaciones: jest.fn(),
@@ -69,6 +70,7 @@ describe('NuevaReservaPage', () => {
       { hora_inicio: '08:00:00', cupos_disponibles: 10 },
       { hora_inicio: '09:00:00', cupos_disponibles: 10 },
     ]);
+    localStorage.clear();
   });
 
   afterEach(() => {
@@ -366,5 +368,44 @@ describe('NuevaReservaPage', () => {
     await waitFor(() => expect(createReserva).toHaveBeenCalledWith(
       expect.objectContaining({ ids_socios: ['socio-1'] })
     ));
+  });
+
+  test('si el titular mismo es moroso, muestra "Ir a pagar" y guarda el progreso por 5 minutos', async () => {
+    const error = new Error('socio-moroso');
+    error.sociosIncumplen = ['1000']; // nro_socio del titular (SOCIO)
+    createReserva.mockRejectedValue(error);
+    const onIrAPagos = jest.fn();
+    render(<NuevaReservaPage socio={SOCIO} onExito={jest.fn()} onIrAPagos={onIrAPagos} />);
+    await screen.findByText('Cancha de fútbol');
+    fireEvent.click(screen.getByText('Cancha de fútbol'));
+    await screen.findByText('08:00');
+    fireEvent.click(screen.getByText('08:00'));
+    await screen.findByText('Agregar socios');
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
+    await screen.findByText('Confirmá tu reserva');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
+
+    const boton = await screen.findByRole('button', { name: 'Ir a pagar' });
+    fireEvent.click(boton);
+    expect(onIrAPagos).toHaveBeenCalledTimes(1);
+
+    const progreso = leerProgreso('socio-1');
+    expect(progreso).toMatchObject({ tipo: 'reserva', datos: { instalacion: expect.objectContaining({ id: 'inst-1' }) } });
+  });
+
+  test('si solo otro socio de la reserva es moroso, no muestra "Ir a pagar" ni guarda progreso', async () => {
+    const error = new Error('socio-moroso');
+    error.sociosIncumplen = ['2000']; // nro_socio de otro socio, no el titular
+    createReserva.mockRejectedValue(error);
+    await irHastaResumen();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
+
+    await screen.findByText(
+      'Los siguientes socios no estan al día con sus pagos y deben regularizar su estado para poder realizar reservas:'
+    );
+    expect(screen.queryByRole('button', { name: 'Ir a pagar' })).not.toBeInTheDocument();
+    expect(leerProgreso('socio-1')).toBeNull();
   });
 });
