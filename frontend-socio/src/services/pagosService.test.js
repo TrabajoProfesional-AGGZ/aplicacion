@@ -1,4 +1,4 @@
-import { procesarPago } from './pagosService';
+import { crearPreferenciaPago } from './pagosService';
 import { fetchTo } from '../utils/utils';
 
 jest.mock('../utils/utils', () => ({
@@ -10,24 +10,26 @@ describe('pagosService', () => {
     jest.clearAllMocks();
   });
 
-  test('llama a fetchTo con la ruta, el formData y el id_cuota, y devuelve el JSON', async () => {
-    const formData = { token: 'tok', transaction_amount: 1500 };
-    const respuesta = { id_pago: 'pago-1', estado: 'approved', estado_detalle: 'accredited' };
+  test('crearPreferenciaPago arma el payload desde el ítem y devuelve el JSON', async () => {
+    const respuesta = { id_preferencia: 'pref-1', init_point: 'https://mp/checkout' };
     fetchTo.mockResolvedValue({ ok: true, json: () => Promise.resolve(respuesta) });
 
-    const resultado = await procesarPago(formData, 'cuota-1', 'cuota'); 
+    const resultado = await crearPreferenciaPago({ id: 'cuota-1', concepto: 'Cuota marzo', monto: '1500' }, 'cuota');
 
-    expect(fetchTo).toHaveBeenCalledWith('/api/v1/pagos/procesar', 'POST', { 
-      ...formData, 
-      id_item: 'cuota-1', 
-      tipo_item: 'cuota' 
+    expect(fetchTo).toHaveBeenCalledWith('/api/v1/pagos/preferencia', 'POST', {
+      id_item: 'cuota-1',
+      tipo_item: 'cuota',
+      titulo: 'Cuota marzo',
+      precio_unitario: 1500,
+      cantidad: 1,
     });
     expect(resultado).toEqual(respuesta);
   });
 
-  test('lanza pago-fallido si la respuesta no es ok', async () => {
-    fetchTo.mockResolvedValue({ ok: false, status: 400, json: () => Promise.resolve({ detail: 'MP rechazó la petición' }) });
+  test('crearPreferenciaPago lanza error-al-crear-preferencia si la respuesta no es ok', async () => {
+    fetchTo.mockResolvedValue({ ok: false, status: 400 });
 
-    await expect(procesarPago({ token: 'tok' }, 'cuota-1', 'cuota')).rejects.toThrow('pago-fallido');
+    await expect(crearPreferenciaPago({ id: 'cuota-1', concepto: 'Cuota', monto: 10 }, 'cuota'))
+      .rejects.toThrow('error-al-crear-preferencia');
   });
 });
