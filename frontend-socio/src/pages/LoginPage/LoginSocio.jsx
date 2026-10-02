@@ -178,7 +178,7 @@ export function LoginSocio({ irARegistro, onIngresoCompleto = () => {} }) {
           className="login-form-wrapper"
         >
           <motion.h2 variants={formItemVariants} className="login-slogan">
-            Porque el club es de los socios, y la gestión es de <b>SocioUnido</b>
+            Aplicación para socios, desarrollada por <b>SocioUnido</b>
           </motion.h2>
 
         <motion.form onSubmit={manejarLogin} variants={formItemVariants}>
