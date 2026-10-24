@@ -99,3 +99,89 @@ describe('AuthProvider — Contingencia Offline', () => {
     expect(await screen.findByText('socio: ninguno')).toBeInTheDocument();
   });
 });
+
+describe('AuthProvider — vencimiento de la sesión a los tres días', () => {
+  const CUATRO_DIAS = 4 * 24 * 60 * 60 * 1000;
+  const DOS_DIAS = 2 * 24 * 60 * 60 * 1000;
+
+  function usuario(hace) {
+    return {
+      email: 'lautaro@example.com',
+      getIdToken: async () => 'token',
+      metadata: { lastSignInTime: new Date(Date.now() - hace).toUTCString() },
+    };
+  }
+
+  function sembrarSesionCacheada() {
+    localStorage.setItem('socio_totp_secret', 'SECRETO123');
+    localStorage.setItem('socio_id', 'id-123');
+    localStorage.setItem('socio_nombre', 'Lautaro');
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    localStorage.clear();
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: true });
+  });
+
+  test('cierra la sesión si el login fue hace más de tres días', async () => {
+    render(
+      <AuthProvider>
+        <Sonda />
+      </AuthProvider>
+    );
+
+    await act(async () => {
+      await callbackAuthState(usuario(CUATRO_DIAS));
+    });
+
+    expect(mockSignOut).toHaveBeenCalled();
+    expect(fetchTo).not.toHaveBeenCalled();
+    expect(await screen.findByText('socio: ninguno')).toBeInTheDocument();
+  });
+
+  test('no la cierra si el login fue hace menos de tres días', async () => {
+    fetchTo.mockResolvedValueOnce({ ok: true, json: async () => ({ nombre: 'Lautaro' }) });
+
+    render(
+      <AuthProvider>
+        <Sonda />
+      </AuthProvider>
+    );
+
+    await act(async () => {
+      await callbackAuthState(usuario(DOS_DIAS));
+    });
+
+    expect(mockSignOut).not.toHaveBeenCalled();
+    expect(await screen.findByText('socio: Lautaro')).toBeInTheDocument();
+  });
+
+  test('no rescata la sesión cacheada en un arranque offline si ya venció', async () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+    sembrarSesionCacheada();
+    localStorage.setItem('sesion_iniciada_en', String(Date.now() - CUATRO_DIAS));
+
+    render(
+      <AuthProvider>
+        <Sonda />
+      </AuthProvider>
+    );
+
+    expect(await screen.findByText('socio: ninguno')).toBeInTheDocument();
+  });
+
+  test('sí la rescata en un arranque offline si todavía está vigente', async () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+    sembrarSesionCacheada();
+    localStorage.setItem('sesion_iniciada_en', String(Date.now() - DOS_DIAS));
+
+    render(
+      <AuthProvider>
+        <Sonda />
+      </AuthProvider>
+    );
+
+    expect(await screen.findByText('socio: Lautaro')).toBeInTheDocument();
+  });
+});

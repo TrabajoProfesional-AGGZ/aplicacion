@@ -7,6 +7,12 @@ import { getSocioPorEmail } from '../services/sociosService';
 import { clubEnMemoria, recordarClub, idDeClubActual } from '../services/clubService';
 import { AuthContext } from './authContextObject';
 import { logger } from '../utils/logger';
+import {
+  inicioDeSesion,
+  sellarInicioDeSesion,
+  sesionExpirada,
+  msRestantesDeSesion,
+} from '../utils/sesion';
 
 /**
  * Compara el claim `club_id` del token contra el club de este dominio (resuelto por hostname).
@@ -34,6 +40,11 @@ async function clubDelTokenCoincide(firebaseUser) {
  * app. Si no hay conexión, o si el fetch del perfil falla en medio de una
  * sesión ya iniciada, reconstruye una sesión mínima desde los datos cacheados
  * en localStorage en vez de deslogear al socio.
+ *
+ * La sesión tiene un tope de `DURACION_MAXIMA_SESION_MS` (tres días) desde el último login, que
+ * se aplica acá y no en `firebase.js`: la persistencia local es la que hace que el carnet ande
+ * offline, así que no se cambia, y Firebase renueva el token indefinidamente mientras esté. Ver
+ * `utils/sesion.js`.
  */
 export function AuthProvider({ children }) {
   const [socio, setSocio] = useState(null);
@@ -48,7 +59,10 @@ export function AuthProvider({ children }) {
       const savedSocioApellido = localStorage.getItem('socio_apellido');
       const savedSocioNro = localStorage.getItem('socio_nro_socio');
 
-      if (savedSecret && savedSocioId) {
+      // Una sesión vencida no se rescata: se deja caer al flujo normal, que la cierra. El
+      // vencimiento vale igual sin red, porque se mide contra el sello del login, no contra el
+      // backend.
+      if (savedSecret && savedSocioId && !sesionExpirada(inicioDeSesion())) {
         logger.log("PWA Offline Boot: Rescatando sesión local directamente.");
         setTimeout(() => {
           setSocio({
@@ -66,6 +80,23 @@ export function AuthProvider({ children }) {
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
+        // Antes que nada y fuera del `try`: el vencimiento no necesita red, y si el signOut
+        // fallara no hay que caer en el rescate de sesión cacheada del `catch`.
+        if (sesionExpirada(sellarInicioDeSesion(firebaseUser))) {
+          logger.log('Sesión vencida (más de tres días desde el login): se cierra.');
+          setSocio(null);
+          setAuthError(null);
+          setCargandoAuth(false);
+          // El signOut vuelve a entrar por este mismo callback con `firebaseUser` null, y es ese
+          // pase el que limpia el cache de la sesión.
+          try {
+            await signOut(auth);
+          } catch (error) {
+            logger.warn('No se pudo cerrar la sesión vencida:', error);
+          }
+          return;
+        }
+
         try {
           if (!(await clubDelTokenCoincide(firebaseUser))) {
             setSocio(null);
@@ -154,6 +185,25 @@ export function AuthProvider({ children }) {
     await signOut(auth);
     setSocio(null);
   }, []);
+
+  // El chequeo del arranque no alcanza: una PWA instalada puede quedar días abierta sin volver a
+  // montar el provider. El timer cierra la sesión en el momento justo, y el `visibilitychange`
+  // está porque el browser frena los timers de una pestaña en segundo plano: al volver al frente,
+  // el plazo puede haber pasado hace rato sin que el setTimeout haya corrido.
+  useEffect(() => {
+    if (!socio) return;
+    const inicio = inicioDeSesion();
+    if (inicio === null) return;
+
+    const revisar = () => { if (sesionExpirada(inicio)) cerrarSesion(); };
+    const id = setTimeout(revisar, Math.max(msRestantesDeSesion(inicio), 0));
+    document.addEventListener('visibilitychange', revisar);
+
+    return () => {
+      clearTimeout(id);
+      document.removeEventListener('visibilitychange', revisar);
+    };
+  }, [socio, cerrarSesion]);
 
   // Vuelve a pedir el perfil del socio al backend. `socio.estado` (usado por WelcomeCard/PerfilPage
   // para el badge de estado financiero) solo se persiste como efecto secundario de GET /finanzas o

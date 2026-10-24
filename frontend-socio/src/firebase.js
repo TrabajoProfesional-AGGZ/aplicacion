@@ -11,5 +11,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
+// Sin setPersistence: se usa el default de Firebase (browserLocalPersistence), para que la sesión
+// sobreviva al cierre de la app y el carnet se pueda mostrar offline. Eso deja la sesión sin
+// vencimiento propio —Firebase renueva el token mientras exista el refresh token—, así que el tope
+// de tres días lo aplica `AuthContext` con `utils/sesion.js`, no la persistencia.
 export const auth = getAuth(app);
 export const messaging = getMessaging(app);
